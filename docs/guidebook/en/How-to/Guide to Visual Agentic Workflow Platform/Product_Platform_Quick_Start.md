@@ -34,7 +34,7 @@ Of course, when utilizing the agent, you need to preconfigure the various LLM mo
 
 ## Using the agentUniverse Product Platform
 ### Starting the Product Service
-To start the product service with a single click, run the [product_application](../../../../../examples/sample_standard_app/boostrap/platform/product_application.py) file located in `sample_standard_app/boostrap/platform` .
+To start the product service with a single click, run the [product_application](../../../../../examples/sample_standard_app/bootstrap/platform/product_application.py) file located in `sample_standard_app/bootstrap/platform` .
 ![img.png](../../../_picture/product_start.png)
 
 Upon successful initiation, it will automatically redirect you to the product homepage, which features system presets as well as your customized Agent, Tool and Knowledge product modules.

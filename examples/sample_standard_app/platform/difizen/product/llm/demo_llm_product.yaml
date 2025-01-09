@@ -1,4 +1,4 @@
-id: demo_llm
+id: qwen_llm
 nickname: 千问系列大模型
 type: LLM
 metadata:

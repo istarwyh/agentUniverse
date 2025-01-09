@@ -104,7 +104,7 @@ pip install magent-ui ruamel.yaml
 
 **One-click Run**
 
-Run [product_application.py](examples/sample_standard_app/boostrap/platform/product_application.py) in sample_standard_app/boostrap/platform for quick startup.
+Run [product_application.py](examples/sample_standard_app/bootstrap/platform/product_application.py) in sample_standard_app/bootstrap/platform for quick startup.
 
 For more details, refer to [Quick Start for Product Platform](docs/guidebook/en/How-to/Guide to Visual Agentic Workflow Platform/Product_Platform_Quick_Start.md) and the [Advanced Guide](docs/guidebook/en/How-to/Guide to Visual Agentic Workflow Platform/Product_Platform_Advancement_Guide.md).
 
@@ -115,7 +115,7 @@ This feature is jointly developed by [difizen](https://github.com/difizen/magent
 ## Why use agentUniverse
 
 ### Concept
-![](docs/guidebook/_picture/agentuniverse_structure.png)
+![](docs/guidebook/_picture/agentuniverse_structure_en.png)
 
 The core of agentUniverse provides all the essential components needed to build a single intelligent agent, the collaboration mechanisms between multiple agents, and allows for the injection of expert knowledge. The enables developers to effortlessly create intelligent applications equipped with professional know-how.
 

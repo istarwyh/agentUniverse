@@ -97,8 +97,8 @@ metadata:
 
 ### step5 Run DataAgent
 Using the [dataAgent code entry](../../../../../examples/sample_apps/data_agent_app/intelligence/agentic/agent/agent_instance/data_agent_case/data_agent.py), configure two parameters:
-1. `queryset_path` , which representing the path to the queryset.
-2. `turn` r, which specifies the total number of rounds for the queryset execution. With these configurations, you can start the dataAgent with a single click.
+1. `queryset_path`, which representing the path to the queryset.
+2. `turn`, which specifies the total number of rounds for the queryset execution. With these configurations, you can start the dataAgent with a single click.
 
 Tips: please configure the queryset and specific the evaluation rows reasonably to avoid excessive computational and token consumption.
 
