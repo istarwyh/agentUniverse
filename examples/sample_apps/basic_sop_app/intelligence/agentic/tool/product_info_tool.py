@@ -6,7 +6,7 @@
 # @Email   : wangchongshi.wcs@antgroup.com
 # @FileName: search_context_tool.py
 from agentuniverse.agent.action.tool.tool import Tool, ToolInput
-from examples.sample_apps.basic_sop_app.intelligence.utils.constant import product_b_info, product_c_info
+from basic_sop_app.intelligence.utils.constant import product_b_info, product_c_info
 
 
 class SearchProductInfoTool(Tool):
