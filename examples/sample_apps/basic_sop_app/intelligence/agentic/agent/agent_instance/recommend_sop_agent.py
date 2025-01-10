@@ -19,7 +19,7 @@ from agentuniverse.agent.template.agent_template import AgentTemplate
 from agentuniverse.base.util.logging.logging_util import LOGGER
 from agentuniverse.llm.llm import LLM
 from agentuniverse.prompt.prompt import Prompt
-from examples.sample_apps.basic_sop_app.intelligence.utils.constant import product_info
+from basic_sop_app.intelligence.utils.constant import product_info
 
 
 class RecommendSopAgent(AgentTemplate):

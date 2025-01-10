@@ -14,7 +14,7 @@ from langchain_core.language_models import BaseLanguageModel
 from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
 from agentuniverse.llm.llm import LLM
 from agentuniverse.llm.llm_output import LLMOutput
-from examples.startup_app.demo_startup_app_with_single_agent.intelligence.agentic.llm.langchian_instance.langchain_instance import \
+from demo_startup_app_with_single_agent.intelligence.agentic.llm.langchian_instance.langchain_instance import \
     LangChainInstance
 
 

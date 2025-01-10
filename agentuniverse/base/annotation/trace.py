@@ -171,6 +171,9 @@ def trace_llm(func):
                 log_llm_trace(start_time)
                 Monitor.pop_invocation_chain()
 
+                log_llm_trace_output(output_str, start_time)
+                Monitor.pop_invocation_chain()
+
             return gen_iterator()
 
     if asyncio.iscoroutinefunction(func):

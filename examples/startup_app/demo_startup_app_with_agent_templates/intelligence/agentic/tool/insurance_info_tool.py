@@ -6,7 +6,7 @@
 # @FileName: insurance_tool.py
 from agentuniverse.agent.action.tool.tool import Tool, ToolInput
 
-from examples.startup_app.demo_startup_app_with_single_agent_and_actions.intelligence.utils.constant.prod_description import \
+from demo_startup_app_with_single_agent_and_actions.intelligence.utils.constant.prod_description import \
     PROD_A_DESCRIPTION, PROD_B_DESCRIPTION
 
 
