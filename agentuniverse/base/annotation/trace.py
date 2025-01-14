@@ -15,34 +15,6 @@ from functools import wraps
 from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
 from agentuniverse.base.util.monitor.monitor import Monitor
 from agentuniverse.llm.llm_output import LLMOutput
-from agentuniverse.base.util.logging.logging_util import LOGGER
-
-
-def _get_invocation_chain_str() -> str:
-    invocation_chain_str = ''
-    invocation_chain = Monitor.get_invocation_chain()
-    if len(invocation_chain) > 0:
-        invocation_chain_str = ' -> '.join(
-            [f"source: {d.get('source', '')}, type: {d.get('type', '')}" for
-             d in invocation_chain]
-        )
-        invocation_chain_str += ' | '
-
-    return invocation_chain_str
-
-
-def _get_au_trace_id_str() -> str:
-    au_trace_id_str = ''
-    trace_id = Monitor.get_trace_id()
-    if trace_id:
-        au_trace_id_str = f'aU trace id: {trace_id} | '
-    return au_trace_id_str
-
-
-def log_trace(log_detail: str = ''):
-    au_trace_id_str = _get_au_trace_id_str()
-    invocation_chain_str = _get_invocation_chain_str()
-    LOGGER.info(au_trace_id_str + invocation_chain_str + log_detail)
 
 
 def trace_llm(func):
@@ -51,18 +23,10 @@ def trace_llm(func):
     Decorator to trace the LLM invocation, add llm input and output to the monitor.
     """
 
-    def log_llm_trace(start_time):
-        cost_time = time.time() - start_time
-        trace_log_str = f"LLM cost {cost_time} seconds"
-        used_token = Monitor.get_token_usage()
-        if used_token:
-            trace_log_str += f", token usage: {used_token}"
-        log_trace(trace_log_str)
-
     @wraps(func)
     async def wrapper_async(*args, **kwargs):
         # get llm input from arguments
-        llm_input = _get_llm_input(func, *args, **kwargs)
+        llm_input = _get_input(func, *args, **kwargs)
 
         source = func.__qualname__
 
@@ -88,14 +52,12 @@ def trace_llm(func):
         # not streaming
         if isinstance(result, LLMOutput):
             # add llm invocation info to monitor
-            Monitor().trace_llm_invocation(source=func.__qualname__, llm_input=llm_input, llm_output=result.text)
+            Monitor().trace_llm_invocation(source=func.__qualname__, llm_input=llm_input, llm_output=result.text,
+                                           cost_time=time.time() - start_time)
 
             # add llm token usage to monitor
             trace_llm_token_usage(self, llm_input, result.text)
-
-            log_llm_trace(start_time)
             Monitor.pop_invocation_chain()
-
             return result
         else:
             # streaming
@@ -107,11 +69,9 @@ def trace_llm(func):
                 # add llm invocation info to monitor
                 output_str = "".join(llm_output)
                 Monitor().trace_llm_invocation(source=func.__qualname__, llm_input=llm_input,
-                                               llm_output=output_str)
+                                               llm_output=output_str, cost_time=time.time() - start_time)
                 # add llm token usage to monitor
                 trace_llm_token_usage(self, llm_input, output_str)
-
-                log_llm_trace(start_time)
                 Monitor.pop_invocation_chain()
 
             return gen_iterator()
@@ -119,7 +79,7 @@ def trace_llm(func):
     @functools.wraps(func)
     def wrapper_sync(*args, **kwargs):
         # get llm input from arguments
-        llm_input = _get_llm_input(func, *args, **kwargs)
+        llm_input = _get_input(func, *args, **kwargs)
 
         source = func.__qualname__
 
@@ -130,27 +90,26 @@ def trace_llm(func):
             if name is not None:
                 source = name
 
+        if self and hasattr(self, 'tracing'):
+            if self.tracing is False:
+                return func(*args, **kwargs)
+
         # add invocation chain to the monitor module.
         Monitor.add_invocation_chain({'source': source, 'type': 'llm'})
 
         start_time = time.time()
-
-        if self and hasattr(self, 'tracing'):
-            if self.tracing is False:
-                return func(*args, **kwargs)
 
         # invoke function
         result = func(*args, **kwargs)
         # not streaming
         if isinstance(result, LLMOutput):
             # add llm invocation info to monitor
-            Monitor().trace_llm_invocation(source=func.__qualname__, llm_input=llm_input, llm_output=result.text)
+            Monitor().trace_llm_invocation(source=source, llm_input=llm_input, llm_output=result.text,
+                                           cost_time=time.time() - start_time)
 
             # add llm token usage to monitor
             trace_llm_token_usage(self, llm_input, result.text)
-            log_llm_trace(start_time)
             Monitor.pop_invocation_chain()
-
             return result
         else:
             # streaming
@@ -164,14 +123,10 @@ def trace_llm(func):
 
                 # add llm invocation info to monitor
                 Monitor().trace_llm_invocation(source=func.__qualname__, llm_input=llm_input,
-                                               llm_output=output_str)
+                                               llm_output=output_str, cost_time=time.time() - start_time)
 
                 # add llm token usage to monitor
                 trace_llm_token_usage(self, llm_input, output_str)
-                log_llm_trace(start_time)
-                Monitor.pop_invocation_chain()
-
-                log_llm_trace_output(output_str, start_time)
                 Monitor.pop_invocation_chain()
 
             return gen_iterator()
@@ -184,27 +139,11 @@ def trace_llm(func):
         return wrapper_sync
 
 
-def _get_llm_input(func, *args, **kwargs) -> dict:
-    """Get the llm input from arguments."""
-    sig = inspect.signature(func)
-    bound_args = sig.bind(*args, **kwargs)
-    bound_args.apply_defaults()
-    return {k: v for k, v in bound_args.arguments.items()}
-
-
 def trace_agent(func):
     """Annotation: @trace_agent
 
     Decorator to trace the agent invocation, add agent input and output to the monitor.
     """
-
-    def log_agent_trace(log_detail: str, start_time=None):
-        trace_log_str = ""
-        if start_time:
-            cost_time = time.time() - start_time
-            trace_log_str = f"Agent cost {cost_time} seconds, "
-        trace_log_str += log_detail
-        log_trace(trace_log_str)
 
     @functools.wraps(func)
     async def wrapper_async(*args, **kwargs):
@@ -226,20 +165,20 @@ def trace_agent(func):
                 if isinstance(profile, dict):
                     tracing = profile.get('tracing', None)
 
+        if tracing is False:
+            return await func(*args, **kwargs)
+
         # add invocation chain to the monitor module.
         Monitor.add_invocation_chain({'source': source, 'type': 'agent'})
 
-        log_agent_trace(f"Agent input is: {agent_input}")
         start_time = time.time()
-        if tracing is False:
-            return await func(*args, **kwargs)
+        Monitor().trace_agent_input(source=source, agent_input=agent_input)
 
         # invoke function
         result = await func(*args, **kwargs)
         # add agent invocation info to monitor
-        Monitor().trace_agent_invocation(source=source, agent_input=agent_input, agent_output=result)
-
-        log_agent_trace(f"Agent output is:{result.to_json_str()}", start_time)
+        Monitor().trace_agent_invocation(source=source, agent_input=agent_input, agent_output=result,
+                                         cost_time=time.time() - start_time)
         Monitor.pop_invocation_chain()
         return result
 
@@ -264,21 +203,20 @@ def trace_agent(func):
                 if isinstance(profile, dict):
                     tracing = profile.get('tracing', None)
 
+        if tracing is False:
+            return func(*args, **kwargs)
+
         # add invocation chain to the monitor module.
         Monitor.add_invocation_chain({'source': source, 'type': 'agent'})
 
-        log_agent_trace(f"Agent input is: {agent_input}")
         start_time = time.time()
-
-        if tracing is False:
-            return func(*args, **kwargs)
+        Monitor().trace_agent_input(source=source, agent_input=agent_input)
 
         # invoke function
         result = func(*args, **kwargs)
         # add agent invocation info to monitor
-        Monitor().trace_agent_invocation(source=source, agent_input=agent_input, agent_output=result)
-
-        log_agent_trace(f"Agent output is:{result.to_json_str()}", start_time)
+        Monitor().trace_agent_invocation(source=source, agent_input=agent_input, agent_output=result,
+                                         cost_time=time.time() - start_time)
         Monitor.pop_invocation_chain()
 
         return result
@@ -296,11 +234,6 @@ def trace_tool(func):
 
     Decorator to trace the tool invocation.
     """
-
-    def log_tool_trace(start_time):
-        cost_time = time.time() - start_time
-        trace_log_str = f"Tool cost {cost_time} seconds"
-        log_trace(trace_log_str)
 
     @functools.wraps(func)
     def wrapper_sync(*args, **kwargs):
@@ -320,11 +253,16 @@ def trace_tool(func):
         # add invocation chain to the monitor module.
         Monitor.add_invocation_chain({'source': source, 'type': 'tool'})
 
-        log_tool_trace(start_time)
+        # invoke function
+        result = func(*args, **kwargs)
+
+        # add tool invocation info to monitor
+        Monitor().trace_tool_invocation(source=source, tool_input=tool_input, tool_output=result,
+                                        cost_time=time.time() - start_time)
+
         Monitor.pop_invocation_chain()
 
-        # invoke function
-        return func(*args, **kwargs)
+        return result
 
     # sync function
     return wrapper_sync

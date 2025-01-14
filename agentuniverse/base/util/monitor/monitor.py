@@ -18,6 +18,7 @@ from agentuniverse.agent.output_object import OutputObject
 from agentuniverse.base.annotation.singleton import singleton
 from agentuniverse.base.config.configer import Configer
 from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
+from agentuniverse.base.util.logging.logging_util import LOGGER
 
 LLM_INVOCATION_SUBDIR = "llm_invocation"
 AGENT_INVOCATION_SUBDIR = "agent_invocation"
@@ -27,6 +28,7 @@ AGENT_INVOCATION_SUBDIR = "agent_invocation"
 class Monitor(BaseModel):
     dir: Optional[str] = './monitor'
     activate: Optional[bool] = False
+    log_activate: Optional[bool] = True
 
     def __init__(self, configer: Configer = None, **kwargs):
         super().__init__(**kwargs)
@@ -35,7 +37,8 @@ class Monitor(BaseModel):
             self.dir = config.get('dir', './monitor')
             self.activate = config.get('activate', False)
 
-    def trace_llm_invocation(self, source: str, llm_input: Union[str, dict], llm_output: Union[str, dict]) -> None:
+    def trace_llm_invocation(self, source: str, llm_input: Union[str, dict], llm_output: Union[str, dict],
+                             cost_time: float = None) -> None:
         """Trace the llm invocation and save it to the monitor jsonl file."""
         if self.activate:
             try:
@@ -61,8 +64,21 @@ class Monitor(BaseModel):
             with jsonlines.open(path_save, 'a') as writer:
                 writer.write(llm_invocation)
 
+        if self.log_activate:
+            log_str = f" LLM cost {cost_time} seconds"
+            used_token = Monitor.get_token_usage()
+            if used_token:
+                log_str += f", token usage: {used_token}"
+            LOGGER.info(self._get_trace_id_str() + self._get_invocation_chain_str() + log_str)
+
+    def trace_agent_input(self, source: str, agent_input: Union[str, dict]) -> None:
+        """Trace the agent input."""
+        if self.log_activate:
+            LOGGER.info(
+                self._get_trace_id_str() + self._get_invocation_chain_str() + f" Agent input is {agent_input}")
+
     def trace_agent_invocation(self, source: str, agent_input: Union[str, dict],
-                               agent_output: Union[str, dict]) -> None:
+                               agent_output: Union[str, dict], cost_time: float = None) -> None:
         """Trace the agent invocation and save it to the monitor jsonl file."""
         if self.activate:
             try:
@@ -87,6 +103,19 @@ class Monitor(BaseModel):
             # write to jsonl
             with jsonlines.open(path_save, 'a') as writer:
                 writer.write(agent_invocation)
+
+        if self.log_activate:
+            log_str = f" Agent cost {cost_time} seconds"
+            LOGGER.info(
+                self._get_trace_id_str() + self._get_invocation_chain_str() + log_str
+                + f" Agent output is {agent_output.to_json_str()}")
+
+    def trace_tool_invocation(self, source: str, tool_input: Union[str, dict],
+                              tool_output: Union[str, dict], cost_time: float = None) -> None:
+        """Trace the tool invocation and save it to the monitor jsonl file."""
+        if self.log_activate:
+            log_str = f" Tool cost {cost_time} seconds"
+            LOGGER.info(self._get_trace_id_str() + self._get_invocation_chain_str() + log_str)
 
     @staticmethod
     def init_trace_id():
@@ -176,6 +205,26 @@ class Monitor(BaseModel):
         """Get the token usage in the framework context."""
         trace_id = FrameworkContextManager().get_context('trace_id')
         return FrameworkContextManager().get_context(trace_id + '_token_usage', {}) if trace_id is not None else {}
+
+    @staticmethod
+    def _get_invocation_chain_str() -> str:
+        invocation_chain_str = ''
+        invocation_chain = Monitor.get_invocation_chain()
+        if len(invocation_chain) > 0:
+            invocation_chain_str = ' -> '.join(
+                [f"source: {d.get('source', '')}, type: {d.get('type', '')}" for
+                 d in invocation_chain]
+            )
+            invocation_chain_str += ' | '
+        return invocation_chain_str
+
+    @staticmethod
+    def _get_trace_id_str() -> str:
+        trace_id_str = ''
+        trace_id = Monitor.get_trace_id()
+        if trace_id:
+            au_trace_id_str = f'aU trace id: {trace_id} | '
+        return trace_id_str
 
     def _get_or_create_subdir(self, subdir: str) -> str:
         """Get or create a subdirectory if it doesn't exist in the monitor directory."""
