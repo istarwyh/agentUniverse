@@ -12,9 +12,9 @@ import time
 
 from functools import wraps
 
-from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
 from agentuniverse.base.util.monitor.monitor import Monitor
 from agentuniverse.llm.llm_output import LLMOutput
+from agentuniverse.base.util.tracing.au_trace_manager import AuTraceManager
 
 
 def trace_llm(func):
@@ -42,7 +42,7 @@ def trace_llm(func):
         Monitor.add_invocation_chain({'source': source, 'type': 'llm'})
 
         start_time = time.time()
-
+        Monitor().trace_llm_input(source=source, llm_input=llm_input)
         if self and hasattr(self, 'tracing'):
             if self.tracing is False:
                 return await func(*args, **kwargs)
@@ -98,7 +98,7 @@ def trace_llm(func):
         Monitor.add_invocation_chain({'source': source, 'type': 'llm'})
 
         start_time = time.time()
-
+        Monitor().trace_llm_input(source=source, llm_input=llm_input)
         # invoke function
         result = func(*args, **kwargs)
         # not streaming
@@ -239,11 +239,11 @@ def trace_tool(func):
     def wrapper_sync(*args, **kwargs):
         # get tool input from arguments
         tool_input = _get_input(func, *args, **kwargs)
-
         start_time = time.time()
 
         source = func.__qualname__
         self = tool_input.pop('self', None)
+        Monitor().trace_tool_input(source, tool_input)
 
         if isinstance(self, object):
             name = getattr(self, 'name', None)
@@ -360,7 +360,7 @@ def trace_llm_token_usage(llm_obj: object, llm_input: dict, output_str: str) -> 
         llm_input(dict): Dictionary of LLM input.
         output_str(str): LLM output.
     """
-    trace_id = FrameworkContextManager().get_context('trace_id')
+    trace_id = AuTraceManager().get_trace_id()
     # trace token usage for a complete request chain based on trace id
     if trace_id:
         token_usage: dict = _get_llm_token_usage(llm_obj, llm_input, output_str)

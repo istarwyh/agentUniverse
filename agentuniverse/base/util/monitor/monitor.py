@@ -10,6 +10,7 @@ import json
 import os
 import uuid
 from typing import Union, Optional
+from loguru import logger
 
 from pydantic import BaseModel
 
@@ -18,7 +19,10 @@ from agentuniverse.agent.output_object import OutputObject
 from agentuniverse.base.annotation.singleton import singleton
 from agentuniverse.base.config.configer import Configer
 from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
+from agentuniverse.base.util.logging.general_logger import get_context_prefix
+from agentuniverse.base.util.logging.log_type_enum import LogTypeEnum
 from agentuniverse.base.util.logging.logging_util import LOGGER
+from agentuniverse.base.util.tracing.au_trace_manager import AuTraceManager
 
 LLM_INVOCATION_SUBDIR = "llm_invocation"
 AGENT_INVOCATION_SUBDIR = "agent_invocation"
@@ -36,6 +40,15 @@ class Monitor(BaseModel):
             config: dict = configer.value.get('MONITOR', {})
             self.dir = config.get('dir', './monitor')
             self.activate = config.get('activate', False)
+
+    def trace_llm_input(self, source: str, llm_input: Union[str, dict]) -> None:
+        """Trace the agent input."""
+        if self.log_activate:
+            logger.bind(
+                log_type=LogTypeEnum.llm_input,
+                llm_input=llm_input,
+                context_prefix=get_context_prefix()
+            ).info("Trace llm input.")
 
     def trace_llm_invocation(self, source: str, llm_input: Union[str, dict], llm_output: Union[str, dict],
                              cost_time: float = None) -> None:
@@ -65,20 +78,25 @@ class Monitor(BaseModel):
                 writer.write(llm_invocation)
 
         if self.log_activate:
-            log_str = f" LLM cost {cost_time} seconds"
-            used_token = Monitor.get_token_usage()
-            if used_token:
-                log_str += f", token usage: {used_token}"
-            LOGGER.info(self._get_trace_id_str() + self._get_invocation_chain_str() + log_str)
+            logger.bind(
+                log_type=LogTypeEnum.llm_invocation,
+                used_token=Monitor.get_token_usage(),
+                cost_time=cost_time,
+                llm_output=llm_output,
+                context_prefix=get_context_prefix()
+            ).info("Trace llm input.")
 
     def trace_agent_input(self, source: str, agent_input: Union[str, dict]) -> None:
         """Trace the agent input."""
         if self.log_activate:
-            LOGGER.info(
-                self._get_trace_id_str() + self._get_invocation_chain_str() + f" Agent input is {agent_input}")
+            logger.bind(
+                log_type=LogTypeEnum.agent_input,
+                agent_input=agent_input,
+                context_prefix=get_context_prefix()
+            ).info("Trace agent input.")
 
     def trace_agent_invocation(self, source: str, agent_input: Union[str, dict],
-                               agent_output: Union[str, dict], cost_time: float = None) -> None:
+                               agent_output: OutputObject, cost_time: float = None) -> None:
         """Trace the agent invocation and save it to the monitor jsonl file."""
         if self.activate:
             try:
@@ -105,36 +123,44 @@ class Monitor(BaseModel):
                 writer.write(agent_invocation)
 
         if self.log_activate:
-            log_str = f" Agent cost {cost_time} seconds"
-            LOGGER.info(
-                self._get_trace_id_str() + self._get_invocation_chain_str() + log_str
-                + f" Agent output is {agent_output.to_json_str()}")
+            logger.bind(
+                log_type=LogTypeEnum.agent_invocation,
+                cost_time=cost_time,
+                agent_output=agent_output,
+                context_prefix=get_context_prefix()
+            ).info("Trace agent invocation.")
+
+    def trace_tool_input(self, source: str, tool_input: Union[str, dict]) -> None:
+        """Trace the agent input."""
+        if self.log_activate:
+            logger.bind(
+                log_type=LogTypeEnum.tool_input,
+                tool_input=tool_input,
+                context_prefix=get_context_prefix()
+            ).info("Trace tool input.")
 
     def trace_tool_invocation(self, source: str, tool_input: Union[str, dict],
                               tool_output: Union[str, dict], cost_time: float = None) -> None:
         """Trace the tool invocation and save it to the monitor jsonl file."""
         if self.log_activate:
-            log_str = f" Tool cost {cost_time} seconds"
-            LOGGER.info(self._get_trace_id_str() + self._get_invocation_chain_str() + log_str)
-
-    @staticmethod
-    def init_trace_id():
-        """Initialize the trace id in the framework context."""
-        if FrameworkContextManager().get_context('trace_id') is None:
-            FrameworkContextManager().set_context('trace_id', str(uuid.uuid4()))
+            logger.bind(
+                log_type=LogTypeEnum.tool_invocation,
+                cost_time=cost_time,
+                tool_output=tool_output,
+                context_prefix=get_context_prefix()
+            ).info("Trace tool invocation.")
 
     @staticmethod
     def init_invocation_chain():
         """Initialize the invocation chain in the framework context."""
-        Monitor.init_trace_id()
-        trace_id = FrameworkContextManager().get_context('trace_id')
+        trace_id = AuTraceManager().get_trace_id()
         if FrameworkContextManager().get_context(trace_id + '_invocation_chain') is None:
             FrameworkContextManager().set_context(trace_id + '_invocation_chain', [])
 
     @staticmethod
     def pop_invocation_chain():
         """Pop the last chain node in invocation chain."""
-        trace_id = FrameworkContextManager().get_context('trace_id')
+        trace_id = AuTraceManager().get_trace_id()
         if trace_id is not None:
             invocation_chain: list = FrameworkContextManager().get_context(
                 trace_id + '_invocation_chain')
@@ -146,14 +172,14 @@ class Monitor(BaseModel):
     @staticmethod
     def clear_invocation_chain():
         """Clear the invocation chain in the framework context."""
-        trace_id = FrameworkContextManager().get_context('trace_id')
+        trace_id = AuTraceManager().get_trace_id()
         if trace_id is not None:
             FrameworkContextManager().del_context(trace_id + '_invocation_chain')
 
     @staticmethod
     def add_invocation_chain(source: dict):
         """Add the source to the invocation chain"""
-        trace_id = FrameworkContextManager().get_context('trace_id')
+        trace_id = AuTraceManager().get_trace_id()
         if trace_id is not None:
             invocation_chain = FrameworkContextManager().get_context(trace_id + '_invocation_chain')
             if invocation_chain is not None:
@@ -163,19 +189,18 @@ class Monitor(BaseModel):
     @staticmethod
     def get_trace_id():
         """Get the trace id in the framework context."""
-        return FrameworkContextManager().get_context('trace_id')
+        return AuTraceManager().get_trace_id()
 
     @staticmethod
     def get_invocation_chain():
         """Get the invocation chain in the framework context."""
-        trace_id = FrameworkContextManager().get_context('trace_id')
+        trace_id = AuTraceManager().get_trace_id()
         return FrameworkContextManager().get_context(trace_id + '_invocation_chain', []) if trace_id is not None else []
 
     @staticmethod
     def init_token_usage():
         """Initialize the token usage in the framework context."""
-        Monitor.init_trace_id()
-        trace_id = FrameworkContextManager().get_context('trace_id')
+        trace_id = AuTraceManager().get_trace_id()
         if FrameworkContextManager().get_context(trace_id + '_token_usage') is None:
             FrameworkContextManager().set_context(trace_id + '_token_usage', {})
 
@@ -184,7 +209,7 @@ class Monitor(BaseModel):
         """Add the token usage to the framework context."""
         if cur_token_usage is None:
             return
-        trace_id = FrameworkContextManager().get_context('trace_id')
+        trace_id = AuTraceManager().get_trace_id()
         if trace_id is not None:
             old_token_usage: dict = FrameworkContextManager().get_context(trace_id + '_token_usage')
             if old_token_usage is not None:
@@ -195,7 +220,7 @@ class Monitor(BaseModel):
     @staticmethod
     def clear_token_usage():
         """Clear the token usage in the framework context."""
-        trace_id = FrameworkContextManager().get_context('trace_id')
+        trace_id = AuTraceManager().get_trace_id()
         if trace_id is not None:
             FrameworkContextManager().del_context(trace_id + '_token_usage')
         FrameworkContextManager().del_context('trace_id')
@@ -203,11 +228,11 @@ class Monitor(BaseModel):
     @staticmethod
     def get_token_usage():
         """Get the token usage in the framework context."""
-        trace_id = FrameworkContextManager().get_context('trace_id')
+        trace_id = AuTraceManager().get_trace_id()
         return FrameworkContextManager().get_context(trace_id + '_token_usage', {}) if trace_id is not None else {}
 
     @staticmethod
-    def _get_invocation_chain_str() -> str:
+    def get_invocation_chain_str() -> str:
         invocation_chain_str = ''
         invocation_chain = Monitor.get_invocation_chain()
         if len(invocation_chain) > 0:
@@ -217,14 +242,6 @@ class Monitor(BaseModel):
             )
             invocation_chain_str += ' | '
         return invocation_chain_str
-
-    @staticmethod
-    def _get_trace_id_str() -> str:
-        trace_id_str = ''
-        trace_id = Monitor.get_trace_id()
-        if trace_id:
-            au_trace_id_str = f'aU trace id: {trace_id} | '
-        return trace_id_str
 
     def _get_or_create_subdir(self, subdir: str) -> str:
         """Get or create a subdirectory if it doesn't exist in the monitor directory."""

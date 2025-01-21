@@ -15,12 +15,16 @@ import uuid
 from datetime import datetime, timedelta
 from threading import Thread
 from typing import Optional, AsyncIterator
+from loguru import logger
 
 from .dal.request_library import RequestLibrary
 from .dal.entity.request_do import RequestDO
 from .thread_with_result import ThreadWithReturnValue
 from agentuniverse.base.util.logging.logging_util import LOGGER
 from ...agent.output_object import OutputObject
+from agentuniverse.base.util.tracing.au_trace_manager import AuTraceManager
+from agentuniverse.base.util.logging.general_logger import get_context_prefix
+from agentuniverse.base.util.logging.log_type_enum import LogTypeEnum
 
 EOF_SIGNAL = '{"type": "EOF"}'
 
@@ -54,7 +58,10 @@ class RequestTask:
         """Init a RequestTask."""
         self.func: callable = func
         self.kwargs = kwargs
-        self.request_id = uuid.uuid4().hex
+        request_id = AuTraceManager().get_trace_id()
+        if not request_id:
+            request_id = uuid.uuid4().hex
+        self.request_id = request_id
         self.queue = queue.Queue(maxsize=1000)
         self.thread: Optional[ThreadWithReturnValue] = None
         self.state = TaskStateEnum.INIT.value
@@ -66,12 +73,22 @@ class RequestTask:
 
     def receive_steps(self):
         """Yield the stream data by getting data from the queue."""
+        first_chunk = True
+        start_time = time.time()
         while True:
             output: str = self.queue.get()
             if output is None:
                 break
             if output == EOF_SIGNAL:
                 break
+            if first_chunk:
+                first_chunk = False
+                cost_time = time.time()-start_time
+                logger.bind(
+                    log_type=LogTypeEnum.agent_first_token,
+                    cost_time=cost_time,
+                    context_prefix=get_context_prefix()
+                ).info("Agent first token generated.")
             yield "data:" + json.dumps({"process": output},
                                        ensure_ascii=False) + "\n\n"
         if self.canceled():
@@ -87,6 +104,8 @@ class RequestTask:
             yield "data:" + json.dumps({"error": {"error_msg": str(e)}}) + "\n\n "
 
     async def async_receive_steps(self) -> AsyncIterator[str]:
+        first_chunk = True
+        start_time = time.time()
         while True:
             try:
                 output: str = await asyncio.wait_for(self.async_queue.get(), timeout=0.5)
@@ -98,6 +117,14 @@ class RequestTask:
                 break
             if output == EOF_SIGNAL:
                 break
+            if first_chunk:
+                first_chunk = False
+                cost_time = time.time() - start_time
+                logger.bind(
+                    log_type=LogTypeEnum.agent_first_token,
+                    cost_time=cost_time,
+                    context_prefix=get_context_prefix()
+                ).info("LLM first token generated.")
             yield "data:" + json.dumps({"process": output},
                                        ensure_ascii=False) + "\n\n"
         if self.canceled():
