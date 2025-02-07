@@ -18,6 +18,7 @@ profile:
     name: 'qwen_llm'
     model_name: 'qwen2.5-72b-instruct'
     temperature: 0.1
+  tracing: true
 action:
   tool:
     - 'google_search_tool'
