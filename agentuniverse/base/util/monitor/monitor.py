@@ -8,7 +8,6 @@
 import datetime
 import json
 import os
-import uuid
 from typing import Union, Optional
 from loguru import logger
 
@@ -21,7 +20,6 @@ from agentuniverse.base.config.configer import Configer
 from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
 from agentuniverse.base.util.logging.general_logger import get_context_prefix
 from agentuniverse.base.util.logging.log_type_enum import LogTypeEnum
-from agentuniverse.base.util.logging.logging_util import LOGGER
 from agentuniverse.base.util.tracing.au_trace_manager import AuTraceManager
 
 LLM_INVOCATION_SUBDIR = "llm_invocation"
@@ -42,7 +40,7 @@ class Monitor(BaseModel):
             self.activate = config.get('activate', False)
 
     def trace_llm_input(self, source: str, llm_input: Union[str, dict]) -> None:
-        """Trace the agent input."""
+        """Trace the llm input."""
         if self.log_activate:
             logger.bind(
                 log_type=LogTypeEnum.llm_input,
@@ -85,6 +83,22 @@ class Monitor(BaseModel):
                 llm_output=llm_output,
                 context_prefix=get_context_prefix()
             ).info("Trace llm input.")
+
+    def trace_llm_token_usage(self, llm_obj: object, llm_input: dict, output_str: str) -> None:
+        """ Trace the token usage of the given LLM object.
+        Args:
+            llm_obj(object): LLM object.
+            llm_input(dict): Dictionary of LLM input.
+            output_str(str): LLM output.
+        """
+        trace_id = AuTraceManager().get_trace_id()
+        # trace token usage for a complete request chain based on trace id
+        if trace_id:
+            old_token_usage: dict = FrameworkContextManager().get_context(trace_id + '_token_usage')
+            if old_token_usage is not None:
+                token_usage: dict = self.get_llm_token_usage(llm_obj, llm_input, output_str)
+                if token_usage:
+                    Monitor.add_token_usage(token_usage)
 
     def trace_agent_input(self, source: str, agent_input: Union[str, dict]) -> None:
         """Trace the agent input."""
@@ -131,7 +145,7 @@ class Monitor(BaseModel):
             ).info("Trace agent invocation.")
 
     def trace_tool_input(self, source: str, tool_input: Union[str, dict]) -> None:
-        """Trace the agent input."""
+        """Trace the tool input."""
         if self.log_activate:
             logger.bind(
                 log_type=LogTypeEnum.tool_input,
@@ -158,6 +172,13 @@ class Monitor(BaseModel):
             FrameworkContextManager().set_context(trace_id + '_invocation_chain', [])
 
     @staticmethod
+    def init_invocation_chain_bak():
+        """Initialize the invocation chain bak version in the framework context."""
+        trace_id = AuTraceManager().get_trace_id()
+        if FrameworkContextManager().get_context(trace_id + '_invocation_chain_bak') is None:
+            FrameworkContextManager().set_context(trace_id + '_invocation_chain_bak', [])
+
+    @staticmethod
     def pop_invocation_chain():
         """Pop the last chain node in invocation chain."""
         trace_id = AuTraceManager().get_trace_id()
@@ -175,6 +196,7 @@ class Monitor(BaseModel):
         trace_id = AuTraceManager().get_trace_id()
         if trace_id is not None:
             FrameworkContextManager().del_context(trace_id + '_invocation_chain')
+            FrameworkContextManager().del_context(trace_id + '_invocation_chain_bak')
 
     @staticmethod
     def add_invocation_chain(source: dict):
@@ -185,6 +207,9 @@ class Monitor(BaseModel):
             if invocation_chain is not None:
                 invocation_chain.append(source)
                 FrameworkContextManager().set_context(trace_id + '_invocation_chain', invocation_chain)
+            invocation_chain_bak = FrameworkContextManager().get_context(trace_id + '_invocation_chain_bak')
+            if invocation_chain_bak is not None:
+                invocation_chain_bak.append(source)
 
     @staticmethod
     def get_trace_id():
@@ -196,6 +221,13 @@ class Monitor(BaseModel):
         """Get the invocation chain in the framework context."""
         trace_id = AuTraceManager().get_trace_id()
         return FrameworkContextManager().get_context(trace_id + '_invocation_chain', []) if trace_id is not None else []
+
+    @staticmethod
+    def get_invocation_chain_bak():
+        """Get the invocation chain bak version in the framework context."""
+        trace_id = AuTraceManager().get_trace_id()
+        return FrameworkContextManager().get_context(trace_id + '_invocation_chain_bak',
+                                                     []) if trace_id is not None else []
 
     @staticmethod
     def init_token_usage():
@@ -242,6 +274,54 @@ class Monitor(BaseModel):
             )
             invocation_chain_str += ' | '
         return invocation_chain_str
+
+    @staticmethod
+    def get_llm_token_usage(llm_obj: object, llm_input: dict, output_str: str) -> dict:
+        """ Calculate the token usage of the given LLM object.
+        Args:
+            llm_obj(object): LLM object.
+            llm_input(dict): Dictionary of LLM input.
+            output_str(str): LLM output.
+
+        Returns:
+            dict: Dictionary of token usage including the completion_tokens, prompt_tokens, and total_tokens.
+        """
+        try:
+            if llm_obj is None or llm_input is None:
+                return {}
+            messages = llm_input.get('kwargs', {}).pop('messages', None)
+
+            input_str = ''
+            if messages is not None and isinstance(messages, list):
+                for m in messages:
+                    if isinstance(m, dict):
+                        input_str += str(m.get('role', '')) + '\n'
+                        input_str += str(m.get('content', '')) + '\n'
+
+                    elif isinstance(m, object):
+                        if hasattr(m, 'role'):
+                            role = m.role
+                            if role is not None:
+                                input_str += str(m.role) + '\n'
+                        if hasattr(m, 'content'):
+                            content = m.content
+                            if content is not None:
+                                input_str += str(m.content) + '\n'
+
+            if input_str == '' or output_str == '':
+                return {}
+
+            usage = {}
+            # the number of input and output tokens is calculated by the llm `get_num_tokens` method.
+            if hasattr(llm_obj, 'get_num_tokens'):
+                completion_tokens = llm_obj.get_num_tokens(output_str)
+                prompt_tokens = llm_obj.get_num_tokens(input_str)
+                total_tokens = completion_tokens + prompt_tokens
+                usage = {'completion_tokens': completion_tokens, 'prompt_tokens': prompt_tokens,
+                         'total_tokens': total_tokens}
+            return usage
+        except Exception as e:
+            return {}
 
     def _get_or_create_subdir(self, subdir: str) -> str:
         """Get or create a subdirectory if it doesn't exist in the monitor directory."""
