@@ -1,6 +1,6 @@
 # Financial Event Analysis
 ## Case Description
-This case study is based on PeerPlanner and presents a multi-agent collaborative example focused on analyzing financial events. Specifically, regarding the topic of "Buffett's 2023 Reduction in BYD Shares"， it demonstrates how to utilize the PEER multi-agent collaboration model within the agentUniverse framework. Additionally, it provides detailed configurations and output examples for each agent in PEER.
+This case study is based on PeerAgentTemplate & PeerWorkPattern and presents a multi-agent collaborative example focused on analyzing financial events. Specifically, regarding the topic of "Buffett's 2023 Reduction in BYD Shares"， it demonstrates how to utilize the PEER multi-agent collaboration model within the agentUniverse framework. Additionally, it provides detailed configurations and output examples for each agent in PEER.
 In this case study, we utilizes the GPT-4o model by OPENAI. Prior to its usage, you need to configure the `OPENAI_API_KEY` in your environment variables.
 
 ## Agents
@@ -46,24 +46,19 @@ The Reviewing Agent is responsible for evaluating whether the answer produced by
 info:
   name: 'demo_peer_agent'
   description: 'demo peer agent'
-plan:
-  planner:
-    name: 'peer_planner'
-    eval_threshold: 60
-    retry_count: 2
-    planning: 'demo_planning_agent'
-    executing: 'demo_executing_agent'
-    expressing: 'demo_expressing_agent'
-    reviewing: 'demo_reviewing_agent'
+profile:
+  planning: 'demo_planning_agent'
+  executing: 'demo_executing_agent'
+  expressing: 'demo_expressing_agent'
+  reviewing: 'demo_reviewing_agent'
+memory:
+  name: 'demo_memory'
 metadata:
   type: 'AGENT'
-  module: 'agentuniverse.agent.default.peer_agent.peer_agent'
-  class: 'PeerAgent'
+  module: 'agentuniverse.agent.template.peer_agent_template'
+  class: 'PeerAgentTemplate'
 ```
-Users can configure the four Agents mentioned above into a complete PEER Agent within the agentuniverse through the `peer_planner` collaboration model. The configurations include:
-- name: Set as `peer_planner`, indicating the utilization of the PEER multi-agent collaboration model.
-- eval_threshold: The minimum score threshold that the Reviewing Agent must achieve to accept an answer.
-- retry_count: The number of retry attempts for the PEER Agent if the Reviewing Agent rejects the answer.
+Users can configure the four Agents mentioned above into a complete PEER Agent within the agentuniverse through the `PeerAgentTemplate` collaboration model. The configurations include:
 - planning：The Agent responsible for the Plan part.
 - executing：The Agent responsible for the Execute part.
 - expressing：The Agent responsible for the Express part.

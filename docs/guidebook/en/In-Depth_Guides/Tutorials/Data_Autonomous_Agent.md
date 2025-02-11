@@ -36,13 +36,12 @@ CWhen configuring the DataAgent within the AgentUniverse framework, the configur
 info:
   name: 'data_agent'
   description: 'data agent'
-plan:
-  planner:
-    dataset_builder: 'dataset_build_agent'
-    dataset_evaluator: 'dataset_eval_agent'
+profile:
+  dataset_builder: 'dataset_build_agent'
+  dataset_evaluator: 'dataset_eval_agent'
 metadata:
   type: 'AGENT'
-  module: 'sample_standard_app.intelligence.agentic.agent.agent_instance.data_agent_case.data_agent'
+  module: 'data_agent_app.intelligence.agentic.agent.agent_instance.data_agent_case.data_agent'
   class: 'DataAgent'
 ```
 [data_agent sample configuration file](../../../../../examples/sample_apps/data_agent_app/intelligence/agentic/agent/agent_instance/data_agent_case/data_agent.yaml)
@@ -59,12 +58,10 @@ info:
   description: 'dataset build agent'
 profile:
   concurrency_level: 1
-plan:
-  planner:
-    candidate: 'demo_rag_agent'
+  candidate: 'demo_rag_agent'
 metadata:
   type: 'AGENT'
-  module: 'sample_standard_app.intelligence.agentic.agent.agent_instance.data_agent_case.dataset_build_agent'
+  module: 'data_agent_app.intelligence.agentic.agent.agent_instance.data_agent_case.dataset_build_agent'
   class: 'DatasetBuildAgent'
 ```
 [dataset_build_agent sample configuration file](../../../../../examples/sample_apps/data_agent_app/intelligence/agentic/agent/agent_instance/data_agent_case/dataset_build_agent.yaml)
@@ -80,15 +77,15 @@ info:
   name: 'dataset_eval_agent'
   description: 'dataset eval agent'
 profile:
-  prompt_version: dataset_eval_agent.en
+  prompt_version: dataset_eval_agent.cn
   max_eval_lines: 10
   llm_model:
-    name: 'demo_llm'
-    model_name: 'gpt-4o'
+    name: 'qwen_llm'
+    model_name: 'qwen2-72b-instruct'
     temperature: 0.1
 metadata:
   type: 'AGENT'
-  module: 'sample_standard_app.intelligence.agentic.agent.agent_instance.data_agent_case.dataset_eval_agent'
+  module: 'data_agent_app.intelligence.agentic.agent.agent_instance.data_agent_case.dataset_eval_agent'
   class: 'DatasetEvalAgent'
 ```
 [dataset_eval_agent sample configuration file](../../../../../examples/sample_apps/data_agent_app/intelligence/agentic/agent/agent_instance/data_agent_case/dataset_eval_agent.yaml)

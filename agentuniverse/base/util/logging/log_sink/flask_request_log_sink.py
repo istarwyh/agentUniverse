@@ -13,6 +13,7 @@ from agentuniverse.base.util.logging.log_type_enum import LogTypeEnum
 class FlaskRequestLogSink(BaseFileLogSink):
     log_type: LogTypeEnum = LogTypeEnum.flask_request
 
+
     def process_record(self, record):
         record["message"] = self.generate_log(
             flask_request=record['extra']['flask_request']

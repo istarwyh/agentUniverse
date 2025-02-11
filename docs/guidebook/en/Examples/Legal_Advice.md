@@ -1,6 +1,6 @@
 # Legal Advice
 ## Case Description
-This case demonstrates a simple legal consultation agent built utilizing `RagPlanner`. The agent provides legal advice by retrieving relevant provisions from the Civil Law and the Criminal Law, and integrating them with the case background.
+This case demonstrates a simple legal consultation agent built utilizing `RagAgentTemplate`. The agent provides legal advice by retrieving relevant provisions from the Civil Law and the Criminal Law, and integrating them with the case background.
 
 The case leverages the embedding and reranking features of DashScope in conjunction with the Qwen llm. Before using this, you need to configure the `DASHSCOPE_API_KEY` in your environment variables.
 

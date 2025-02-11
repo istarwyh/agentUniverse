@@ -24,6 +24,26 @@ Note - Additional remarks regarding the version.
 ***************************************************
 
 # Version Update History
+## [0.0.14] - 2025-01-26
+### Added
+- aU Memory Component Version Update   
+The new version provides comprehensive memory management and utilization capabilities for multi-agent applications through a global memory module. It can automatically collect, record, and process memory interactions among multiple agents, including conversations, model calls, tool calls, and knowledge retrieval. Additionally, it offers functionalities such as memory addition, memory retrieval, memory modification, memory compression, memory pruning, memory extraction, and multi-source persistence for both single-agent and multi-agent.
+
+- Add AgentTemplate Component and WorkPattern Component    
+The AgentTemplate component helps users rapidly create agents according to pre-defined templates, while the WorkPattern component assists agent teams in selecting specific collaboration methods. In versions prior to V0.0.13, the Planner component offered both the customization logic of intelligent agents and their work patterns. The customization logic for agents was often modified due to the task, whereas work patterns were validated and stability. Consequently, users frequently needed to rewrite the Planner and focus on the code logic related to work patterns, which significantly increased their usage and development costs. With the new version, we have layered the customization logic and work patterns in the agent-building process. It will make the research on collaboration modes and the construction of intelligent agents more focused and efficient. The original Planner component will still be retained, but it will no longer be recommended.
+
+- Knowledge Components Update   
+Add: Markdown format knowledge loading component, document chapter and paragraph segmentation component, knowledge graph storage component (beta version).
+
+### Changed
+- Standard Project Scaffolding Update   
+The scaffolding Project Scaffolding has been standardized. You can read the [「Application Project Structure and Explanation」](./docs/guidebook/en/Get_Start/1.Application_Project_Structure_and_Explanation.md)  for more details. For users of older versions, we have provided some guidelines and tools for this update. 
+
+### Note 
+- Update docs for new memory version
+- Optimization official docs and examples project
+- Ask for high-priority features
+
 # [0.0.13] - 2024-09-12
 ### Added
 - RAG(Retrieval-Augmented Generation) Component Version Update  

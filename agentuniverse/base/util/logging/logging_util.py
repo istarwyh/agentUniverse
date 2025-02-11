@@ -68,7 +68,7 @@ def _add_standard_logger():
         filter=_standard_filter,
         rotation=LoggingConfig.log_rotation,
         retention=LoggingConfig.log_retention,
-        compression='zip',
+        compression=LoggingConfig.log_compression if LoggingConfig.log_compression else None,
         encoding="utf-8",
         enqueue=True
     )
