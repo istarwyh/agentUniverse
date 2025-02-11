@@ -58,6 +58,7 @@ class Tool(ComponentBase):
     description: Optional[str] = None
     tool_type: ToolTypeEnum = ToolTypeEnum.FUNC
     input_keys: Optional[List] = None
+    tracing: Optional[bool] = None
 
     def __init__(self, **kwargs):
         super().__init__(component_type=ComponentEnum.TOOL, **kwargs)
@@ -125,4 +126,6 @@ class Tool(ComponentBase):
             self.tool_type = next((member for member in ToolTypeEnum if member.value == component_configer.tool_type))
         if component_configer.input_keys:
             self.input_keys = component_configer.input_keys
+        if hasattr(component_configer, "tracing"):
+            self.tracing = component_configer.tracing
         return self
