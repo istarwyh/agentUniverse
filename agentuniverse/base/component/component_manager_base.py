@@ -40,7 +40,7 @@ class ComponentManagerBase(Generic[ComponentTypeVar]):
         self._instance_obj_map.pop(component_instance_name)
 
     def get_instance_obj(self, component_instance_name: str,
-                         appname: str = None, new_instance: bool = False) -> ComponentTypeVar:
+                         appname: str = None, new_instance: bool = True) -> ComponentTypeVar:
         """Return the component instance object."""
         if component_instance_name == "__default_instance__":
             return self.get_default_instance(new_instance)

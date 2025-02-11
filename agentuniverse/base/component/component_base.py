@@ -52,4 +52,7 @@ class ComponentBase(BaseModel):
         return self.default_symbol
 
     def create_copy(self):
-        return self.model_copy(deep=True)
+        try:
+            return self.model_copy(deep=True)
+        except:
+            return self.model_copy()
