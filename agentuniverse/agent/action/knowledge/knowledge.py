@@ -64,6 +64,7 @@ class Knowledge(ComponentBase):
 
         ext_info (Optional[Dict]): The extended information of the knowledge.
     """
+
     class Config:
         arbitrary_types_allowed = True
 
@@ -78,6 +79,7 @@ class Knowledge(ComponentBase):
     readers: Dict[str, str] = dict()
     insert_executor: Optional[ThreadPoolExecutorWithReturnValue] = None
     query_executor: Optional[ThreadPoolExecutorWithReturnValue] = None
+    tracing: Optional[bool] = None
     ext_info: Optional[Dict] = None
 
     def __init__(self, **kwargs):
@@ -263,6 +265,8 @@ class Knowledge(ComponentBase):
             self.post_processors = knowledge_configer.post_processors
         if hasattr(knowledge_configer, "readers"):
             self.readers = knowledge_configer.readers
+        if hasattr(knowledge_configer, "tracing"):
+            self.tracing = knowledge_configer.tracing
         return self
 
     def langchain_query(self, query: str) -> str:

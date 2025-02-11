@@ -16,6 +16,7 @@ from agentuniverse.base.config.application_configer.application_config_manager i
 from agentuniverse.base.config.component_configer.component_configer import ComponentConfiger
 from agentuniverse.base.config.config_type_enum import ConfigTypeEnum
 from agentuniverse.base.config.configer import Configer
+from agentuniverse.base.util.monitor.monitor import Monitor
 from agentuniverse.base.util.system_util import get_project_root_path
 from agentuniverse.base.annotation.singleton import singleton
 from agentuniverse.database.sqldb_wrapper_manager import SQLDBWrapperManager

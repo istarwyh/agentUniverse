@@ -155,7 +155,6 @@ class AppConfiger(object):
     @property
     def conversation_memory_configer(self) -> dict:
         return self.__conversation_memory_configer
-
     def load_by_configer(self, configer: Configer) -> 'AppConfiger':
         """Load the AppConfiger by the given Configer.
 

@@ -10,6 +10,12 @@ from enum import Enum
 
 class LogTypeEnum(str, Enum):
     default = 'default'
-    llm_trace = 'llm_trace'
     flask_request = 'flask_request'
     flask_response = 'flask_response'
+    agent_input = 'agent_input'
+    agent_invocation = 'agent_invocation'
+    agent_first_token = 'agent_first_token'
+    llm_input = 'llm_input'
+    llm_invocation = 'llm_invocation'
+    tool_input = 'tool_input'
+    tool_invocation = 'tool_invocation'

@@ -41,6 +41,7 @@ class AgentUniverse(object):
         self.__config_container: ApplicationConfigManager = ApplicationConfigManager()
         self.__system_default_agent_package = ['agentuniverse.agent.default']
         self.__system_default_llm_package = ['agentuniverse.llm.default']
+        self.__system_default_tool_package = ['agentuniverse.agent.action.tool']
         self.__system_default_planner_package = ['agentuniverse.agent.plan.planner']
         self.__system_default_memory_package = ['agentuniverse.agent.memory.default']
         self.__system_default_prompt_package = ['agentuniverse.agent', 'agentuniverse.base.util']
@@ -137,7 +138,8 @@ class AgentUniverse(object):
                                  + self.__system_default_llm_package)
         core_planner_package_list = ((app_configer.core_planner_package_list or app_configer.core_default_package_list)
                                      + self.__system_default_planner_package)
-        core_tool_package_list = app_configer.core_tool_package_list or app_configer.core_default_package_list
+        core_tool_package_list = ((app_configer.core_tool_package_list or app_configer.core_default_package_list)
+                                    + self.__system_default_tool_package)
         core_service_package_list = app_configer.core_service_package_list or app_configer.core_default_package_list
         core_sqldb_wrapper_package_list = app_configer.core_sqldb_wrapper_package_list or app_configer.core_default_package_list
         core_memory_package_list = ((app_configer.core_memory_package_list or app_configer.core_default_package_list)

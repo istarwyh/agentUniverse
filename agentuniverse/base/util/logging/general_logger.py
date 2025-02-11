@@ -25,7 +25,7 @@ LOG_LEVEL = Literal[
 ]
 
 
-def _get_context_prefix() -> str:
+def get_context_prefix() -> str:
     """Get a dict contains log prefix info from current context and format it
     to a log prefix string."""
     log_context = FrameworkContextManager().get_context("LOG_CONTEXT")
@@ -160,42 +160,42 @@ class GeneralLogger(Logger):
         self._logger.opt(depth=self.get_inheritance_depth()).bind(
             log_type=LogTypeEnum.default,
             source=self.module_name,
-            context_prefix=_get_context_prefix()
+            context_prefix=get_context_prefix()
         ).warning(msg, *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
         self._logger.opt(depth=self.get_inheritance_depth()).bind(
             log_type=LogTypeEnum.default,
             source=self.module_name,
-            context_prefix=_get_context_prefix()
+            context_prefix=get_context_prefix()
         ).info(msg, *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
         self._logger.opt(depth=self.get_inheritance_depth()).bind(
             log_type=LogTypeEnum.default,
             source=self.module_name,
-            context_prefix=_get_context_prefix()
+            context_prefix=get_context_prefix()
         ).error(msg, *args, **kwargs)
 
     def critical(self, msg, *args, **kwargs):
         self._logger.opt(depth=self.get_inheritance_depth()).bind(
             log_type=LogTypeEnum.default,
             source=self.module_name,
-            context_prefix=_get_context_prefix()
+            context_prefix=get_context_prefix()
         ).critical(msg, *args, **kwargs)
 
     def trace(self, msg, *args, **kwargs):
         self._logger.opt(depth=self.get_inheritance_depth()).bind(
             log_type=LogTypeEnum.default,
             source=self.module_name,
-            context_prefix=_get_context_prefix()
+            context_prefix=get_context_prefix()
         ).trace(msg, *args, **kwargs)
 
     def debug(self, msg, *args, **kwargs):
         self._logger.opt(depth=self.get_inheritance_depth()).bind(
             log_type=LogTypeEnum.default,
             source=self.module_name,
-            context_prefix=_get_context_prefix()
+            context_prefix=get_context_prefix()
         ).debug(msg, *args, **kwargs)
 
     def _add_handler(self, log_level: LOG_LEVEL = "INFO"):
