@@ -102,8 +102,8 @@ class AgentTemplate(Agent, ABC):
         copied = super().create_copy()
         copied.llm_name = self.llm_name
         copied.memory_name = self.memory_name
-        copied.tool_names = self.tool_names.copy() if self.tool_names else None
-        copied.knowledge_names = self.knowledge_names.copy() if self.knowledge_names else None
+        copied.tool_names = self.tool_names.copy() if self.tool_names is not None else None
+        copied.knowledge_names = self.knowledge_names.copy() if self.knowledge_names is not None else None
         copied.prompt_version = self.prompt_version
         copied.conversation_memory_name = self.conversation_memory_name
         return copied
