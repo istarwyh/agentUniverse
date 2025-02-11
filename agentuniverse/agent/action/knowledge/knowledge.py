@@ -8,6 +8,7 @@
 import os
 import re
 import traceback
+from copy import deepcopy
 from typing import Optional, Dict, List, Any
 from concurrent.futures import wait, ALL_COMPLETED
 
@@ -298,3 +299,15 @@ class Knowledge(ComponentBase):
             description=self.description or '' + args_description,
             func=self.langchain_query,
         )
+
+    def create_copy(self):
+        copied = self.model_copy()
+        copied.stores = self.stores.copy()
+        copied.query_paraphrasers = self.query_paraphrasers.copy()
+        copied.insert_processors = self.insert_processors.copy()
+        copied.update_processors = self.update_processors.copy()
+        copied.post_processors = self.post_processors.copy()
+        copied.readers = deepcopy(self.readers)
+        if self.ext_info is not None:
+            copied.ext_info = deepcopy(self.ext_info)
+        return copied

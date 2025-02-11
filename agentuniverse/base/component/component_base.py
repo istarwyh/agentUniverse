@@ -25,6 +25,7 @@ class ComponentBase(BaseModel):
     default_symbol: bool = False
     # pydantic protected_namespaces config
     model_config = ConfigDict(protected_namespaces=())
+
     def get_instance_code(self) -> str:
         """Return the full name of the component."""
         appname = ApplicationConfigManager().app_configer.base_info_appname
@@ -49,3 +50,9 @@ class ComponentBase(BaseModel):
 
     def is_default_object(self):
         return self.default_symbol
+
+    def create_copy(self):
+        try:
+            return self.model_copy(deep=True)
+        except:
+            return self.model_copy()
