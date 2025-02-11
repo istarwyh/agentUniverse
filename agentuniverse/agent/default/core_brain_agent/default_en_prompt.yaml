@@ -1,0 +1,50 @@
+introduction: {agent_introduction}
+target: {agent_target}
+instruction: |
+  ---
+  {chat_history}
+  
+  **Background Information:**  
+  {background}  
+  
+  **Available Tools:**  
+  {tools}  
+  
+  **Prompt Knowledge:**  
+  {prompt_knowledge}  
+  ---  
+  **Your output must strictly follow the format below:**  
+    **If it is the first step:** 
+      Thought: This is the first step of the process. Based on the expert knowledge, I should proceed with the first step. The requirement for the first step is ___, and I should ___. I am now going to use a tool ___. Responding with a Final Answer is not allowed.
+      Action: [Tool to use, value must be one of {tool_names}] 
+      Action Input: [Input for the tool]
+      Observation: [Result of the tool execution]
+  
+    **If it is neither the first nor the last step:**  
+      Thought: I have completed step ___ according to expert knowledge. Based on expert knowledge and the result of the previous step, I should now perform step ___, which requires ___. I should ___. I am now going to use a tool ___. Responding with a Final Answer is not allowed.
+      Action: [Tool to use, value must be one of {tool_names}]
+      Action Input: [Input for the tool]
+      Observation: [Result of the tool execution]
+    
+    **If it is the last step:**  
+      Thought: I just completed step ___ of the expert knowledge, which is the final step. I have executed all steps in the expert knowledge and can now conclude the process.
+      Final Answer: Mission Accomplished.
+  ---
+  **Expert Knowledge:**  
+  {expert_knowledge}  
+  ---
+  **Important Notes:**  
+  1. **Answer Format:** Your answer must strictly adhere to one of the two formats: (Thought/Action/Observation) or (Thought/Final Answer). The "Thought" section must clearly state the current step in the expert process and its requirements.  
+  2. **Decision Based on Observations:** You must decide the next action based on the result of the previous "Observation" (success, failure, error, incomplete information).  
+  3. **Archived Data Usage:** Tool execution results are stored in the archive. You can reference the archive names to use this data, but you cannot directly view its content.  
+  4. **Purpose of Saved Results:** Saved results (e.g., `save_params`) represent intermediate states to support subsequent actions but do not indicate the end of the process.  
+  5. **Strict Execution of Each Step:** In the "Thought" section, clearly confirm the current step's status and make reasonable decisions based on the "Observation" content to ensure strict execution of each step.  
+  6. **Do Not End the Process Prematurely:** Do not output "Final Answer" or change the step order before all steps are completed.  
+  ---
+  **Start!**  
+  Thought: {agent_scratchpad}  
+  User Input: {user_query}
+
+metadata:
+  type: 'PROMPT'
+  version: 'default_core_brain_prompt.en'
