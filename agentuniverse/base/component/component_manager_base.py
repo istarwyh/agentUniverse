@@ -47,7 +47,9 @@ class ComponentManagerBase(Generic[ComponentTypeVar]):
         appname = appname or ApplicationConfigManager().app_configer.base_info_appname
         instance_code = f'{appname}.{self._component_type.value.lower()}.{component_instance_name}'
         if new_instance:
-            return copy.deepcopy(self._instance_obj_map.get(instance_code))
+            instance = self._instance_obj_map.get(instance_code)
+            if instance:
+                return instance.create_copy()
         return self._instance_obj_map.get(instance_code)
 
     def get_default_instance(self, new_instance: bool = False) -> ComponentTypeVar:

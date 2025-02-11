@@ -456,3 +456,9 @@ class Agent(ComponentBase, ABC):
             else:
                 return memory_messages[-1].content
         return "Up to Now, No Summarize Memory"
+
+    def create_copy(self):
+        copied = self.model_copy()
+        if self.agent_model is not None:
+            copied.agent_model = self.agent_model.model_copy(deep=True)
+        return copied

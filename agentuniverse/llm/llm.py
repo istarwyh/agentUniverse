@@ -7,6 +7,7 @@ import queue
 # @FileName: llm.py
 
 from abc import abstractmethod
+from copy import deepcopy
 from typing import Optional, Any, AsyncIterator, Iterator, Union
 from langchain_core.language_models.base import BaseLanguageModel
 from langchain_core.runnables import Runnable
@@ -179,3 +180,13 @@ class LLM(ComponentBase):
         except Exception as e:
             LOGGER.error(f'Error in LLM acall: {e}')
             raise e
+
+    def create_copy(self):
+        copied = self.model_copy()
+        if self.ext_info is not None:
+            copied.ext_info = deepcopy(self.ext_info)
+        # Shared reference
+        copied.client = self.client
+        copied.async_client = self.async_client
+        copied.langchain_instance = self.langchain_instance
+        return copied

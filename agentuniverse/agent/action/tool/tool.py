@@ -126,3 +126,9 @@ class Tool(ComponentBase):
         if component_configer.input_keys:
             self.input_keys = component_configer.input_keys
         return self
+
+    def create_copy(self):
+        copied = self.model_copy()
+        if self.input_keys is not None:
+            copied.input_keys = self.input_keys.copy()
+        return copied

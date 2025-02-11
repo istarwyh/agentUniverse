@@ -174,3 +174,9 @@ class Memory(ComponentBase):
         if component_configer.memory_summarize_agent:
             self.summarize_agent_id = component_configer.memory_summarize_agent
         return self
+
+    def create_copy(self):
+        copied = self.model_copy()
+        if self.memory_storages is not None:
+            copied.memory_storages = self.memory_storages.copy()
+        return copied
