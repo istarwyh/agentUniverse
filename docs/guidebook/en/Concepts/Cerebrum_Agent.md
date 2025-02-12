@@ -1,25 +1,30 @@
-## Core Brain Agent
+## Cerebrum Agent
 
-### What is a Core Brain Agent?
-A Core Brain Agent (CBA) is capable of analyzing tasks provided by users based on human expert knowledge and dynamically breaking down the task execution steps. It accomplishes these steps by dynamically creating and calling sub-agents or tools. Ultimately, the Core Brain Agent completes the task requested by the user.
-![core brain mode](../../_picture/core_brain_struct.png)
-- The Core Brain Agent does not directly participate in the task execution. It is only responsible for breaking down the task and then using sub-agents and tools to execute the broken-down steps.
-- The basis for task decomposition comes from real human expert knowledge. Users only need to provide expert knowledge in natural language form, and the Core Brain Agent can dynamically break down the task and execute the steps. This reduces the need for hardcoding standard operating procedures (SOPs) and increases the flexibility of the agent.
-- The Core Brain Agent creates different sub-agents by utilizing a prompt knowledge base. Expanding this knowledge base allows the Core Brain Agent to create a wider variety of sub-agents, which improves the completion of the broken-down steps.
-- The results of sub-agent and tool executions are stored in an Archive Dataset, making them available for use in subsequent steps. For the Core Brain Agent, it only needs to view the summary of these results to determine which data is needed for each step and pass the corresponding key-value to the tool or sub-agent. This avoids issues like hallucinations or poor compliance when the Core Brain Agent faces long contexts, making it more suitable for complex tasks.
+### What is a Cerebrum Agent?
+The Cerebrum Agent is capable of analyzing and identifying the roles required to accomplish a task based on the objectives set by the user and human expert knowledge. It creates Slave Agents, orchestrates and supervises their task execution, autonomously completing the tasks assigned by the user.
 
+![cerebrum mode](../../_picture/cerebrum_brain_struct_en.png)
 
+The Cerebrum Agent possesses the following key capabilities:
 
-### Workflow of the Core Brain Model
+- Analyzing and determining all roles required to solve a problem
+- Creating a series of sub-agents corresponding to these roles
+- Dynamically assigning responsibilities and capabilities to the agents
+- Planning, orchestrating, executing, and supervising the agents' execution process
+- Collecting feedback from the agents' execution and synthesizing the results to deliver the final task outcome
+
+### Workflow of the Cerebrum Mode
+
+![cerebrum mode](../../_picture/cerebrum_brain_struct.png)
 
 **Input**: 
-- Expert knowledge `E`  
-- Task goal `Q`
+- Expert knowledge `E`: The expert knowledge is provided by the user in natural language. The Cerebrum Agent will dynamically plan and create agents based on this experience and autonomously think through and orchestrate the task SOP (Standard Operating Procedure) process.
+- Task goal `Q`: The objective of the task proposed by user.
 
 **Resources**:  
-- Toolset `Tools`：Simple task-handling functions that can be directly called  
-- Prompt knowledge base `PromptKnowledge`：Provides prompts for complex task handling  
-- Archive dataset `ArchiveDataset`：Stores and retrieves intermediate results
+- Toolset `Tools`：Tools accessible to the Cerebrum Agent for assignment/usage
+- Prompt knowledgebase `PromptKnowledge`：Allows the Cerebrum Agent to extract, create, and assign capabilities and responsibilities to slave agents. By expanding the knowledgebase, the Cerebrum Agent can create a wider variety of slave agents, thereby improving the effectiveness and performance of task handling.
+- Archive dataset `ArchiveDataset`：Archives the process information during the execution of slave agents. Assists the Cerebrum Agent in supervising and executing sub tasks, mitigating such as hallucinations or poor compliance that may arise when the Cerebrum Agent deals with long contexts. This becomes particularly crucial in complex task scenarios.
 
 **Output**: Final result of the task
 
@@ -43,7 +48,7 @@ A Core Brain Agent (CBA) is capable of analyzing tasks provided by users based o
 4. Output the final result stored in ArchiveDataset.
 
 
-### Core Brain Agent Demo
+### Cerebrum Agent Demo
 <div style="max-height: 200px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">
 > Entering new AgentExecutor chain...  
 
