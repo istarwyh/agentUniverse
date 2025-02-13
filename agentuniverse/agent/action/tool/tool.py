@@ -129,3 +129,9 @@ class Tool(ComponentBase):
         if hasattr(component_configer, "tracing"):
             self.tracing = component_configer.tracing
         return self
+
+    def create_copy(self):
+        copied = self.model_copy()
+        if self.input_keys is not None:
+            copied.input_keys = self.input_keys.copy()
+        return copied
