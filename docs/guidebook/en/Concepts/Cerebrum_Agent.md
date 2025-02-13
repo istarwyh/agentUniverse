@@ -49,7 +49,8 @@ The Cerebrum Agent possesses the following key capabilities:
 
 
 ### Cerebrum Agent Demo
-[demo script](../../../../examples/sample_apps/cerebrum_agent_app/intelligence/test/run_cerebrum_agent.py)
+#### examples
+**Query:** 我想去杭州旅行三天，想顺带去盗墓笔记相关的地方圣地巡礼。
 <div style="max-height: 200px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">
 > Entering new AgentExecutor chain...  
 
@@ -190,7 +191,10 @@ Final Answer: 结束
 > Finished chain.
 </div>
 
-If you want to run your own brain agent based on this case, you need to modify the following:
+#### modify & run
+[CerebrumAgent Script](../../../../examples/sample_apps/cerebrum_agent_app/intelligence/test/run_cerebrum_agent.py)
+
+If you want to run your own Cerebrum Agent, you need to modify the following:
 - Prompt Knowledge Base: The brain agent in this case uses a simple dictionary as its prompt knowledge base. You can modify [this file](../../../../examples/sample_apps/cerebrum_agent_app/intelligence/agentic/prompt/demo_prompt_knowledge.py) based on your own prompt content.
 - Modify the runtime parameters in the [script file](../../../../examples/sample_apps/cerebrum_agent_app/intelligence/test/run_cerebrum_agent.py):
   - agent_introduction: The agent's role definition.
