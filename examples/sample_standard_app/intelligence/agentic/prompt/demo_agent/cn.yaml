@@ -19,6 +19,3 @@ instruction: |
   开始!
   
   需要回答的问题是: {input}
-metadata:
-  type: 'PROMPT'
-  version: 'demo_agent.cn'

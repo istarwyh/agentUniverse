@@ -29,6 +29,3 @@ instruction: |
   必须使用中文回答用户提出的问题。
   
   需要回答的问题是: {input}
-metadata:
-  type: 'PROMPT'
-  version: 'demo_planning_agent.cn'

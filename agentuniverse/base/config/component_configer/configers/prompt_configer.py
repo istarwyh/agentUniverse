@@ -5,6 +5,7 @@
 # @Author  : wangchongshi
 # @Email   : wangchongshi.wcs@antgroup.com
 # @FileName: prompt_configer.py
+from pathlib import Path
 from typing import Optional
 
 from agentuniverse.base.config.component_configer.component_configer import ComponentConfiger
@@ -40,7 +41,11 @@ class PromptConfiger(ComponentConfiger):
         """
         super().load_by_configer(configer)
         try:
-            self.__metadata_version = configer.value.get('metadata').get('version')
+            if configer.value.get('metadata'):
+                self.__metadata_version = configer.value.get('metadata').get('version')
+            else:
+                path = Path(configer.path)
+                self.__metadata_version = f"{path.parent.name}.{path.stem}"
             # set the prompt default module and class
             if self.metadata_module is None:
                 self.metadata_module = 'agentuniverse.prompt.prompt'
