@@ -8,11 +8,11 @@ from typing import Optional, List
 
 from agentuniverse.agent.action.tool.tool import ToolInput
 from agentuniverse.agent.agent_manager import AgentManager
-from agentuniverse.agent.action.tool.core_brain_tool.core_brain_tool import CoreBrainTool
+from agentuniverse.agent.action.tool.cerebrum_tool.cerebrum_tool import CerebrumTool
 from agentuniverse.base.context.context_archive_utils import update_context_archive
 
 
-class CallSlaveRagAgentTool(CoreBrainTool):
+class CallSlaveRagAgentTool(CerebrumTool):
 
     def update_archive_data(self, name, data, description):
         update_context_archive(name, data, description)

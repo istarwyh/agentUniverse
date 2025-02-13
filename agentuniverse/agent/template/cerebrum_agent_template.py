@@ -39,7 +39,7 @@ from typing import List, Tuple
 from langchain_core.agents import AgentAction
 
 
-class CoreBrainAgentTemplate(AgentTemplate):
+class CerebrumAgentTemplate(AgentTemplate):
     agent_names: Optional[list[str]] = None
     stop_sequence: Optional[list[str]] = None
     max_iterations: Optional[int] = None

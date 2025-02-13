@@ -9,12 +9,12 @@ from typing import Optional, List
 from pydantic import Field
 from langchain_community.utilities.google_serper import GoogleSerperAPIWrapper
 from agentuniverse.agent.action.tool.tool import ToolInput
-from agentuniverse.agent.action.tool.core_brain_tool.core_brain_tool import CoreBrainTool
+from agentuniverse.agent.action.tool.cerebrum_tool.cerebrum_tool import CerebrumTool
 from agentuniverse.base.util.env_util import get_from_env
 from agentuniverse.base.context.context_archive_utils import update_context_archive
 
 
-class GoogleSearchWithArchiveTool(CoreBrainTool):
+class GoogleSearchWithArchiveTool(CerebrumTool):
     """The demo google search tool.
 
     Implement the execute method of demo google search tool, using the `GoogleSerperAPIWrapper` to implement a simple Google search.
