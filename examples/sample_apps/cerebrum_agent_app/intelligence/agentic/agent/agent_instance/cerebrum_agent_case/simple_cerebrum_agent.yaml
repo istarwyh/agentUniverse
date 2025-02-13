@@ -1,6 +1,6 @@
 info:
-  name: 'tour_plan_agent'
-  description: 'an agent used to plan a tour'
+  name: 'simple_cerebrum_agent'
+  description: 'a simple cerebrum agent use a stable prompt knowledge dict'
 profile:
   prompt_version: default_cerebrum_prompt.cn
   llm_model:
@@ -13,5 +13,5 @@ action:
     - 'call_slave_rag_agent_tool'
 metadata:
   type: 'AGENT'
-  module: 'cerebrum_agent_app.intelligence.agentic.agent.agent_template.tour_plan_agent_template'
-  class: 'TourPlanAgentTemplate'
+  module: 'cerebrum_agent_app.intelligence.agentic.agent.agent_template.simple_cerebrum_agent_template'
+  class: 'SimpleCerebrumAgentTemplate'
