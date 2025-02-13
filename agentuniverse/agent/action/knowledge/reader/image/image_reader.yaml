@@ -1,0 +1,6 @@
+name: 'default_image_reader'
+description: 'default image reader by easyocr'
+metadata:
+  type: 'READER'
+  module: 'agentuniverse.agent.action.knowledge.reader.image.image_reader'
+  class: 'ImageReader'
