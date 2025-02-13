@@ -10,7 +10,7 @@ import os
 
 from agentuniverse.agent.action.knowledge.embedding.gemini_embedding import GeminiEmbedding
 
-class EmbeddingTest(unittest.TestCase):
+class GeminiEmbeddingTest(unittest.TestCase):
     """
     Test cases for Embedding class
     """
