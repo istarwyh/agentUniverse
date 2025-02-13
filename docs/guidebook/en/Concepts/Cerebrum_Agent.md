@@ -189,3 +189,11 @@ Final Answer: 结束
 
 > Finished chain.
 </div>
+
+If you want to run your own brain agent based on this case, you need to modify the following:
+- Prompt Knowledge Base: The brain agent in this case uses a simple dictionary as its prompt knowledge base. You can modify [this file](../../../../examples/sample_apps/cerebrum_agent_app/intelligence/agentic/prompt/demo_prompt_knowledge.py) based on your own prompt content.
+- Modify the runtime parameters in the [script file](../../../../examples/sample_apps/cerebrum_agent_app/intelligence/test/run_cerebrum_agent.py):
+  - agent_introduction: The agent's role definition.
+  - agent_target: The agent's execution goal.
+  - expert_knowledge: Expert guidance experience to help the agent learn how to carry out tasks.
+  - user_query: The user input for their needs.

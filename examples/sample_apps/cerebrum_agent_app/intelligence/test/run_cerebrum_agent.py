@@ -7,15 +7,17 @@
 # @FileName: run_neo4jstore.py
 from agentuniverse.base.agentuniverse import AgentUniverse
 from agentuniverse.agent.agent_manager import AgentManager
-
 AgentUniverse().start(config_path='../../config/config.toml', core_mode=True)
 
 
 
 if __name__=="__main__":
-    tour_plan_agent = AgentManager().get_instance_obj('tour_plan_agent')
+    simple_cerebrum_agent = AgentManager().get_instance_obj('simple_cerebrum_agent')
 
-    result = tour_plan_agent.run(
+    from cerebrum_agent_app.intelligence.agentic.prompt.demo_prompt_knowledge import \
+        DEMO_PROMPT_KNOWLEDGE
+    simple_cerebrum_agent.set_prompt_knowledge_dict(DEMO_PROMPT_KNOWLEDGE)
+    result = simple_cerebrum_agent.run(
         agent_introduction="你是一名专业的旅游规划人员",
         agent_target="你的目标是调用工具为用户规划完整的旅行计划",
         expert_knowledge='''
