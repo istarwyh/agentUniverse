@@ -9,8 +9,7 @@
 LLM_MODEL_NAME = {
     'demo_llm': ['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o', 'gpt-4o-mini', 'o1', 'o1-mini', 'o3-mini'],
     'openai_llm': ['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o', 'gpt-4o-mini', 'o1', 'o1-mini', 'o3-mini'],
-    'default_openai_llm': ['gpt-3.5-turbo', 'gpt-4o', 'gpt-4-turbo', 'gpt-4o-mini', 'gpt-4', 'gpt-4o-mini', 'o1',
-                           'o1-mini', 'o3-mini'],
+    'default_openai_llm': ['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o', 'gpt-4o-mini', 'o1', 'o1-mini', 'o3-mini'],
     'qwen_llm': ['qwen-max', 'qwen-long', 'qwen-plus', 'qwen-turbo', 'qwen-coder-plus',
                  'qwen2.5-72b-instruct', 'qwen2.5-32b-instruct', 'qwen2.5-14b-instruct', 'qwen2.5-7b-instruct'],
     'default_qwen_llm': ['qwen-max', 'qwen-long', 'qwen-plus', 'qwen-turbo', 'qwen-coder-plus',
