@@ -1,7 +1,7 @@
 name: 'default_gemini_llm'
 description: 'default gemini llm with spi'
 model_name: 'gemini-2.0-flash'
-max_tokens: 1048576
+max_tokens: 1000
 metadata:
   type: 'LLM'
   module: 'agentuniverse.llm.default.gemini_openai_style_llm'
