@@ -8,6 +8,9 @@ profile:
   # Please select the llm.
   llm_model:
     name: 'demo_llm'
+#    name: 'deepseek_llm'
+#    model_name: 'deepseek-chat'
+#    model_name: 'deepseek-reasoner'
 action:
   # Please select the tools and knowledge base.
   tool:

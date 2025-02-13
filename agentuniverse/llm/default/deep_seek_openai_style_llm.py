@@ -16,12 +16,13 @@ from agentuniverse.llm.llm_output import LLMOutput
 from agentuniverse.llm.openai_style_llm import OpenAIStyleLLM
 
 DEEpSEEkMAXCONTETNLENGTH = {
-    "deepseek-chat": 32000,
+    "deepseek-chat": 64000,
     "deepseek-coder": 32000,
     "claude-3-haiku-20240307": 200000,
     "claude-2.1": 200000,
     "claude-2.0": 100000,
-    "claude-instant-1.2": 100000
+    "claude-instant-1.2": 100000,
+    "deepseek-reasoner": 64000
 }
 
 
