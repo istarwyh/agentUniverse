@@ -2,7 +2,7 @@ info:
   name: 'tour_plan_agent'
   description: 'an agent used to plan a tour'
 profile:
-  prompt_version: default_core_brain_prompt.cn
+  prompt_version: default_cerebrum_prompt.cn
   llm_model:
     name: 'qwen_llm'
     stop: 'Observation'
@@ -13,5 +13,5 @@ action:
     - 'call_slave_rag_agent_tool'
 metadata:
   type: 'AGENT'
-  module: 'core_brain_agent_app.intelligence.agentic.agent.agent_template.tour_plan_agent_template'
+  module: 'cerebrum_agent_app.intelligence.agentic.agent.agent_template.tour_plan_agent_template'
   class: 'TourPlanAgentTemplate'

@@ -56,4 +56,4 @@ instruction: |
 
 metadata:
   type: 'PROMPT'
-  version: 'default_core_brain_prompt.cn'
+  version: 'default_cerebrum_prompt.cn'

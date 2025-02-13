@@ -46,5 +46,5 @@ tool_type: 'func'
 input_keys: ['prompt_name', 'prompt_params']
 metadata:
   type: 'TOOL'
-  module: 'agentuniverse.agent.action.tool.core_brain_tool.call_slave_rag_agent_tool'
+  module: 'agentuniverse.agent.action.tool.cerebrum_tool.call_slave_rag_agent_tool'
   class: 'CallSlaveRagAgentTool'

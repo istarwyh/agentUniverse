@@ -6,10 +6,10 @@
 # @Email   : wangchongshi.wcs@antgroup.com
 # @FileName: discussion_group_template.py
 import json
-from core_brain_agent_app.intelligence.agentic.prompt.demo_prompt_knowledge import DEMO_PROMPT_KNOWLEDGE
-from agentuniverse.agent.template.core_brain_agent_template import CoreBrainAgentTemplate
+from cerebrum_agent_app.intelligence.agentic.prompt.demo_prompt_knowledge import DEMO_PROMPT_KNOWLEDGE
+from agentuniverse.agent.template.cerebrum_agent_template import CerebrumAgentTemplate
 
 
-class TourPlanAgentTemplate(CoreBrainAgentTemplate):
+class TourPlanAgentTemplate(CerebrumAgentTemplate):
     def get_prompt_knowledge(self):
         return json.dumps(DEMO_PROMPT_KNOWLEDGE, ensure_ascii=False)

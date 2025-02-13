@@ -5,7 +5,7 @@ from abc import ABC
 # @Time    : 2024/12/16 17:40
 # @Author  : fanen.lhy
 # @Email   : fanen.lhy@antgroup.com
-# @FileName: core_brain_tool.py
+# @FileName: cerebrum_tool.py
 
 from abc import abstractmethod
 from langchain_core.utils.json import parse_and_check_json_markdown
@@ -13,7 +13,7 @@ from agentuniverse.base.annotation.trace import trace_tool
 from agentuniverse.agent.action.tool.tool import Tool, ToolInput
 
 
-class CoreBrainTool(Tool, ABC):
+class CerebrumTool(Tool, ABC):
 
     @abstractmethod
     def update_archive_data(self, name, data, description):
