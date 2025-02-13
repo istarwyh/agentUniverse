@@ -27,10 +27,10 @@ profile:
     需要回答的问题是: {input}
   # Please select the llm.
   llm_model:
-    name: 'deepseek_llm'
-    model_name: 'deepseek-chat'
+    name: 'demo_llm'
+#    name: 'deepseek_llm'
+#    model_name: 'deepseek-chat'
 #    model_name: 'deepseek-reasoner'
-#    name: 'qwen_llm'
 action:
   # Please select the tools and knowledge base.
   tool:
