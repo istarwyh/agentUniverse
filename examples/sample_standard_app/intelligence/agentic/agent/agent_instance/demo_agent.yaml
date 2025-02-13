@@ -7,7 +7,7 @@ profile:
   prompt_version: demo_agent.cn
   # Please select the llm.
   llm_model:
-    name: 'qwen_llm'
+    name: 'demo_llm'
 action:
   # Please select the tools and knowledge base.
   tool:
