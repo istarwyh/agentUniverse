@@ -1,0 +1,7 @@
+id: default_deepseek_llm
+nickname: 深度求索系列大模型
+type: LLM
+metadata:
+  type: 'PRODUCT'
+  module: 'agentuniverse_product.base.product'
+  class: 'Product'
