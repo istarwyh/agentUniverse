@@ -1,5 +1,5 @@
-id: qwen_llm
-nickname: 千问系列大模型
+id: demo_llm
+nickname: aU默认模型列表
 type: LLM
 metadata:
   type: 'PRODUCT'
