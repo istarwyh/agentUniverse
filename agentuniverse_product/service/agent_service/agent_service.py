@@ -64,8 +64,8 @@ class AgentService:
         Returns:
             AgentDTO | None: AgentDTO or None.
         """
-        product: Product = ProductManager().get_instance_obj(id)
-        agent: Agent = AgentManager().get_instance_obj(id)
+        product: Product = ProductManager().get_instance_obj(id, new_instance=False)
+        agent: Agent = AgentManager().get_instance_obj(id, new_instance=False)
         if agent is None:
             raise ValueError("The agent instance corresponding to the agent id cannot be found.")
         agent_dto = AgentDTO(id=id,
@@ -82,7 +82,7 @@ class AgentService:
         if agent_dto.id is None:
             raise ValueError("Agent id cannot be None.")
         product: Product = ProductManager().get_instance_obj(agent_dto.id)
-        agent: Agent = AgentManager().get_instance_obj(agent_dto.id)
+        agent: Agent = AgentManager().get_instance_obj(agent_dto.id, new_instance=False)
         if agent is None:
             raise ValueError("The agent instance corresponding to the agent id cannot be found.")
         # update agent product yaml configuration file
@@ -104,7 +104,7 @@ class AgentService:
         """
         if agent_id is None or session_id is None:
             raise ValueError("Agent id or session id cannot be None.")
-        agent: Agent = AgentManager().get_instance_obj(agent_id)
+        agent: Agent = AgentManager().get_instance_obj(agent_id, new_instance=False)
         if agent is None:
             raise ValueError("The agent instance corresponding to the agent id cannot be found.")
 

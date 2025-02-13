@@ -106,11 +106,11 @@ class KnowledgeService:
         if knowledge_dto.id is None:
             raise ValueError("knowledge_id is None.")
 
-        knowledge: Knowledge = KnowledgeManager().get_instance_obj(component_instance_name=knowledge_dto.id)
+        knowledge: Knowledge = KnowledgeManager().get_instance_obj(component_instance_name=knowledge_dto.id, new_instance=False)
         if knowledge is None:
             raise ValueError("The knowledge instance corresponding to the knowledge_id cannot be found.")
 
-        product: Product = ProductManager().get_instance_obj(component_instance_name=knowledge_dto.id)
+        product: Product = ProductManager().get_instance_obj(component_instance_name=knowledge_dto.id, new_instance=False)
         if product is None:
             raise ValueError("The knowledge product instance corresponding to the knowledge_id cannot be found.")
 
@@ -142,11 +142,11 @@ class KnowledgeService:
             bool: True if the knowledge is deleted successfully, False otherwise.
         """
 
-        knowledge: Knowledge = KnowledgeManager().get_instance_obj(component_instance_name=knowledge_id)
+        knowledge: Knowledge = KnowledgeManager().get_instance_obj(component_instance_name=knowledge_id, new_instance=False)
         if knowledge is None:
             raise ValueError("The knowledge instance corresponding to the knowledge_id cannot be found.")
 
-        product: Product = ProductManager().get_instance_obj(component_instance_name=knowledge_id)
+        product: Product = ProductManager().get_instance_obj(component_instance_name=knowledge_id, new_instance=False)
         if product is None:
             raise ValueError("The knowledge product instance corresponding to the knowledge_id cannot be found.")
 
@@ -195,7 +195,7 @@ class KnowledgeService:
                                   "agentic", "knowledge", "store", f"{knowledge_id}_store.yaml"))
         knowledge_store_name = f"{knowledge_id}_chroma_store"
 
-        knowledge = KnowledgeManager().get_instance_obj(component_instance_name=knowledge_id)
+        knowledge = KnowledgeManager().get_instance_obj(component_instance_name=knowledge_id, new_instance=False)
 
         try:
             # If the store YAML file does not exist, create and register the store, and update the knowledge YAML.

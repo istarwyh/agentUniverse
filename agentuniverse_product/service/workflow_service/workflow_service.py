@@ -62,7 +62,7 @@ class WorkflowService:
         """
         if workflow_dto.id is None:
             raise ValueError("workflow_id is None.")
-        workflow: Workflow = WorkflowManager().get_instance_obj(component_instance_name=workflow_dto.id)
+        workflow: Workflow = WorkflowManager().get_instance_obj(component_instance_name=workflow_dto.id, new_instance=False)
         if workflow is None:
             raise ValueError("The workflow instance corresponding to the workflow_id cannot be found.")
         workflow_update_config = {
@@ -93,7 +93,7 @@ class WorkflowService:
         Returns:
             WorkflowDTO | None: WorkflowDTO or None.
         """
-        workflow: Workflow = WorkflowManager().get_instance_obj(component_instance_name=id)
+        workflow: Workflow = WorkflowManager().get_instance_obj(component_instance_name=id, new_instance=False)
         if workflow is None:
             raise ValueError("The workflow instance corresponding to the workflow_id cannot be found.")
         return WorkflowDTO(id=workflow.id, name=workflow.name, description=workflow.description,
