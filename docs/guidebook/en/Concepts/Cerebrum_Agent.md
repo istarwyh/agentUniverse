@@ -49,6 +49,7 @@ The Cerebrum Agent possesses the following key capabilities:
 
 
 ### Cerebrum Agent Demo
+[demo script](../../../../examples/sample_apps/cerebrum_agent_app/intelligence/test/run_cerebrum_agent.py)
 <div style="max-height: 200px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">
 > Entering new AgentExecutor chain...  
 
