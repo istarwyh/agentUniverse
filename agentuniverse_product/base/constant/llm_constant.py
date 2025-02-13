@@ -7,7 +7,8 @@
 # @FileName: llm.py
 # llm model name list
 LLM_MODEL_NAME = {
-    'demo_llm': ['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o', 'gpt-4o-mini', 'o1', 'o1-mini', 'o3-mini'],
+    'demo_llm': ['gpt-4o', 'gpt-4o-mini', 'o1', 'o3-mini', 'qwen-max', 'qwen-long', 'qwen-plus',
+                 'qwen-turbo', 'qwen2.5-72b-instruct', 'qwen2.5-7b-instruct'],
     'openai_llm': ['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o', 'gpt-4o-mini', 'o1', 'o1-mini', 'o3-mini'],
     'default_openai_llm': ['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o', 'gpt-4o-mini', 'o1', 'o1-mini', 'o3-mini'],
     'qwen_llm': ['qwen-max', 'qwen-long', 'qwen-plus', 'qwen-turbo', 'qwen-coder-plus',
