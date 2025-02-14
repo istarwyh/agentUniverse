@@ -10,7 +10,7 @@ profile:
     name: 'demo_llm'
 #    name: 'deepseek_llm'
 #    model_name: 'deepseek-chat'
-#    model_name: 'deepseek-reasoner'
+#    model_name: 'deepseek-r1'
 action:
   # Please select the tools and knowledge base.
   tool:
