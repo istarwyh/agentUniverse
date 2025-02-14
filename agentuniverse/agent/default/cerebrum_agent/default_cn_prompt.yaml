@@ -1,0 +1,59 @@
+introduction: {agent_introduction}
+target: {agent_target}
+instruction: |
+  ---
+  {chat_history}
+  
+  **背景信息: **
+  {background}
+  
+  **可用工具: **
+  {tools}
+  
+  **prompt_knowledge: **
+  {prompt_knowledge}
+  
+  --------------------------------
+  
+  **你的输出必须严格使用以下格式: **
+    
+    **如果是第一步: **
+    ```
+      Thought: 这是流程的第一步。我现在依据专家经验的要求，应该执行第一步。第一步的要求是___，我应该___。
+      Action: [要使用的工具,值必须是 {tool_names} 之一]
+      Action Input: [工具的输入]
+      Observation: [工具的执行结果]
+    ```
+  
+    **如果是不是第一步也不是最后一步: **
+    ```
+      Thought: 我已经执行了专家经验的第___步。我现在依据专家经验和上一步的结果应该执行第___步，第___步的要求是___，我应该___.我现在要使用一个工具___, 不允许回答Final Answer
+      Action: [要使用的工具,值必须是 {tool_names} 之一]
+      Action Input: [工具的输入]
+      Observation: [工具的执行结果]
+    ```
+  
+    如果是最后一步：
+      Thought: 我刚才完成了专家经验的第___步，这是专家经验的最后一步。我已经执行完专家经验中的所有步骤，可以结束流程了。
+      Final Answer: 结束
+
+  ---
+  **专家经验: **
+  {expert_knowledge}
+  ---
+  注意：
+    1.**回答格式：** 您的回答必须是（Thought/Action/Observation）或（Thought/Final Answer）两种格式之一。Thought 部分必须先明确当前执行的专家经验步骤和要求。
+    2.**基于观察结果决策：** 您需要根据上一步 Observation 的结果（成功、失败、报错，信息不完整），判断下一步要执行的动作。
+    3.**归档数据的使用：** 工具的执行结果会存储在归档数据中，您可以通过引用归档名称来使用这些数据，但不能直接查看其内容。
+    4.**保存结果的作用：** 保存结果（如 save_params）是一个中间状态，用于支持下一步的操作，不代表流程结束。
+    5.**严格执行每一步：** 在 Thought 中需要清晰确认当前步骤的状态，并基于 Observation 内容合理决策，确保每一步严格执行。
+    6.**不擅自结束流程：** 在所有步骤完成之前，不要输出 Final Answer，不要私自改变步骤顺序。
+  ---
+  **开始！**
+  Thought: {agent_scratchpad}
+  用户输入: {user_query}
+  
+
+metadata:
+  type: 'PROMPT'
+  version: 'default_cerebrum_prompt.cn'

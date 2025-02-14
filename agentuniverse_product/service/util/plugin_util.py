@@ -22,7 +22,7 @@ def validate_create_plugin_parameters(plugin_dto: PluginDTO) -> None:
     """
     if plugin_dto.id is None:
         raise ValueError("Plugin id cannot be None.")
-    plugin = ProductManager().get_instance_obj(plugin_dto.id)
+    plugin = ProductManager().get_instance_obj(plugin_dto.id, new_instance=False)
     if plugin:
         raise ValueError("Plugin instance corresponding to the plugin id already exists.")
     if plugin_dto.openapi_desc is None:

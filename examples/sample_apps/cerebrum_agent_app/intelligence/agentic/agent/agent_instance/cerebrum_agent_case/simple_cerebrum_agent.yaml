@@ -1,0 +1,17 @@
+info:
+  name: 'simple_cerebrum_agent'
+  description: 'a simple cerebrum agent use a stable prompt knowledge dict'
+profile:
+  prompt_version: default_cerebrum_prompt.cn
+  llm_model:
+    name: 'qwen_llm'
+    stop: 'Observation'
+    temperature: 0.3
+action:
+  tool:
+    - 'google_search_with_archive_tool'
+    - 'call_slave_rag_agent_tool'
+metadata:
+  type: 'AGENT'
+  module: 'cerebrum_agent_app.intelligence.agentic.agent.agent_template.simple_cerebrum_agent_template'
+  class: 'SimpleCerebrumAgentTemplate'

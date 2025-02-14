@@ -7,6 +7,8 @@
 # @FileName: component_configer.py
 
 from typing import Optional
+
+from agentuniverse.base.component.component_enum import ComponentEnum
 from agentuniverse.base.config.configer import Configer
 
 
@@ -67,9 +69,12 @@ class ComponentConfiger(object):
         try:
             for k, v in configer.value.items():
                 self.__dict__[k] = v
-            self.__metadata_type = configer.value.get('metadata').get('type')
-            self.__metadata_module = configer.value.get('metadata').get('module')
-            self.__metadata_class = configer.value.get('metadata').get('class')
+            if configer.value.get('metadata'):
+                self.__metadata_type = configer.value.get('metadata').get('type')
+                self.__metadata_module = configer.value.get('metadata').get('module')
+                self.__metadata_class = configer.value.get('metadata').get('class')
+            elif configer.path and 'prompt' in configer.path:
+                self.__metadata_type = ComponentEnum.PROMPT.value
         except Exception as e:
             raise Exception(f"Failed to parse the component configuration: {e}")
 
