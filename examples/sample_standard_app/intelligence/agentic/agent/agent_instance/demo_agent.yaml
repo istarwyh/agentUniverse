@@ -30,7 +30,6 @@ profile:
     name: 'deepseek_llm'
     #    model_name: 'deepseek-chat'
     model_name: 'deepseek-r1'
-    reasoning: true
 #    name: 'qwen_llm'
 action:
   # Please select the tools and knowledge base.

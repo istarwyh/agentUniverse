@@ -6,17 +6,19 @@
 # @Email   : weizhongjie.wzj@antgroup.com
 # @FileName: langchain_openai_style_instance.py
 
-from typing import Any, List, Optional, AsyncIterator, Iterator, Mapping, Dict, Type
+from typing import Any, List, Optional, AsyncIterator, Iterator, Mapping, Dict, Type, Union
 
 from langchain.callbacks.manager import AsyncCallbackManagerForLLMRun, CallbackManagerForLLMRun
 from langchain.schema import BaseMessage, ChatResult
-from langchain_community.chat_models.openai import  _create_retry_decorator
+from langchain_community.chat_models.openai import _create_retry_decorator
 from langchain_community.utils.openai import is_openai_v1
 from langchain_core.language_models.chat_models import generate_from_stream, agenerate_from_stream
 from langchain_core.messages import AIMessageChunk, get_buffer_string, BaseMessageChunk, HumanMessageChunk, \
-    SystemMessageChunk, FunctionMessageChunk, ToolMessageChunk, ChatMessageChunk
-from langchain_core.outputs import ChatGenerationChunk
+    SystemMessageChunk, FunctionMessageChunk, ToolMessageChunk, ChatMessageChunk, HumanMessage, AIMessage, \
+    SystemMessage, FunctionMessage, ToolMessage, ChatMessage
+from langchain_core.outputs import ChatGenerationChunk, ChatGeneration
 from langchain_community.chat_models import ChatOpenAI
+from pydantic.v1 import BaseModel
 
 from agentuniverse.llm.llm import LLM
 
@@ -41,7 +43,7 @@ async def acompletion_with_retry(
 
 
 def _convert_delta_to_message_chunk(
-    _dict: Mapping[str, Any], default_class: Type[BaseMessageChunk]
+        _dict: Mapping[str, Any], default_class: Type[BaseMessageChunk]
 ) -> BaseMessageChunk:
     role = _dict.get("role")
     content = _dict.get("content") or ""
@@ -71,6 +73,47 @@ def _convert_delta_to_message_chunk(
         return ChatMessageChunk(content=content, role=role)
     else:
         return default_class(content=content)
+
+
+def convert_dict_to_message(_dict: Mapping[str, Any]) -> BaseMessage:
+    """Convert a dictionary to a LangChain message.
+
+    Args:
+        _dict: The dictionary.
+
+    Returns:
+        The LangChain message.
+    """
+    role = _dict.get("role")
+    if role == "user":
+        return HumanMessage(content=_dict.get("content", ""))
+    elif role == "assistant":
+        # Fix for azure
+        # Also OpenAI returns None for tool invocations
+        content = _dict.get("content", "") or ""
+        additional_kwargs: Dict = {}
+        if function_call := _dict.get("function_call"):
+            additional_kwargs["function_call"] = dict(function_call)
+        if tool_calls := _dict.get("tool_calls"):
+            additional_kwargs["tool_calls"] = tool_calls
+        if reasoning_content := _dict.get("reasoning_content"):
+            additional_kwargs["reasoning_content"] = reasoning_content
+        return AIMessage(content=content, additional_kwargs=additional_kwargs)
+    elif role == "system":
+        return SystemMessage(content=_dict.get("content", ""))
+    elif role == "function":
+        return FunctionMessage(content=_dict.get("content", ""), name=_dict.get("name"))
+    elif role == "tool":
+        additional_kwargs = {}
+        if "name" in _dict:
+            additional_kwargs["name"] = _dict["name"]
+        return ToolMessage(
+            content=_dict.get("content", ""),
+            tool_call_id=_dict.get("tool_call_id"),
+            additional_kwargs=additional_kwargs,
+        )
+    else:
+        return ChatMessage(content=_dict.get("content", ""), role=role)
 
 
 class LangchainOpenAIStyleInstance(ChatOpenAI):
@@ -273,3 +316,25 @@ class LangchainOpenAIStyleInstance(ChatOpenAI):
             if run_manager:
                 await run_manager.on_llm_new_token(token=cg_chunk.text, chunk=cg_chunk)
             yield cg_chunk
+
+    def _create_chat_result(self, response: Union[dict, BaseModel]) -> ChatResult:
+        generations = []
+        if not isinstance(response, dict):
+            response = response.dict()
+        for res in response["choices"]:
+            message = convert_dict_to_message(res["message"])
+            generation_info = dict(finish_reason=res.get("finish_reason"))
+            if "logprobs" in res:
+                generation_info["logprobs"] = res["logprobs"]
+            gen = ChatGeneration(
+                message=message,
+                generation_info=generation_info,
+            )
+            generations.append(gen)
+        token_usage = response.get("usage", {})
+        llm_output = {
+            "token_usage": token_usage,
+            "model_name": self.model_name,
+            "system_fingerprint": response.get("system_fingerprint", ""),
+        }
+        return ChatResult(generations=generations, llm_output=llm_output)
