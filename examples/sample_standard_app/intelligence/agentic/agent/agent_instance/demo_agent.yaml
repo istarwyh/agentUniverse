@@ -28,14 +28,15 @@ profile:
   # Please select the llm.
   llm_model:
     name: 'deepseek_llm'
-    model_name: 'deepseek-chat'
-#    model_name: 'deepseek-reasoner'
+    #    model_name: 'deepseek-chat'
+    model_name: 'deepseek-r1'
+    reasoning: true
 #    name: 'qwen_llm'
 action:
   # Please select the tools and knowledge base.
   tool:
     - 'mock_search_tool'
-#    - 'demo_search_tool'
+  #    - 'demo_search_tool'
   knowledge:
 #    - 'demo_knowledge'
 memory:
