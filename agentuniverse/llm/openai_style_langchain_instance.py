@@ -6,14 +6,15 @@
 # @Email   : weizhongjie.wzj@antgroup.com
 # @FileName: langchain_openai_style_instance.py
 
-from typing import Any, List, Optional, AsyncIterator, Iterator
+from typing import Any, List, Optional, AsyncIterator, Iterator, Mapping, Dict, Type
 
 from langchain.callbacks.manager import AsyncCallbackManagerForLLMRun, CallbackManagerForLLMRun
 from langchain.schema import BaseMessage, ChatResult
-from langchain_community.chat_models.openai import _convert_delta_to_message_chunk, _create_retry_decorator
+from langchain_community.chat_models.openai import  _create_retry_decorator
 from langchain_community.utils.openai import is_openai_v1
 from langchain_core.language_models.chat_models import generate_from_stream, agenerate_from_stream
-from langchain_core.messages import AIMessageChunk, get_buffer_string
+from langchain_core.messages import AIMessageChunk, get_buffer_string, BaseMessageChunk, HumanMessageChunk, \
+    SystemMessageChunk, FunctionMessageChunk, ToolMessageChunk, ChatMessageChunk
 from langchain_core.outputs import ChatGenerationChunk
 from langchain_community.chat_models import ChatOpenAI
 
@@ -37,6 +38,39 @@ async def acompletion_with_retry(
         return await llm.llm.acall(**kwargs)
 
     return await _completion_with_retry(**kwargs)
+
+
+def _convert_delta_to_message_chunk(
+    _dict: Mapping[str, Any], default_class: Type[BaseMessageChunk]
+) -> BaseMessageChunk:
+    role = _dict.get("role")
+    content = _dict.get("content") or ""
+    additional_kwargs: Dict = {}
+    if _dict.get("function_call"):
+        function_call = dict(_dict["function_call"])
+        if "name" in function_call and function_call["name"] is None:
+            function_call["name"] = ""
+        additional_kwargs["function_call"] = function_call
+    if _dict.get("tool_calls"):
+        additional_kwargs["tool_calls"] = _dict["tool_calls"]
+
+    if _dict.get("reasoning_content"):
+        additional_kwargs["reasoning_content"] = _dict["reasoning_content"]
+
+    if role == "user" or default_class == HumanMessageChunk:
+        return HumanMessageChunk(content=content)
+    elif role == "assistant" or default_class == AIMessageChunk:
+        return AIMessageChunk(content=content, additional_kwargs=additional_kwargs)
+    elif role == "system" or default_class == SystemMessageChunk:
+        return SystemMessageChunk(content=content)
+    elif role == "function" or default_class == FunctionMessageChunk:
+        return FunctionMessageChunk(content=content, name=_dict["name"])
+    elif role == "tool" or default_class == ToolMessageChunk:
+        return ToolMessageChunk(content=content, tool_call_id=_dict["tool_call_id"])
+    elif role or default_class == ChatMessageChunk:
+        return ChatMessageChunk(content=content, role=role)
+    else:
+        return default_class(content=content)
 
 
 class LangchainOpenAIStyleInstance(ChatOpenAI):
