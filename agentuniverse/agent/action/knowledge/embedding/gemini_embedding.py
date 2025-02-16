@@ -2,7 +2,6 @@
 # -*- coding:utf-8 -*-
 from typing import List, Any
 
-from google import genai
 from langchain_core.embeddings import Embeddings as LCEmbeddings
 from pydantic import Field
 from typing_extensions import Optional
@@ -23,6 +22,13 @@ class GeminiEmbedding(Embedding):
     gemini_api_key: Optional[str] = Field(default_factory=lambda: get_from_env("GOOGLE_API_KEY"))
 
     def __init__(self, **kwargs):
+        try:
+            from google import genai
+        except ImportError as e:
+            raise ImportError(
+                "genai is required. Install with: pip install google-genai"
+            ) from e
+
         super().__init__(**kwargs)
         self.client = genai.Client(api_key=self.gemini_api_key)
         # Gemini does not have a native proxy solution.
