@@ -13,7 +13,7 @@ from langchain_core.output_parsers.base import T
 from langchain_core.outputs import Generation
 
 
-class AuStrOutputParser(StrOutputParser):
+class ReasoningOutputParser(StrOutputParser):
     def parse_result(self, result: List[Generation], *, partial: bool = False) -> T:
         if not result:
             return ""
