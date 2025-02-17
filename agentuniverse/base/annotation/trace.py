@@ -154,6 +154,7 @@ def get_caller_info(instance: object = None):
             'type': 'user'
         }
 
+
 def trace_agent(func):
     """Annotation: @trace_agent
 
@@ -183,7 +184,7 @@ def trace_agent(func):
         kwargs['memory_source_info'] = start_info
         ConversationMemoryModule().add_agent_input_info(start_info, self, agent_input, pair_id)
         if tracing is False:
-            result =  await func(*args, **kwargs)
+            result = await func(*args, **kwargs)
             ConversationMemoryModule().add_agent_result_info(self, result, start_info, pair_id)
             return result
 
@@ -226,10 +227,9 @@ def trace_agent(func):
         kwargs['memory_source_info'] = start_info
         ConversationMemoryModule().add_agent_input_info(start_info, self, agent_input, pair_id)
         if tracing is False:
-            result =  func(*args, **kwargs)
+            result = func(*args, **kwargs)
             ConversationMemoryModule().add_agent_result_info(self, result, start_info, pair_id)
             return result
-
 
         # add invocation chain to the monitor module.
         Monitor.init_invocation_chain()
@@ -275,7 +275,7 @@ def trace_tool(func):
 
         if self and hasattr(self, 'tracing'):
             if self.tracing is False:
-                result =  func(*args, **kwargs)
+                result = func(*args, **kwargs)
                 ConversationMemoryModule().add_tool_output_info(start_info, source, params=result, pair_id=pair_id)
                 return result
 
