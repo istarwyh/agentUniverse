@@ -14,5 +14,5 @@ memory:
   name: 'demo_memory'
 metadata:
   type: 'AGENT'
-  module: 'agentuniverse.agent.template.rag_agent_template'
-  class: 'RagAgentTemplate'
+  module: 'multimodal_app.intelligence.agentic.agent.agent_instance.multimodal_agent'
+  class: 'MultimodalAgent'
