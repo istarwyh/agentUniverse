@@ -85,3 +85,16 @@ class ChatPrompt(Prompt):
                             content = [
                                 {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{base64_image}"}}]
                             self.messages.append(Message(type=ChatMessageEnum.HUMAN.value, content=content))
+
+    def generate_audio_prompt(self, audio_url: str) -> None:
+        """ Generate the prompt with audio url.
+
+        Args:
+            audio_url (str): The audio url.
+        """
+        if audio_url:
+            parsed_url = urlparse(audio_url)
+            # Check if the URL is a valid HTTP or HTTPS URL.
+            if parsed_url.scheme in ["http", "https"]:
+                content = [{"type": "input_audio", "input_audio": {"data": audio_url}}]
+                self.messages.append(Message(type=ChatMessageEnum.HUMAN.value, content=content))

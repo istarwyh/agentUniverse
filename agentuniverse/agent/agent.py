@@ -154,6 +154,7 @@ class Agent(ComponentBase, ABC):
         agent_input['chat_history'] = input_object.get_data('chat_history') or ''
         agent_input['background'] = input_object.get_data('background') or ''
         agent_input['image_urls'] = input_object.get_data('image_urls') or []
+        agent_input['audio_url'] = input_object.get_data('audio_url') or ''
         agent_input['date'] = datetime.now().strftime('%Y-%m-%d')
         agent_input['session_id'] = input_object.get_data('session_id') or ''
         agent_input['agent_id'] = self.agent_model.info.get('name', '')
@@ -365,6 +366,10 @@ class Agent(ComponentBase, ABC):
         image_urls: list = agent_input.pop('image_urls', []) or []
         if image_urls:
             chat_prompt.generate_image_prompt(image_urls)
+
+        audio_url: str = agent_input.pop('audio_url') or ''
+        if audio_url:
+            chat_prompt.generate_audio_prompt(audio_url)
         return chat_prompt
 
     def get_memory_params(self, agent_input: dict) -> dict:
