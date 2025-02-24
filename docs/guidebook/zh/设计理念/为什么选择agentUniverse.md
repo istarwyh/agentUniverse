@@ -2,7 +2,7 @@
 agentUniverse是一个多智能体框架，面向实际业务场景中的复杂任务优化设计。agentUniverse不仅提供搭建单一智能体的全部关键组件，还提供了多智能体之间协作模式的编排组件（类似于Pattern Factory），开发者可以通过自定义协同模式，让智能体各司其职，更好的解决自己领域的专业问题。同时，agentUniverse提供专家经验的注入机制，帮助开发者和企业轻松构建具备专业KnowHow的智能应用。
 
 ## 架构大图
-![au_architectural_diagram](../../_picture/au_architectural_diagram.png)
+![au_architectural_diagram](../../_picture/agentuniverse_structure.png)
 
 agentUniverse基础能力包含单Agent能力，提供多智能体协同模式编排组件，同时给开发者提供知识注入的手段与机制。
 

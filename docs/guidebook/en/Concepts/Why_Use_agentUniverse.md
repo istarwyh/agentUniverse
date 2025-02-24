@@ -4,6 +4,9 @@ agentUniverse is a multi-agent framework specifically optimized for tackling com
 
 
 **Architecture Diagram**
+
+![au_architectural_diagram](../../_picture/agentuniverse_structure_en.png)
+
 agentUniverse boasts a range of basic capabilities, including single-agent functionalities, orchestration components for multi-agent collaboration modes, and tools and mechanisms for knowledge injection. Through the framework's standardized interfaces, users can seamlessly integrate their own models, knowledge bases, and tools, enabling different agents to leverage these resources effectively.
 
 With these capabilities, you can build your own intelligent applications tailored to your needs. Moreover, the framework further provides key capability components and application solutions specifically designed for large model applications. These components address common challenges in large model applications, such as RAG (Retrieve-and-Generate), tool invocation, and security rigor, helping developers overcome inevitable difficulties. The application solutions, on the other hand, offer end-to-end solutions for typical scenarios of large model applications, such as knowledge Q&A, intelligent search, and analysis and interpretation, thereby enhancing application development efficiency.

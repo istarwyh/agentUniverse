@@ -7,19 +7,21 @@ profile:
   prompt_version: demo_agent.cn
   # Please select the llm.
   llm_model:
-    name: 'demo_llm'
-#    name: 'deepseek_llm'
-#    model_name: 'deepseek-chat'
-#    model_name: 'deepseek-r1'
+    # you can change this config to a customized LLM
+    # e.g. demo_llm, which defined in /intelligence/agentic/llm/demo_llm.yaml
+    name: 'default_deepseek_llm'
 action:
   # Please select the tools and knowledge base.
   tool:
+    # here we use a mock_search_tool to mock a search result
+    # you can change to customized search tool
+    # e.g. demo_search_tool, to do a real internet search
+    # for using demo_search_tool, you need to get either /Google/Bing/search.io search API key
+    # and config it into /config/custom_key.toml
     - 'mock_search_tool'
-  #    - 'demo_search_tool'
   knowledge:
-#    - 'demo_knowledge'
+    # advantage feature，please refer to doc
 memory:
-  # Please select the memory.
   name: 'demo_memory'
 metadata:
   type: AGENT
