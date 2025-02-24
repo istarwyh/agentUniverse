@@ -1,21 +1,20 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-# @Time    : 2024/10/24 21:19
-# @Author  : wangchongshi
-# @Email   : wangchongshi.wcs@antgroup.com
+# @Time    :
+# @Author  :
+# @Email   :
 # @FileName: rag_template.py
-from langchain_core.output_parsers import StrOutputParser
 
-from agentuniverse.base.util.prompt_util import process_llm_token
-
-from agentuniverse.base.util.agent_util import assemble_memory_input, assemble_memory_output
 from agentuniverse.agent.agent import Agent
-
 from agentuniverse.agent.input_object import InputObject
 from agentuniverse.agent.memory.memory import Memory
+from agentuniverse.base.util.agent_util import assemble_memory_input, assemble_memory_output
+from agentuniverse.base.util.prompt_util import process_llm_token
 from agentuniverse.llm.llm import LLM
 from agentuniverse.prompt.prompt import Prompt
+
+from langchain_core.output_parsers import StrOutputParser
 
 
 class DemoAgent(Agent):
