@@ -1,6 +1,6 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
-import datetime
+
 # @Time    : 2024/3/15 10:05
 # @Author  : wangchongshi
 # @Email   : wangchongshi.wcs@antgroup.com
@@ -44,7 +44,7 @@ class Memory(ComponentBase):
     memory_key: Optional[str] = 'chat_history'
     max_tokens: int = 2000
     memory_compressor: Optional[str] = None
-    memory_storages: Optional[List[str]] = ['local_memory_storage']
+    memory_storages: Optional[List[str]] = ['ram_memory_storage']
     memory_retrieval_storage: Optional[str] = None
     summarize_agent_id: Optional[str] = 'memory_summarize_agent'
 

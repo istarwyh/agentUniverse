@@ -4,18 +4,18 @@
 # @Time    : 2024/10/11 17:49
 # @Author  : wangchongshi
 # @Email   : wangchongshi.wcs@antgroup.com
-# @FileName: local_memory_storage.py
+# @FileName: ram_memory_storage.py
 from typing import Optional, List, Dict
 
 from agentuniverse.agent.memory.memory_storage.memory_storage import MemoryStorage
 from agentuniverse.agent.memory.message import Message
 
 
-class LocalMemoryStorage(MemoryStorage):
-    """The local temporary memory storage class.
+class RamMemoryStorage(MemoryStorage):
+    """The ram memory storage class.
 
     Attributes:
-        messages (dict[str, dict[str, list[Message]]]): The messages in the local temporary memory.
+        messages (dict[str, dict[str, list[Message]]]): The messages in the ram memory.
     """
 
     messages: Optional[Dict[str, Dict[str, List[Message]]]] = dict()
