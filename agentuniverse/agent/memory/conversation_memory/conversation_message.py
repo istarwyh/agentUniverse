@@ -67,10 +67,9 @@ class ConversationMessage(Message):
 
     def as_langchain(self):
         """Convert the agentUniverse(aU) message class to the langchain message class."""
-        if self.type in [ConversationMessageSourceType.AGENT.value,
-                         ConversationMessageSourceType.USER.value]:
+        if self.type == ConversationMessageEnum.INPUT.value:
             return HumanMessagePromptTemplate.from_template(self.content)
-        elif self.type == ChatMessageEnum.AI.value:
+        elif self.type == ConversationMessageEnum.OUTPUT.value:
             return AIMessagePromptTemplate.from_template(self.content)
         else:
             return BaseStringMessagePromptTemplate.from_template(self.content)

@@ -1,6 +1,7 @@
 import traceback
 import time
 from flask import Flask, Response, g, request
+from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 from loguru import logger
 from concurrent.futures import TimeoutError
@@ -9,6 +10,7 @@ from ..service_instance import ServiceInstance, ServiceNotFoundError
 from .request_task import RequestTask
 from .web_util import request_param, service_run_queue, make_standard_response, FlaskServerManager
 from .thread_with_result import ThreadPoolExecutorWithReturnValue
+from ...base.context.framework_context_manager import FrameworkContextManager
 from ...base.util.logging.logging_util import LOGGER
 from agentuniverse.base.util.logging.log_type_enum import LogTypeEnum
 from agentuniverse.base.util.logging.general_logger import get_context_prefix
@@ -59,6 +61,8 @@ def timed_generator(generator, start_time):
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 app.json.ensure_ascii = False
+# 允许跨域
+CORS(app, resources="*")
 
 
 @app.before_request
@@ -144,7 +148,7 @@ def service_run_stream(service_id: str, params: dict, saved: bool = False):
     params = {} if params is None else params
     params['service_id'] = service_id
     task = RequestTask(service_run_queue, saved, **params)
-    response = Response(timed_generator(task.stream_run(),g.start_time), mimetype="text/event-stream")
+    response = Response(timed_generator(task.stream_run(), g.start_time), mimetype="text/event-stream")
     response.headers['X-Request-ID'] = task.request_id
     return response
 
@@ -219,3 +223,21 @@ def handle_exception(e):
     return make_standard_response(success=False,
                                   message="Internal Server Error",
                                   status_code=500)
+
+
+@app.route("/chat/completions", methods=['POST'])
+@request_param
+def openai_stream_chat(model: str, messages: list, stream: bool):
+    """
+    OpenAI chat completion API.
+    """
+    params = {
+        "service_id": model,
+        "messages": messages,
+        "stream": stream,
+        "model": model
+    }
+    task = RequestTask(service_run_queue, False, **params)
+    response = Response(timed_generator(task.user_stream_run(), g.start_time), mimetype="text/event-stream")
+    response.headers['X-Request-ID'] = task.request_id
+    return response

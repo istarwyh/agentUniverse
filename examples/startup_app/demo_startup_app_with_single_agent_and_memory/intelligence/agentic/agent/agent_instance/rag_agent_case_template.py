@@ -18,9 +18,11 @@ from agentuniverse.agent.template.rag_agent_template import RagAgentTemplate
 from agentuniverse.base.util.prompt_util import process_llm_token
 from agentuniverse.llm.llm import LLM
 from agentuniverse.prompt.prompt import Prompt
+from examples.startup_app.demo_startup_app_with_single_agent_and_memory.intelligence.agentic.agent.agent_instance.openai_agent_template import \
+    OpenAIAgentTemplate
 
 
-class RagAgentCaseTemplate(RagAgentTemplate):
+class RagAgentCaseTemplate(OpenAIAgentTemplate):
     def execute_query(self, input: str):
         """
         Args:
@@ -46,7 +48,6 @@ class RagAgentCaseTemplate(RagAgentTemplate):
         # invoke tool
         knowledge_res: str = self.execute_query(agent_input.get('input'))
         agent_input['background'] = knowledge_res
-
         # 1. load memory
         self.load_memory(memory, agent_input)
         # 2. add user query memory
@@ -56,8 +57,10 @@ class RagAgentCaseTemplate(RagAgentTemplate):
         agent_input['background'] = (agent_input['background']
                                      + f"\nsummarize_memory:\n {summarize_memory}")
         process_llm_token(llm, prompt.as_langchain(), self.agent_model.profile, agent_input)
+
+        prompt = self.build_prompt(agent_input, prompt)
         # 4. invoke chain
-        chain = prompt.as_langchain() | llm.as_langchain_runnable(
+        chain = prompt | llm.as_langchain_runnable(
             self.agent_model.llm_params()) | StrOutputParser()
         res = self.invoke_chain(chain, agent_input, input_object, **kwargs)
         # 5. stream output
