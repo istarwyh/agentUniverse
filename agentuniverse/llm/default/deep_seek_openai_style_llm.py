@@ -16,7 +16,7 @@ from agentuniverse.llm.llm_output import LLMOutput
 from agentuniverse.llm.openai_style_llm import OpenAIStyleLLM
 
 DEEpSEEkMAXCONTETNLENGTH = {
-    "deepseek-chat": 32000,
+    "deepseek-chat": 64000,
     "deepseek-coder": 32000,
     "deepseek-reasoner": 64000
 }
