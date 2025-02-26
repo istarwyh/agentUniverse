@@ -14,15 +14,26 @@ import yaml
 from agentuniverse.base.annotation.singleton import singleton
 from agentuniverse.base.config.config_type_enum import ConfigTypeEnum
 
+
 @singleton
 class PlaceholderResolver:
     def __init__(self):
         self._resolvers = []
         self.register_resolver(r'\${(.+?)}',
-                                   lambda match: os.getenv(match.group(1), ''))
+                               lambda match: os.getenv(match.group(1), ''))
+
     def register_resolver(self, pattern, func):
         """Register a new resolver with a regex pattern and its corresponding function."""
         self._resolvers.append((re.compile(pattern), func))
+
+    def set_root_package_name(self, root_package_name: str):
+        """Set the value of root_package_name for ${ROOT_PACKAGE} placeholder resolution.
+
+        Args:
+            root_package_name: The value to replace ${ROOT_PACKAGE}.
+        """
+        if root_package_name:
+            self._resolvers.insert(0, (re.compile(r'\${ROOT_PACKAGE}'), lambda _: root_package_name))
 
     def resolve(self, value):
         """Resolve placeholders in a given value based on registered resolvers."""
@@ -36,6 +47,7 @@ class PlaceholderResolver:
             return value
         else:
             return value
+
 
 class Configer(object):
     """Configger object, responsible for the configuration file load, update, etc."""
@@ -171,6 +183,9 @@ class Configer(object):
         """
         with open(path, 'rb') as f:
             config_data = tomli.load(f)
+        if config_data:
+            root_package_name = config_data.get('PACKAGE_PATH_INFO', {}).get('ROOT_PACKAGE')
+            PlaceholderResolver().set_root_package_name(root_package_name)
         config_data = PlaceholderResolver().resolve(config_data)
         return config_data
 

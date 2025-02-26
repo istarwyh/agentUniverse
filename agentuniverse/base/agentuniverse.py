@@ -121,7 +121,6 @@ class AgentUniverse(object):
         # scan and register the components
         self.__scan_and_register(self.__config_container.app_configer)
         if core_mode:
-
             for _func, args, kwargs in POST_FORK_QUEUE:
                 _func(*args, **kwargs)
 

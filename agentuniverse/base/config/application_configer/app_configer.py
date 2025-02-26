@@ -6,7 +6,7 @@
 # @Email   : jerry.zzw@antgroup.com
 # @FileName: app_configer.py
 from typing import Optional
-from agentuniverse.base.config.configer import Configer
+from agentuniverse.base.config.configer import Configer, PlaceholderResolver
 
 
 class AppConfiger(object):
@@ -39,6 +39,7 @@ class AppConfiger(object):
         self.__core_work_pattern_package_list: Optional[list[str]] = None
         self.__core_log_sink_package_list: Optional[list[str]] = None
         self.__conversation_memory_configer: Optional[dict] = {}
+        self.__root_package_name: Optional[str] = None
 
     @property
     def base_info_appname(self) -> Optional[str]:
@@ -155,6 +156,11 @@ class AppConfiger(object):
     @property
     def conversation_memory_configer(self) -> dict:
         return self.__conversation_memory_configer
+
+    @property
+    def root_package_name(self) -> str:
+        return self.__root_package_name
+
     def load_by_configer(self, configer: Configer) -> 'AppConfiger':
         """Load the AppConfiger by the given Configer.
 
@@ -165,6 +171,7 @@ class AppConfiger(object):
         """
         self.__configer = configer
         self.__base_info_appname = configer.value.get('BASE_INFO', {}).get('appname')
+        self.__root_package_name = configer.value.get('PACKAGE_PATH_INFO', {}).get('ROOT_PACKAGE')
         self.__core_default_package_list = configer.value.get('CORE_PACKAGE', {}).get('default')
         self.__core_agent_package_list = configer.value.get('CORE_PACKAGE', {}).get('agent')
         self.__core_knowledge_package_list = configer.value.get('CORE_PACKAGE', {}).get('knowledge')
