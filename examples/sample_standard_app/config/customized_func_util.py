@@ -65,4 +65,4 @@ class CustomizedFuncUtil(object):
         """
         if agent_id == "demo_agent":
             return 'demo_llm'
-        return 'demo_deepseek_llm'
+        return 'demo_llm'

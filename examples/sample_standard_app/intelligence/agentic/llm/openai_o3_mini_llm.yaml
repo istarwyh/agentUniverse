@@ -1,0 +1,9 @@
+name: 'openai_o3_mini_llm'
+description: 'openai_o3_mini_llm'
+model_name: 'o3-mini'
+max_tokens: 2000
+api_key: '${OPENAI_API_KEY}'
+metadata:
+  type: 'LLM'
+  module: 'agentuniverse.llm.default.default_openai_llm'
+  class: 'DefaultOpenAILLM'

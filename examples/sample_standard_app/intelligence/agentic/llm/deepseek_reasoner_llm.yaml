@@ -1,6 +1,6 @@
-name: 'demo_deepseek_llm'
-description: 'demo deepseek llm with spi'
-model_name: 'deepseek-chat'
+name: 'deepseek-reasoner_llm'
+description: 'deepseek-reasoner_llm'
+model_name: 'deepseek-reasoner'
 max_tokens: 2000
 api_key: '${DEEPSEEK_API_KEY}'
 metadata:
