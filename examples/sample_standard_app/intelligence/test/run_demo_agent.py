@@ -1,11 +1,10 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
-import os
 
 # @Time    : 2024/4/1 14:32
 # @Author  : wangchongshi
 # @Email   : wangchongshi.wcs@antgroup.com
-# @FileName: test_rag_agent.py
+# @FileName: run_demo_agent.py
 from agentuniverse.agent.agent import Agent
 from agentuniverse.agent.agent_manager import AgentManager
 from agentuniverse.base.agentuniverse import AgentUniverse

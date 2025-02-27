@@ -11,6 +11,7 @@ from typing import TypeVar, Generic
 from agentuniverse.base.config.application_configer.application_config_manager import ApplicationConfigManager
 from agentuniverse.base.component.component_base import ComponentBase
 from agentuniverse.base.component.component_enum import ComponentEnum
+from agentuniverse.base.util.logging.logging_util import LOGGER
 from agentuniverse.base.util.system_util import is_system_builtin
 
 # 添加类型范型限定
@@ -31,6 +32,8 @@ class ComponentManagerBase(Generic[ComponentTypeVar]):
         """Register the component instance."""
         if component_instance_name in self._instance_obj_map.keys():
             if is_system_builtin(component_instance_obj):
+                LOGGER.info(f"Component name '{component_instance_name}' is already registered. "
+                            f"Skipping system built-in component in favor of user-configured component.")
                 return
             raise ValueError(f"{self._component_type.value} component object instance with name "
                              f"'{component_instance_name}' already exists.")
