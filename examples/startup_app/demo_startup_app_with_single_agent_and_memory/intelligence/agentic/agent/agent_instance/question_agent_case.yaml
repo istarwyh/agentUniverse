@@ -40,8 +40,8 @@ profile:
   prompt_version: question_parse_agent.cn
   llm_model:
     name: 'qwen_llm'
-    model_name: 'qwen2.5-72b-instruct'
-    temperature: 0.1
+#    model_name: 'qwen2.5-72b-instruct'
+#    temperature: 0.1
 memory:
   conversation_memory: 'global_conversation_memory'
   agent_id: rag_agent_case

@@ -1,5 +1,6 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
+import time
 
 # @Time    : 2024/4/1 14:32
 # @Author  : wangchongshi
@@ -23,6 +24,7 @@ def chat(question: str):
     res_info = f"\nDemo agent execution result is :\n"
     res_info += output_object.get_data('output')
     print(res_info)
+    time.sleep(10)
 
 
 if __name__ == '__main__':

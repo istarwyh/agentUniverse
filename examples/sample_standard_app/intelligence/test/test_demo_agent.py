@@ -1,6 +1,7 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
 import queue
+import time
 # @Time    : 2024/4/1 14:32
 # @Author  : wangchongshi
 # @Email   : wangchongshi.wcs@antgroup.com
@@ -12,6 +13,7 @@ from agentuniverse.agent.agent import Agent
 from agentuniverse.agent.agent_manager import AgentManager
 from agentuniverse.agent.output_object import OutputObject
 from agentuniverse.base.agentuniverse import AgentUniverse
+from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
 
 
 class DemoAgentTest(unittest.TestCase):
@@ -44,10 +46,12 @@ class DemoAgentTest(unittest.TestCase):
 
     def test_demo_agent_stream(self):
         output_stream = queue.Queue(10)
+        FrameworkContextManager().set_context("session_id", "111111111")
         instance: Agent = AgentManager().get_instance_obj('demo_agent')
         Thread(target=self.read_output, args=(output_stream,)).start()
-        result = instance.run(input='你来自哪里，名字是什么', output_stream=output_stream)
+        result = instance.run(input='你来自哪里，名字是什么', output_stream=output_stream,session_id="111111111")
         print(result)
+        time.sleep(10)
 
 if __name__ == '__main__':
     unittest.main()

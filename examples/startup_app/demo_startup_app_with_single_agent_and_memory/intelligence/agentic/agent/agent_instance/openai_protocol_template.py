@@ -9,38 +9,30 @@ import json
 from queue import Queue
 from typing import Any, List, Dict
 
-from langchain_core.messages import HumanMessage, BaseMessage, AIMessage
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableSerializable
 
 from agentuniverse.agent.input_object import InputObject
 from agentuniverse.agent.memory.memory import Memory
 from agentuniverse.agent.memory.message import Message
+
 from agentuniverse.agent.template.agent_template import AgentTemplate
 from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
-from agentuniverse.base.util.prompt_util import process_llm_token
-from agentuniverse.llm.llm import LLM
-from agentuniverse.prompt.prompt import Prompt
+from agentuniverse.base.util.memory_util import get_memory_string
 
 
-class OpenAIAgentTemplate(AgentTemplate):
+class OpenAIProtocolTemplate(AgentTemplate):
     def input_keys(self) -> list[str]:
         return [
             'messages', 'model', 'stream'
         ]
 
     def convert_message(self, messages: List[Dict]):
-        langchain_messages = []
         for message in messages:
             if message.get('role') == 'user':
                 message['type'] = 'human'
-                langchain_messages.append(HumanMessage(content=message['content']))
             elif message.get('role') == 'assistant':
                 message['type'] = 'ai'
-                langchain_messages.append(AIMessage(content=message['content']))
-
-        return langchain_messages
+        return [Message.from_dict(message) for message in messages]
 
     def parse_input(self, input_object: InputObject, agent_input: dict) -> dict:
         for key in self.input_keys():
@@ -51,34 +43,15 @@ class OpenAIAgentTemplate(AgentTemplate):
         input = messages[-1].get('content')
         agent_input['input'] = input
         if len(convert_messages) > 1:
-            agent_input['convert_messages'] = convert_messages[0:len(convert_messages) - 1]
+            agent_input['chat_history'] = convert_messages[0:len(convert_messages) - 1]
         return agent_input
 
-    def build_prompt(self, agent_input: dict, prompt: Prompt):
-        prompt: ChatPromptTemplate = prompt.as_langchain()
-        current_prompt_messages = prompt.messages
-        prompt.messages = []
-        if len(current_prompt_messages) > 1:
-            prompt.append(current_prompt_messages[0])
-        prompt.extend(agent_input.get("convert_messages", []))
-        if len(current_prompt_messages) > 1:
-            prompt.append(current_prompt_messages[1])
-        else:
-            prompt.extend(current_prompt_messages)
-        return prompt
-
-    def customized_execute(self, input_object: InputObject, agent_input: dict, memory: Memory, llm: LLM, prompt: Prompt,
-                           **kwargs) -> dict:
-        self.load_memory(memory, agent_input)
-        process_llm_token(llm, prompt.as_langchain(), self.agent_model.profile, agent_input)
-        if not memory:
-            prompt = self.build_prompt(agent_input, prompt)
-        chain = prompt | llm.as_langchain_runnable(
-            self.agent_model.llm_params()) | StrOutputParser()
-        res = self.invoke_chain(chain, agent_input, input_object, **kwargs)
-        self.add_memory(memory, f"Human: {agent_input.get('input')}, AI: {res}", agent_input=agent_input)
-        self.add_output_stream(input_object.get_data('output_stream'), res)
-        return {**agent_input, 'output': res}
+    def process_memory(self, agent_input: dict, **kwargs) -> Memory | None:
+        if 'chat_history' in agent_input:
+            agent_input['chat_history'] = get_memory_string(agent_input.get('chat_history'),
+                                                            agent_input.get('agent_id'))
+            return None
+        return super().process_memory(agent_input, **kwargs)
 
     def output_keys(self) -> list[str]:
         return ["choices"]
@@ -102,7 +75,8 @@ class OpenAIAgentTemplate(AgentTemplate):
                 "prompt_tokens": 0,
                 "completion_tokens": 0,
                 "total_tokens": 0
-            }
+            },
+            "output": agent_result.get('output')
         }
 
     def add_openai_output_stream(self, output_stream: Queue, agent_output: str):

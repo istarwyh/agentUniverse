@@ -1,6 +1,8 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
+from langchain_core.output_parsers import StrOutputParser
 
+from agentuniverse.agent.template.rag_agent_template import RagAgentTemplate
 # @Time    : 2024/10/24 21:19
 # @Author  : wangchongshi
 # @Email   : wangchongshi.wcs@antgroup.com
@@ -19,7 +21,7 @@ from agentuniverse.llm.llm import LLM
 from agentuniverse.prompt.prompt import Prompt
 
 
-class DemoAgent(Agent):
+class DemoAgent(RagAgentTemplate):
 
     def input_keys(self) -> list[str]:
         return ['input']
@@ -33,25 +35,25 @@ class DemoAgent(Agent):
 
     def parse_result(self, agent_result: dict) -> dict:
         return {**agent_result, 'output': agent_result['output']}
-
-    def execute(self, input_object: InputObject, agent_input: dict) -> dict:
-        memory: Memory = self.process_memory(agent_input)
-        llm: LLM = self.process_llm()
-        prompt: Prompt = self.process_prompt(agent_input)
-        tool_res: str = self.invoke_tools(input_object)
-        knowledge_res: str = self.invoke_knowledge(agent_input.get('input'), input_object)
-        agent_input['background'] = (agent_input['background']
-                                     + f"tool_res: {tool_res} \n\n knowledge_res: {knowledge_res}")
-        return self.customized_execute(input_object, agent_input, memory, llm, prompt)
-
-    def customized_execute(self, input_object: InputObject, agent_input: dict, memory: Memory, llm: LLM, prompt: Prompt,
-                           **kwargs) -> dict:
-        assemble_memory_input(memory, agent_input)
-        process_llm_token(llm, prompt.as_langchain(), self.agent_model.profile, agent_input)
-        chain = prompt.as_langchain() | llm.as_langchain_runnable(
-            self.agent_model.llm_params()) | ReasoningOutputParser()
-        res = self.invoke_chain(chain, agent_input, input_object, **kwargs)
-        assemble_memory_output(memory=memory,
-                               agent_input=agent_input,
-                               content=f"Human: {agent_input.get('input')}, AI: {res}")
-        return {**agent_input, 'output': res}
+    #
+    # def execute(self, input_object: InputObject, agent_input: dict) -> dict:
+    #     memory: Memory = self.process_memory(agent_input)
+    #     llm: LLM = self.process_llm()
+    #     prompt: Prompt = self.process_prompt(agent_input)
+    #     tool_res: str = self.invoke_tools(input_object)
+    #     knowledge_res: str = self.invoke_knowledge(agent_input.get('input'), input_object)
+    #     agent_input['background'] = (agent_input['background']
+    #                                  + f"tool_res: {tool_res} \n\n knowledge_res: {knowledge_res}")
+    #     return self.customized_execute(input_object, agent_input, memory, llm, prompt)
+    #
+    # def customized_execute(self, input_object: InputObject, agent_input: dict, memory: Memory, llm: LLM, prompt: Prompt,
+    #                        **kwargs) -> dict:
+    #     assemble_memory_input(memory, agent_input)
+    #     process_llm_token(llm, prompt.as_langchain(), self.agent_model.profile, agent_input)
+    #     chain = prompt.as_langchain() | llm.as_langchain_runnable(
+    #         self.agent_model.llm_params()) | StrOutputParser()
+    #     res = self.invoke_chain(chain, agent_input, input_object, **kwargs)
+    #     assemble_memory_output(memory=memory,
+    #                            agent_input=agent_input,
+    #                            content=f"Human: {agent_input.get('input')}, AI: {res}")
+    #     return {**agent_input, 'output': res}

@@ -270,19 +270,19 @@ def trace_tool(func):
         source = func.__qualname__
         start_info = get_caller_info()
         pair_id = f"tool_{uuid.uuid4().hex}"
-        ConversationMemoryModule().add_tool_input_info(start_info, source, tool_input, pair_id)
         self = tool_input.pop('self', None)
-
+        if isinstance(self, object):
+            name = getattr(self, 'name', None)
+            if name is not None:
+                source = name
+        ConversationMemoryModule().add_tool_input_info(start_info, source, tool_input, pair_id)
         if self and hasattr(self, 'tracing'):
             if self.tracing is False:
                 result = func(*args, **kwargs)
                 ConversationMemoryModule().add_tool_output_info(start_info, source, params=result, pair_id=pair_id)
                 return result
 
-        if isinstance(self, object):
-            name = getattr(self, 'name', None)
-            if name is not None:
-                source = name
+
 
         Monitor().trace_tool_input(source, tool_input)
 
@@ -319,6 +319,10 @@ def trace_knowledge(func):
         self = knowledge_input.pop('self', None)
         start = get_caller_info()
         pair_id = f"knowledge_{uuid.uuid4().hex}"
+        if isinstance(self, object):
+            name = getattr(self, 'name', None)
+            if name is not None:
+                source = name
         ConversationMemoryModule().add_knowledge_input_info(start, source, knowledge_input, pair_id)
 
         if self and hasattr(self, 'tracing'):
@@ -327,10 +331,7 @@ def trace_knowledge(func):
                 ConversationMemoryModule().add_knowledge_output_info(start, source, params=result, pair_id=pair_id)
                 return result
 
-        if isinstance(self, object):
-            name = getattr(self, 'name', None)
-            if name is not None:
-                source = name
+
 
         # add invocation chain to the monitor module.
         Monitor.add_invocation_chain({'source': source, 'type': 'knowledge'})
