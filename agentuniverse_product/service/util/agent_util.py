@@ -74,7 +74,7 @@ def validate_create_agent_parameters(agent_dto: AgentDTO) -> None:
     """
     if agent_dto.id is None:
         raise ValueError("Agent id cannot be None.")
-    agent = AgentManager().get_instance_obj(agent_dto.id)
+    agent = AgentManager().get_instance_obj(agent_dto.id, new_instance=False)
     if agent:
         raise ValueError("Agent instance corresponding to the agent id already exists.")
     if agent_dto.planner is None:
@@ -108,7 +108,7 @@ def assemble_agent_config_data(agent_dto: AgentDTO) -> Dict:
         agent_config_data['profile']['workflow_id'] = agent_dto.planner.workflow_id
 
     if agent_dto.llm:
-        llm = LLMManager().get_instance_obj(agent_dto.llm.id)
+        llm = LLMManager().get_instance_obj(agent_dto.llm.id, new_instance=False)
         if llm is None:
             raise ValueError("The llm instance corresponding to the llm id cannot be found.")
         llm_model_dict = {'name': agent_dto.llm.id}
@@ -255,8 +255,8 @@ def get_knowledge_dto_list(agent_model: AgentModel) -> List[KnowledgeDTO]:
     if not knowledge_name_list:
         return res
     for knowledge_name in knowledge_name_list:
-        product: Product = ProductManager().get_instance_obj(knowledge_name)
-        knowledge: Knowledge = KnowledgeManager().get_instance_obj(knowledge_name)
+        product: Product = ProductManager().get_instance_obj(knowledge_name, new_instance=False)
+        knowledge: Knowledge = KnowledgeManager().get_instance_obj(knowledge_name, new_instance=False)
         if knowledge is None:
             continue
         knowledge_dto = KnowledgeDTO(nickname=product.nickname if product else '', id=knowledge_name)
@@ -272,8 +272,8 @@ def get_tool_dto_list(agent_model: AgentModel) -> List[ToolDTO]:
     if len(tool_name_list) < 1:
         return res
     for tool_name in tool_name_list:
-        product: Product = ProductManager().get_instance_obj(tool_name)
-        tool: Tool = ToolManager().get_instance_obj(tool_name)
+        product: Product = ProductManager().get_instance_obj(tool_name, new_instance=False)
+        tool: Tool = ToolManager().get_instance_obj(tool_name, new_instance=False)
         tool_dto = ToolDTO(nickname=product.nickname if product is not None else '',
                            avatar=product.avatar if product is not None else '',
                            id=tool.name)

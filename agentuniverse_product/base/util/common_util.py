@@ -24,5 +24,5 @@ def is_component_id_unique(component_id: str, component_type: str) -> bool:
         return True
     component_enum = ComponentEnum.from_value(component_type.upper())
     component_manager_clz = ComponentConfigerUtil.get_component_manager_clz_by_type(component_enum)
-    instance: ComponentBase = component_manager_clz().get_instance_obj(component_id)
+    instance: ComponentBase = component_manager_clz().get_instance_obj(component_id, new_instance=False)
     return instance is None

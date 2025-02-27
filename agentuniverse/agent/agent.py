@@ -154,6 +154,7 @@ class Agent(ComponentBase, ABC):
         agent_input['chat_history'] = input_object.get_data('chat_history') or ''
         agent_input['background'] = input_object.get_data('background') or ''
         agent_input['image_urls'] = input_object.get_data('image_urls') or []
+        agent_input['audio_url'] = input_object.get_data('audio_url') or ''
         agent_input['date'] = datetime.now().strftime('%Y-%m-%d')
         agent_input['session_id'] = input_object.get_data('session_id') or ''
         agent_input['agent_id'] = self.agent_model.info.get('name', '')
@@ -273,7 +274,7 @@ class Agent(ComponentBase, ABC):
                 }
             })
             result.append(token)
-        return "".join(result)
+        return self.generate_result(result)
 
     async def async_invoke_chain(self, chain: RunnableSerializable[Any, str], agent_input: dict,
                                  input_object: InputObject, **kwargs):
@@ -290,7 +291,17 @@ class Agent(ComponentBase, ABC):
                 }
             })
             result.append(token)
-        return "".join(result)
+        return self.generate_result(result)
+
+    def generate_result(self, data: list[dict | str]):
+        if isinstance(data[0], str):
+            return "".join(data)
+        text = [val.get('text') for val in data]
+        reasoning_content = [val.get('reasoning_content',"") for val in data]
+        return {
+            'text': "".join(text),
+            'reasoning_content': "".join(reasoning_content)
+        }
 
     def invoke_tools(self, input_object: InputObject, **kwargs) -> str:
         tool_names = kwargs.get('tool_names') or self.agent_model.action.get('tool', [])
@@ -355,6 +366,10 @@ class Agent(ComponentBase, ABC):
         image_urls: list = agent_input.pop('image_urls', []) or []
         if image_urls:
             chat_prompt.generate_image_prompt(image_urls)
+
+        audio_url: str = agent_input.pop('audio_url') or ''
+        if audio_url:
+            chat_prompt.generate_audio_prompt(audio_url)
         return chat_prompt
 
     def get_memory_params(self, agent_input: dict) -> dict:

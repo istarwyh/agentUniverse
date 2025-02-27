@@ -1,6 +1,6 @@
 [BASE_INFO]
 # The app name will be applied to all processes including agent service integration.
-appname = 'demo_app'
+appname = 'sample_standard_app'
 
 [CORE_PACKAGE]
 # Perform a full component scan and registration for all the paths under this list.

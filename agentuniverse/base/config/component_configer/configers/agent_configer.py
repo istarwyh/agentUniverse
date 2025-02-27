@@ -8,6 +8,7 @@
 from typing import Optional
 from agentuniverse.base.config.component_configer.component_configer import ComponentConfiger
 from agentuniverse.base.config.configer import Configer
+from agentuniverse.base.util.system_util import get_project_root_path, get_module_path
 
 
 class AgentConfiger(ComponentConfiger):
@@ -65,6 +66,8 @@ class AgentConfiger(ComponentConfiger):
 
         try:
             configer_value: dict = configer.value
+            if self.metadata_module is None:
+                self.metadata_module = get_module_path(configer.path, get_project_root_path().name)
             self.__info = configer_value.get('info') or self.__info
             self.__profile = configer_value.get('profile') or self.__profile
             self.__plan = configer_value.get('plan') or self.__plan
