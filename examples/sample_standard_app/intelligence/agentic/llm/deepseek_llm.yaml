@@ -2,7 +2,7 @@ name: 'demo_deepseek_llm'
 description: 'demo deepseek llm with spi'
 model_name: 'deepseek-chat'
 max_tokens: 2000
-api_key: '@FUNC(load_api_key(model_name="deepseek"))'
+api_key: '${DEEPSEEK_API_KEY}'
 metadata:
   type: 'LLM'
   module: 'agentuniverse.llm.default.deep_seek_openai_style_llm'

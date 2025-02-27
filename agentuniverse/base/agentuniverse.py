@@ -75,6 +75,7 @@ class AgentUniverse(object):
         app_configer = AppConfiger().load_by_configer(configer)
         self.__config_container.app_configer = app_configer
 
+        # init customized func util class
         customized_func_instance = self.__init_customized_func_util(config_path)
         self.__customized_func_instance = customized_func_instance
 
@@ -374,13 +375,7 @@ class AgentUniverse(object):
                 return instance
 
             # Call the customized_init_config method
-            try:
-                instance.customized_init_config()
-                print("Successfully called customized_init_config method")
-            except Exception as e:
-                print(f"Error occurred while calling customized_init_config method: {e}")
-                raise Exception(f"Failed to execute customized_init_config: {e}")
-
+            instance.customized_init_config()
             return instance
 
         except Exception as e:

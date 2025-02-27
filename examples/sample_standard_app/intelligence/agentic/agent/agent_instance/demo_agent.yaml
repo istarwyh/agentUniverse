@@ -9,6 +9,15 @@ profile:
   llm_model:
     # you can change this config to a customized LLM
     # e.g. demo_llm, which defined in /intelligence/agentic/llm/demo_llm.yaml
+    #
+    # The `name` field specifies the LLM to be used by the agent.
+    # - In this configuration, the `@FUNC` annotation is used to dynamically determine the LLM name at runtime.
+    # - The `@FUNC` syntax allows users to call a custom function, in this case, `get_llm_by_agent_id`,
+    #   which is defined in the `CustomizedFuncUtil` class within the `customized_func_util.py` file.
+    # - When the application loads this YAML configuration, agentUniverse will parse the `@FUNC` annotation,
+    #   execute the `get_llm_by_agent_id` function with the provided argument (`"demo_agent"`),
+    #   and replace the annotation with the function's return value.
+    #
     name: '@FUNC(get_llm_by_agent_id("demo_agent"))'
 action:
   # Please select the tools and knowledge base.

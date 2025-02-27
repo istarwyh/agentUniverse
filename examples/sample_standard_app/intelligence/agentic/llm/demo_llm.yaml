@@ -2,6 +2,14 @@ name: 'demo_llm'
 description: 'demo qwen llm with spi'
 model_name: 'qwen2.5-72b-instruct'
 max_tokens: 2000
+#
+# The `api_key` field uses the `@FUNC` annotation to dynamically load the API key at runtime.
+# - The `@FUNC` syntax allows users to call a custom function, in this case, `load_api_key`,
+#   which is defined in the `CustomizedFuncUtil` class within the `customized_func_util.py` file.
+# - When the application loads this YAML configuration, agentUniverse will parse the `@FUNC` annotation,
+#   execute the `load_api_key` function with the provided argument (`model_name="qwen"`),
+#   and replace the annotation with the function's return value.
+#
 api_key: '@FUNC(load_api_key(model_name="qwen"))'
 metadata:
   type: 'LLM'

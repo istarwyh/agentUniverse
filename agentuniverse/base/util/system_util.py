@@ -208,6 +208,8 @@ def is_system_builtin(component_instance: ComponentBase) -> bool:
         bool: True if the component is system-built-in, False otherwise.
     """
     component_enum: ComponentEnum = component_instance.component_type
+    if component_enum is None or not component_instance.component_config_path:
+        return False
     if component_enum.value == ComponentEnum.LLM.value:
         # Check if the LLM component is system-built-in
         return "agentuniverse/llm/default" in component_instance.component_config_path
@@ -247,6 +249,9 @@ def has_required_api_keys(component_instance: ComponentBase, metadata_module: st
         "search_api": "search_api_key",
         "bing_search": "bing_subscription_key"
     }
+
+    if component_instance is None or not metadata_module:
+        return True
 
     for module_name, api_key_name in api_key_mapping.items():
         if module_name in metadata_module and is_api_key_missing(component_instance, api_key_name):

@@ -2,6 +2,8 @@
 # The app name will be applied to all processes including agent service integration.
 appname = 'sample_standard_app'
 
+# The placeholder "${ROOT_PACKAGE}" is mapped to the value of "ROOT_PACKAGE" defined in this file.
+# It allows you to conveniently manage multiple different agent applications by configuring the root package value.
 [PACKAGE_PATH_INFO]
 ROOT_PACKAGE = 'sample_standard_app'
 
