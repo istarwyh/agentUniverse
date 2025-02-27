@@ -1,7 +1,8 @@
-name: 'deepseek_llm'
-description: 'default default_deepseek_llm llm with spi'
+name: 'demo_deepseek_llm'
+description: 'demo deepseek llm with spi'
 model_name: 'deepseek-chat'
 max_tokens: 2000
+api_key: '@FUNC(load_api_key(model_name="deepseek"))'
 metadata:
   type: 'LLM'
   module: 'agentuniverse.llm.default.deep_seek_openai_style_llm'

@@ -21,6 +21,7 @@ class ComponentConfiger(object):
         self.__metadata_type: Optional[str] = None
         self.__metadata_module: Optional[str] = None
         self.__metadata_class: Optional[str] = None
+        self.__customized_func_instance = None
 
     @property
     def configer(self) -> Optional[Configer]:
@@ -49,6 +50,14 @@ class ComponentConfiger(object):
     @metadata_class.setter
     def metadata_class(self, metadata_class: str):
         self.__metadata_class = metadata_class
+
+    @property
+    def customized_func_instance(self):
+        return self.__customized_func_instance
+
+    @customized_func_instance.setter
+    def customized_func_instance(self, value):
+        self.__customized_func_instance = value
 
     def load(self) -> 'ComponentConfiger':
         """Load the configuration by the Configer object.

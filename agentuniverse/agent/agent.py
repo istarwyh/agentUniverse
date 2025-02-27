@@ -40,6 +40,7 @@ from agentuniverse.base.util.common_util import stream_output
 from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
 from agentuniverse.base.util.logging.logging_util import LOGGER
 from agentuniverse.base.util.memory_util import generate_messages, get_memory_string
+from agentuniverse.base.util.system_util import process_dict_with_funcs
 from agentuniverse.llm.llm import LLM
 from agentuniverse.llm.llm_manager import LLMManager
 from agentuniverse.prompt.chat_prompt import ChatPrompt
@@ -193,6 +194,7 @@ class Agent(ComponentBase, ABC):
         agent_config: Optional[AgentConfiger] = component_configer.load()
         info: Optional[dict] = agent_config.info
         profile: Optional[dict] = agent_config.profile
+        profile = process_dict_with_funcs(profile, component_configer.customized_func_instance)
         plan: Optional[dict] = agent_config.plan
         memory: Optional[dict] = agent_config.memory
         action: Optional[dict] = agent_config.action

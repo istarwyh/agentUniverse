@@ -14,6 +14,7 @@ from qianfan import QfResponse
 from qianfan.resources.tools import tokenizer
 
 from agentuniverse.base.annotation.trace import trace_llm
+from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
 from agentuniverse.base.util.env_util import get_from_env
 from agentuniverse.llm.llm import LLM
 from agentuniverse.llm.llm_output import LLMOutput
@@ -137,3 +138,11 @@ class WenXinLLM(LLM):
     def as_langchain(self) -> BaseLanguageModel:
         """Return an instance of the LangChain `BaseLanguageModel` class."""
         return WenXinLangChainInstance(llm=self)
+
+    def initialize_by_component_configer(self, component_configer: LLMConfiger) -> 'WenXinLLM':
+        super().initialize_by_component_configer(component_configer)
+        if 'qianfan_ak' in component_configer.configer.value:
+            self.qianfan_ak = component_configer.configer.value.get('qianfan_ak')
+        if 'qianfan_sk' in component_configer.configer.value:
+            self.qianfan_sk = component_configer.configer.value.get('qianfan_sk')
+        return self

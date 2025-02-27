@@ -6,8 +6,8 @@
 # @Email   : jerry.zzw@antgroup.com
 # @FileName: agentuniverse.py
 import importlib
+import os
 import sys
-import threading
 from pathlib import Path
 
 from agentuniverse.base.annotation.singleton import singleton
@@ -22,7 +22,8 @@ from agentuniverse.base.config.configer import Configer
 from agentuniverse.base.config.custom_configer.custom_key_configer import CustomKeyConfiger
 from agentuniverse.base.component.component_enum import ComponentEnum
 from agentuniverse.base.util.monitor.monitor import Monitor
-from agentuniverse.base.util.system_util import get_project_root_path
+from agentuniverse.base.util.system_util import get_project_root_path, is_api_key_missing, \
+    is_system_builtin, has_required_api_keys
 from agentuniverse.base.util.logging.logging_util import init_loggers
 from agentuniverse.agent_serve.web.request_task import RequestLibrary
 from agentuniverse.agent_serve.web.rpc.grpc.grpc_server_booster import set_grpc_config
@@ -54,6 +55,7 @@ class AgentUniverse(object):
         self.__system_default_memory_storage_package = ['agentuniverse.agent.memory.memory_storage']
         self.__system_default_work_pattern_package = ['agentuniverse.agent.work_pattern']
         self.__system_default_log_sink_package = ['agentuniverse.base.util.logging.log_sink.log_sink']
+        self.__customized_func_instance = None
 
     def start(self, config_path: str = None, core_mode: bool = False):
         """Start the agentUniverse framework.
@@ -72,6 +74,9 @@ class AgentUniverse(object):
         configer = Configer(path=config_path).load()
         app_configer = AppConfiger().load_by_configer(configer)
         self.__config_container.app_configer = app_configer
+
+        customized_func_instance = self.__init_customized_func_util(config_path)
+        self.__customized_func_instance = customized_func_instance
 
         # load user custom key
         custom_key_configer_path = self.__parse_sub_config_path(
@@ -238,11 +243,29 @@ class AgentUniverse(object):
         for component_configer in component_configer_list:
             configer_clz = ComponentConfigerUtil.get_component_config_clz_by_type(component_enum)
             configer_instance: ComponentConfiger = configer_clz().load_by_configer(component_configer.configer)
+            configer_instance.customized_func_instance = self.__customized_func_instance
             component_clz = ComponentConfigerUtil.get_component_object_clz_by_component_configer(configer_instance)
             component_instance: ComponentBase = component_clz().initialize_by_component_configer(configer_instance)
             if component_instance is None:
                 continue
             component_instance.component_config_path = component_configer.configer.path
+            metadata_module = configer_instance.metadata_module
+            if component_enum.value == ComponentEnum.LLM.value:
+                if is_system_builtin(component_instance):
+                    if is_api_key_missing(component_instance, "api_key"):
+                        continue
+                else:
+                    if is_api_key_missing(component_instance, "api_key"):
+                        raise ValueError(
+                            f"Missing required API key for LLM component {component_instance.get_instance_code()}.")
+            elif component_enum.value == ComponentEnum.TOOL.value:
+                if is_system_builtin(component_instance):
+                    if not has_required_api_keys(component_instance, metadata_module):
+                        continue
+                else:
+                    if not has_required_api_keys(component_instance, metadata_module):
+                        raise ValueError(
+                            f"Missing required API key for Tool component {component_instance.get_instance_code()}.")
             component_manager_clz().register(component_instance.get_instance_code(), component_instance)
 
     def __package_name_to_path(self, package_name: str) -> str:
@@ -302,3 +325,64 @@ class AgentUniverse(object):
             app_path = root_path / sub_dir
             if app_path.exists():
                 sys.path.append(str(app_path))
+
+    def __init_customized_func_util(self, config_path):
+        """
+        Initialize and load the CustomizedFuncUtil class from the customized_func_util.py file.
+
+        Args:
+            config_path (str): Path to the configuration file used to locate customized_func_util.py.
+
+        Returns:
+            Any: An instance of the CustomizedFuncUtil class if successfully initialized, otherwise None.
+
+        Raises:
+            Exception: If an error occurs during initialization or method invocation.
+        """
+        # Get the directory of the config_path
+        config_dir = os.path.dirname(os.path.abspath(config_path))
+
+        # Construct the path to the customized_func_util.py file
+        customized_func_util_path = os.path.join(config_dir, 'customized_func_util.py')
+
+        # Check if the file exists
+        if not os.path.exists(customized_func_util_path):
+            print(f"File not found: {customized_func_util_path}")
+            return None
+
+        try:
+            # Dynamically load the customized_func_util.py module
+            module_name = 'customized_func_util'
+            spec = importlib.util.spec_from_file_location(module_name, customized_func_util_path)
+            customized_func_util = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(customized_func_util)
+
+            # Check if the CustomizedFuncUtil class exists in the module
+            if not hasattr(customized_func_util, 'CustomizedFuncUtil'):
+                print(f"Class CustomizedFuncUtil not found in module {module_name}")
+                return None
+
+            # Get the CustomizedFuncUtil class
+            CustomizedFuncUtil = getattr(customized_func_util, 'CustomizedFuncUtil')
+
+            # Create an instance of CustomizedFuncUtil
+            instance = CustomizedFuncUtil()
+
+            # Check if the customized_init_config method exists in the CustomizedFuncUtil class
+            if not hasattr(CustomizedFuncUtil, 'customized_init_config'):
+                print(f"Method customized_init_config not found in class CustomizedFuncUtil")
+                return instance
+
+            # Call the customized_init_config method
+            try:
+                instance.customized_init_config()
+                print("Successfully called customized_init_config method")
+            except Exception as e:
+                print(f"Error occurred while calling customized_init_config method: {e}")
+                raise Exception(f"Failed to execute customized_init_config: {e}")
+
+            return instance
+
+        except Exception as e:
+            print(f"An unexpected error occurred during initialization: {e}")
+            return None
