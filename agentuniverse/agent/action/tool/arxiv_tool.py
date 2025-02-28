@@ -10,8 +10,8 @@ import os
 from dataclasses import dataclass
 from enum import Enum
 from pydantic import Field
-from agentuniverse.agent.action.tool.utils import retry
 from agentuniverse.agent.action.tool.tool import Tool, ToolInput
+from agentuniverse.base.annotation.retry import retry
 
 
 class SearchMode(Enum):
