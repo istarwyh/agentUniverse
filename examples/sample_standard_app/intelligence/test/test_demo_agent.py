@@ -1,7 +1,6 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
 import queue
-import time
 # @Time    : 2024/4/1 14:32
 # @Author  : wangchongshi
 # @Email   : wangchongshi.wcs@antgroup.com
@@ -13,7 +12,6 @@ from agentuniverse.agent.agent import Agent
 from agentuniverse.agent.agent_manager import AgentManager
 from agentuniverse.agent.output_object import OutputObject
 from agentuniverse.base.agentuniverse import AgentUniverse
-from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
 
 
 class DemoAgentTest(unittest.TestCase):

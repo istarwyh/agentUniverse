@@ -9,7 +9,7 @@ profile:
   llm_model:
     # you can change this config to a customized LLM
     # e.g. demo_llm, which defined in /intelligence/agentic/llm/demo_llm.yaml
-    name: 'demo_llm'
+    name: 'default_deepseek_llm'
 action:
   # Please select the tools and knowledge base.
   tool:
@@ -22,8 +22,7 @@ action:
   knowledge:
     # advantage feature，please refer to doc
 memory:
-#  name: 'demo_memory'
-  conversation_memory: 'global_conversation_memory'
+  name: 'demo_memory'
 metadata:
   type: AGENT
   class: DemoAgent
