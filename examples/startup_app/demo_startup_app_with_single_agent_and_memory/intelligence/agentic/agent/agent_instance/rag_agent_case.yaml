@@ -24,7 +24,7 @@ action:
     - 'google_search_tool'
   knowledge:
 memory:
-#  conversation_memory: 'global_conversation_memory'
+  conversation_memory: 'global_conversation_memory'
   input_field: 'input'
   output_field: 'output'
   top_k: 10

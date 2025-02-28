@@ -46,12 +46,10 @@ class DemoAgentTest(unittest.TestCase):
 
     def test_demo_agent_stream(self):
         output_stream = queue.Queue(10)
-        FrameworkContextManager().set_context("session_id", "111111111")
         instance: Agent = AgentManager().get_instance_obj('demo_agent')
         Thread(target=self.read_output, args=(output_stream,)).start()
-        result = instance.run(input='你来自哪里，名字是什么', output_stream=output_stream,session_id="111111111")
+        result = instance.run(input='你来自哪里，名字是什么', output_stream=output_stream)
         print(result)
-        time.sleep(10)
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,5 +1,5 @@
 name: 'openai_service'
 description: 'demo service of demo agent'
-agent: 'rag_agent_case'
+agent: 'openai_protocol_agent_case'
 metadata:
   type: 'SERVICE'

@@ -1,7 +1,6 @@
 import traceback
 import time
 from flask import Flask, Response, g, request
-from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 from loguru import logger
 from concurrent.futures import TimeoutError
@@ -10,7 +9,6 @@ from ..service_instance import ServiceInstance, ServiceNotFoundError
 from .request_task import RequestTask
 from .web_util import request_param, service_run_queue, make_standard_response, FlaskServerManager
 from .thread_with_result import ThreadPoolExecutorWithReturnValue
-from ...base.context.framework_context_manager import FrameworkContextManager
 from ...base.util.logging.logging_util import LOGGER
 from agentuniverse.base.util.logging.log_type_enum import LogTypeEnum
 from agentuniverse.base.util.logging.general_logger import get_context_prefix
@@ -61,8 +59,6 @@ def timed_generator(generator, start_time):
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 app.json.ensure_ascii = False
-# 允许跨域
-CORS(app, resources="*")
 
 
 @app.before_request

@@ -14,22 +14,21 @@ from agentuniverse.agent.agent_manager import AgentManager
 from agentuniverse.agent.input_object import InputObject
 from agentuniverse.agent.memory.memory import Memory
 from agentuniverse.agent.template.agent_template import AgentTemplate
+from agentuniverse.agent.template.rag_agent_template import RagAgentTemplate
 from agentuniverse.base.util.prompt_util import process_llm_token
 from agentuniverse.llm.llm import LLM
 from agentuniverse.prompt.prompt import Prompt
-from examples.startup_app.demo_startup_app_with_single_agent_and_memory.intelligence.agentic.agent.agent_instance.openai_protocol_template import \
-    OpenAIProtocolTemplate
 
 
-class RagAgentCaseTemplate(OpenAIProtocolTemplate):
-    def execute_query(self, input: str, chat_history: str):
+class RagAgentCaseTemplate(RagAgentTemplate):
+    def execute_query(self, input: str):
         """
         Args:
             input: user query
         """
         # 1. do question analyze
         agent_instance: AgentTemplate = AgentManager().get_instance_obj('question_agent_case')
-        output_object = agent_instance.run(input=input, chat_history=chat_history)
+        output_object = agent_instance.run(input=input)
         output = output_object.get_data('output')
         query_info = parse_json_markdown(output)
         if not query_info.get('need_google_search'):
@@ -44,11 +43,12 @@ class RagAgentCaseTemplate(OpenAIProtocolTemplate):
 
     def customized_execute(self, input_object: InputObject, agent_input: dict, memory: Memory, llm: LLM, prompt: Prompt,
                            **kwargs) -> dict:
+        # invoke tool
+        knowledge_res: str = self.execute_query(agent_input.get('input'))
+        agent_input['background'] = knowledge_res
+
         # 1. load memory
         self.load_memory(memory, agent_input)
-        # invoke tool
-        knowledge_res: str = self.execute_query(agent_input.get('input'), chat_history=agent_input.get('chat_history'))
-        agent_input['background'] = knowledge_res
         # 2. add user query memory
         self.add_memory(memory, f"{agent_input.get('input')}", type='human', agent_input=agent_input)
         # 3. load summarize memory
@@ -56,7 +56,6 @@ class RagAgentCaseTemplate(OpenAIProtocolTemplate):
         agent_input['background'] = (agent_input['background']
                                      + f"\nsummarize_memory:\n {summarize_memory}")
         process_llm_token(llm, prompt.as_langchain(), self.agent_model.profile, agent_input)
-
         # 4. invoke chain
         chain = prompt.as_langchain() | llm.as_langchain_runnable(
             self.agent_model.llm_params()) | StrOutputParser()
