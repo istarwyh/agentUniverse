@@ -1,6 +1,6 @@
 # High Availability Deployment with K8S
 agentUniverse provides standard working environment images specifically designed to support containerized deployments on Kubernetes (K8S) clusters. This guide will demonstrate how to utilize these images to deploy and set up a cluster within a K8S  environment. You can get the full list of tags on [this site](https://cr.console.aliyun.com/repository/cn-hangzhou/agent_universe/agent_universe/images).
-Official K8S Documentation: [Kubernetes Setup Documentation](https://kubernetes.io/docs/setup/)
+Official K8S Documentation: [Kubernetes Setup Documentation](https://kubernetes.io/docs/setup/). If you want to package an image based on your own project, please refer to [Project Image Packaging](./Project_Image_Packaging.md).
 
 ## 1. Resource Configuration
 Firstly, you need to configure the necessary resource files. Below is an example YAML configuration file used to define the required Namespace, Deployment, and Service resources:
