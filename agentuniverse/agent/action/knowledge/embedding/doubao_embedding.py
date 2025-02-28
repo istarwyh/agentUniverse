@@ -21,7 +21,7 @@ class DoubaoEmbedding(Embedding):
     ark_api_key: Optional[str] = Field(
         default_factory=lambda: get_from_env("ARK_API_KEY"))
     endpoint_id: Optional[str] = Field(
-        default_factory=lambda: get_from_env("ENDPOINT_ID"))
+        default_factory=lambda: get_from_env("ARK_ENDPOINT_ID"))
     client: Optional[Any] = None
     embedding_dims: Optional[int] = None
 
