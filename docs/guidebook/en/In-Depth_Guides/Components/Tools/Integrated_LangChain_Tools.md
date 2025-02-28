@@ -9,7 +9,7 @@ For the second category of tools, we have implemented a LangChainTool base class
 Note: If you want to directly use the description from LangChain, the description in the configuration file must be set to empty.
 
 An Example of Tool Initialization:
-[Tool Path](../../../../../../examples/sample_standard_app/intelligence/agentic/tool/samples/human_input_run.yaml)
+[Tool Path](../../../../../../examples/sample_standard_app/intelligence/agentic/tool/human_input_run.yaml)
 ```yaml
 name: 'human_input_run'
 description: ''
@@ -38,7 +38,7 @@ Parameter Description:
     If you completely override the `init_langchain_tool` method, then you do not need to configure this part.
 
 ## 1. Integrate the DuckDuckGo Tool from LangChain
-[Tool Path](../../../../../../examples/sample_standard_app/intelligence/agentic/tool/samples/duckduckgo_search.yaml)
+[Tool Path](../../../../../../examples/sample_standard_app/intelligence/agentic/tool/duckduckgo_search.yaml)
 ```yaml
 name: 'duckduckgo_search'
 description: 'DuckDuckGo Search tool'

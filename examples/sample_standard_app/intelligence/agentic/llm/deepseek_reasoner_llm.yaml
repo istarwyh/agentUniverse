@@ -1,8 +1,13 @@
-name: 'deepseek-reasoner_llm'
-description: 'deepseek-reasoner_llm'
+name: 'deepseek_reasoner_llm'
+description: 'deepseek_reasoner_llm'
 model_name: 'deepseek-reasoner'
+temperature: 0.5
 max_tokens: 2000
 api_key: '${DEEPSEEK_API_KEY}'
+organization: '${DEEPSEEK_ORGANIZATION}'
+api_base: 'https://api.deepseek.com/v1'
+proxy: '${DEEPSEEK_PROXY}'
+streaming: True
 metadata:
   type: 'LLM'
   module: 'agentuniverse.llm.default.deep_seek_openai_style_llm'

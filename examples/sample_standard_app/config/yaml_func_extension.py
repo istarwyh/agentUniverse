@@ -1,18 +1,19 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-# @Time    : 2025/2/27 16:35
+# @Time    : 2025/2/28 17:32
 # @Author  : wangchongshi
 # @Email   : wangchongshi.wcs@antgroup.com
-# @FileName: customized_func_util.py
+# @FileName: yaml_func_extension.py
 import os
 
+from agentuniverse.base.config.configer import Configer
 
-class CustomizedFuncUtil(object):
+
+class YamlFuncExtension:
     """
-   This class is a utility class that allows users to define custom functions.
-   During the startup of the agentUniverse, all functions in this class will be registered,
-   and the `customized_init_config` method will be executed by default.
+   This class is a yaml function extension class that allows users to define custom functions in YAML configuration.
+   During the startup of the agentUniverse, all functions in this class will be registered.
 
    Users can configure function calls in YAML files using the syntax `@FUNC(function_name(args))`.
    The agentUniverse will automatically parse the `@FUNC` annotation and execute the corresponding function,
@@ -23,18 +24,6 @@ class CustomizedFuncUtil(object):
        - The framework will call the `load_api_key` method with the argument `'qwen'`,
          and replace the annotation with the returned API key.
    """
-
-    def customized_init_config(self):
-        """
-        This method is automatically executed during the initialization of the agentUniverse.
-        It serves as a hook for users to define custom initialization logic for the application.
-
-        For example, this method can be used to:
-            - Load additional configuration files.
-            - Initialize external services or APIs.
-            - Set up default values or environment variables required by the application.
-        """
-        pass
 
     def load_api_key(self, model_name: str):
         """

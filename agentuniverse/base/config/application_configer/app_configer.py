@@ -40,6 +40,8 @@ class AppConfiger(object):
         self.__core_log_sink_package_list: Optional[list[str]] = None
         self.__conversation_memory_configer: Optional[dict] = {}
         self.__root_package_name: Optional[str] = None
+        self.__yaml_func_instance = None
+        self.__agent_llm_configer = None
 
     @property
     def base_info_appname(self) -> Optional[str]:
@@ -160,6 +162,22 @@ class AppConfiger(object):
     @property
     def root_package_name(self) -> str:
         return self.__root_package_name
+
+    @property
+    def yaml_func_instance(self):
+        return self.__yaml_func_instance
+
+    @yaml_func_instance.setter
+    def yaml_func_instance(self, value):
+        self.__yaml_func_instance = value
+
+    @property
+    def agent_llm_configer(self):
+        return self.__agent_llm_configer
+
+    @agent_llm_configer.setter
+    def agent_llm_configer(self, value):
+        self.__agent_llm_configer = value
 
     def load_by_configer(self, configer: Configer) -> 'AppConfiger':
         """Load the AppConfiger by the given Configer.

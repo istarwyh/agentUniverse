@@ -15,5 +15,5 @@ tool_type: 'api'
 input_keys: ['input']
 metadata:
   type: 'TOOL'
-  module: 'sample_standard_app.intelligence.agentic.tool.samples.python_repl'
+  module: 'agentuniverse.agent.action.tool.common_tool.python_repl'
   class: 'PythonREPLTool'

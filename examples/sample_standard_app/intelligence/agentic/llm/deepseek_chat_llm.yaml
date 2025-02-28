@@ -1,8 +1,13 @@
 name: 'deepseek_chat_llm'
 description: 'deepseek_chat_llm'
 model_name: 'deepseek-chat'
+temperature: 0.5
 max_tokens: 2000
 api_key: '${DEEPSEEK_API_KEY}'
+organization: '${DEEPSEEK_ORGANIZATION}'
+api_base: 'https://api.deepseek.com/v1'
+proxy: '${DEEPSEEK_PROXY}'
+streaming: True
 metadata:
   type: 'LLM'
   module: 'agentuniverse.llm.default.deep_seek_openai_style_llm'

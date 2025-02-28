@@ -16,7 +16,7 @@ from openai import OpenAI, AsyncOpenAI
 
 from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
 from agentuniverse.base.util.env_util import get_from_env
-from agentuniverse.base.util.system_util import process_customized_func
+from agentuniverse.base.util.system_util import process_yaml_func
 from agentuniverse.llm.llm import LLM, LLMOutput
 from agentuniverse.llm.openai_style_langchain_instance import LangchainOpenAIStyleInstance
 
@@ -171,20 +171,20 @@ class OpenAIStyleLLM(LLM):
     def initialize_by_component_configer(self, component_configer: LLMConfiger) -> 'LLM':
         if 'api_base' in component_configer.configer.value:
             api_base = component_configer.configer.value.get('api_base')
-            self.api_base = process_customized_func(api_base, component_configer.customized_func_instance)
+            self.api_base = process_yaml_func(api_base, component_configer.yaml_func_instance)
         elif 'api_base_env' in component_configer.configer.value:
             self.api_base = get_from_env(component_configer.configer.value.get('api_base_env'))
         if 'api_key' in component_configer.configer.value:
             api_key = component_configer.configer.value.get('api_key')
-            self.api_key = process_customized_func(api_key, component_configer.customized_func_instance)
+            self.api_key = process_yaml_func(api_key, component_configer.yaml_func_instance)
         elif 'api_key_env' in component_configer.configer.value:
             self.api_key = get_from_env(component_configer.configer.value.get('api_key_env'))
         if 'organization' in component_configer.configer.value:
             organization = component_configer.configer.value.get('organization')
-            self.organization = process_customized_func(organization, component_configer.customized_func_instance)
+            self.organization = process_yaml_func(organization, component_configer.yaml_func_instance)
         if 'proxy' in component_configer.configer.value:
             proxy = component_configer.configer.value.get('proxy')
-            self.proxy = process_customized_func(proxy, component_configer.customized_func_instance)
+            self.proxy = process_yaml_func(proxy, component_configer.yaml_func_instance)
         return super().initialize_by_component_configer(component_configer)
 
     def get_num_tokens(self, text: str) -> int:

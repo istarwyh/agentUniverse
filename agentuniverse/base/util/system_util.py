@@ -14,6 +14,7 @@ from typing import Any
 
 from agentuniverse.base.component.component_base import ComponentBase
 from agentuniverse.base.component.component_enum import ComponentEnum
+from agentuniverse.base.config.custom_configer.agent_llm_configer import AgentLLMConfiger
 
 PROJECT_ROOT_PATH = None
 
@@ -100,27 +101,27 @@ def get_module_path(yaml_path: str, root_name: str) -> str:
     return module_path
 
 
-def process_customized_func(func_expr: str, customized_func_instance: Any) -> str:
+def process_yaml_func(func_expr: str, yaml_func_instance: Any) -> str:
     """
     Process the YAML configuration by resolving @FUNC expressions.
 
     Args:
         func_expr (str): The function expression to process (e.g., '@FUNC(load_api_key("qwen"))').
-        customized_func_instance (Any): The instance containing the methods to call.
+        yaml_func_instance (Any): The instance containing the methods to call.
 
     Returns:
         str: The result of the function call or the original expression if no @FUNC is found.
 
     Raises:
-        ValueError: If @FUNC expression is provided but `customized_func_instance` is None.
+        ValueError: If @FUNC expression is provided but `yaml_func_instance` is None.
         Exception: If an error occurs while calling the method.
     """
     # Return an empty string if the function expression is None
-    if not func_expr or customized_func_instance is None:
+    if not func_expr or yaml_func_instance is None:
         return func_expr
 
-    if func_expr.startswith('@FUNC(') and customized_func_instance is None:
-        raise ValueError(f"customized_func is required to resolve @FUNC expression {func_expr}.")
+    if func_expr.startswith('@FUNC(') and yaml_func_instance is None:
+        raise ValueError(f"yaml_func_extension.py is required to resolve @FUNC expression {func_expr}.")
 
     # Process @FUNC expressions
     if func_expr.startswith('@FUNC(') and func_expr.endswith(')'):
@@ -141,9 +142,9 @@ def process_customized_func(func_expr: str, customized_func_instance: Any) -> st
         args = [ast.literal_eval(arg) for arg in parsed_expr.body.args]
         kwargs = {kw.arg: ast.literal_eval(kw.value) for kw in parsed_expr.body.keywords}
 
-        # Check if the method exists in the customized function instance
-        if hasattr(customized_func_instance, func_name):
-            func = getattr(customized_func_instance, func_name)
+        # Check if the method exists in the yaml function instance
+        if hasattr(yaml_func_instance, func_name):
+            func = getattr(yaml_func_instance, func_name)
 
             # Validate function signature
             sig = inspect.signature(func)
@@ -159,42 +160,74 @@ def process_customized_func(func_expr: str, customized_func_instance: Any) -> st
             except Exception as e:
                 raise Exception(f"Failed to execute method {func_name}: {str(e)}")
         else:
-            raise AttributeError(f"Method {func_name} not found in customized_func.")
+            raise AttributeError(f"Method {func_name} not found in yaml_func_extension.py")
 
     return func_expr
 
 
-def process_dict_with_funcs(input_dict: dict, customized_func_instance: Any) -> dict:
+def process_dict_with_funcs(input_dict: dict, yaml_func_instance: Any) -> dict:
     """
     Process a dictionary by resolving @FUNC expressions in its values.
 
     Args:
         input_dict (dict): The dictionary to process.
-        customized_func_instance (Any): The instance containing the methods to call.
+        yaml_func_instance (Any): The instance containing the methods to call.
 
     Returns:
         dict: A new dictionary with resolved @FUNC expressions.
 
     Raises:
-        ValueError: If @FUNC expression is provided but `customized_func_instance` is None.
+        ValueError: If @FUNC expression is provided but `yaml_func_instance` is None.
         Exception: If an error occurs while calling the method.
     """
-    if not input_dict or customized_func_instance is None:
+    if not input_dict or yaml_func_instance is None:
         return input_dict
 
     processed_dict = {}
     for key, value in input_dict.items():
         if isinstance(value, str) and value.startswith('@FUNC('):
             # Process the @FUNC expression
-            processed_dict[key] = process_customized_func(value, customized_func_instance)
+            processed_dict[key] = process_yaml_func(value, yaml_func_instance)
         elif isinstance(value, dict):
             # Recursively process nested dictionaries
-            processed_dict[key] = process_dict_with_funcs(value, customized_func_instance)
+            processed_dict[key] = process_dict_with_funcs(value, yaml_func_instance)
         else:
             # Keep the value as is
             processed_dict[key] = value
 
     return processed_dict
+
+
+def process_agent_llm_config(agent_id: str, agent_profile: dict, agent_llm_configer: AgentLLMConfiger) -> dict:
+    """
+    Process the Agent-LLM configuration by updating the LLM model name in the agent profile.
+
+    Args:
+        agent_id (str): The ID of the agent.
+        agent_profile (dict): The profile of the agent, containing configuration details.
+        agent_llm_configer (AgentLLMConfiger): The configuration manager for Agent-LLM mappings.
+
+    Returns:
+        dict: The updated agent profile with the LLM model name configured.
+    """
+    if not agent_id or agent_llm_configer is None:
+        return agent_profile
+
+    if not agent_profile:
+        agent_profile = {}
+
+    llm_model = agent_profile.setdefault('llm_model', {})
+
+    llm_name = agent_profile.get('llm_model').get('name')
+
+    if not llm_name:
+        return agent_profile
+
+    if agent_llm_configer.agent_llm_config and agent_id in agent_llm_configer.agent_llm_config:
+        llm_model['name'] = agent_llm_configer.agent_llm_config.get(agent_id)
+    elif agent_llm_configer.default_llm:
+        llm_model['name'] = agent_llm_configer.default_llm
+    return agent_profile
 
 
 def is_system_builtin(component_instance: ComponentBase) -> bool:
@@ -231,29 +264,3 @@ def is_api_key_missing(component_instance: ComponentBase, api_key_name: str) -> 
         bool: True if the API key is missing or empty, False otherwise.
     """
     return hasattr(component_instance, api_key_name) and not getattr(component_instance, api_key_name)
-
-
-def has_required_api_keys(component_instance: ComponentBase, metadata_module: str) -> bool:
-    """
-    Check if the component has all required API keys based on the metadata module.
-
-    Args:
-        component_instance (ComponentBase): The component instance to check.
-        metadata_module (str): The metadata module name.
-
-    Returns:
-        bool: True if all required API keys are present, False otherwise.
-    """
-    api_key_mapping = {
-        "google_search": "serper_api_key",
-        "search_api": "search_api_key",
-        "bing_search": "bing_subscription_key"
-    }
-
-    if component_instance is None or not metadata_module:
-        return True
-
-    for module_name, api_key_name in api_key_mapping.items():
-        if module_name in metadata_module and is_api_key_missing(component_instance, api_key_name):
-            return False  # Missing required API key
-    return True  # All required API keys are present

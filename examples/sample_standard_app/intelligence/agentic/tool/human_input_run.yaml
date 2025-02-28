@@ -7,5 +7,5 @@ langchain:
   class_name: HumanInputRun
 metadata:
   type: 'TOOL'
-  module: 'sample_standard_app.intelligence.agentic.tool.samples.langchain_tool'
+  module: 'agentuniverse.agent.action.tool.common_tool.langchain_tool'
   class: 'LangChainTool'

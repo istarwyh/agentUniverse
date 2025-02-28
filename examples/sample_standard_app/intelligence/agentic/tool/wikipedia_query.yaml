@@ -4,5 +4,5 @@ tool_type: 'api'
 input_keys: ['input']
 metadata:
   type: 'TOOL'
-  module: 'sample_standard_app.intelligence.agentic.tool.samples.wikipedia_query'
+  module: 'agentuniverse.agent.action.tool.common_tool.wikipedia_query'
   class: 'WikipediaTool'

@@ -1,9 +1,0 @@
-name: 'kimi_moonshot_auto_llm'
-description: 'kimi_moonshot_auto_llm'
-model_name: 'moonshot-v1-auto'
-max_tokens: 2000
-api_key: '${KIMI_API_KEY}'
-metadata:
-  type: 'LLM'
-  module: 'agentuniverse.llm.default.kimi_openai_style_llm'
-  class: 'KIMIOpenAIStyleLLM'
