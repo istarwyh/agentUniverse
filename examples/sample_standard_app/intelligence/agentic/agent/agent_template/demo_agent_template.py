@@ -1,10 +1,11 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-# @Time    : 2024/10/30 20:02
-# @Author  : wangchongshi
-# @Email   : wangchongshi.wcs@antgroup.com
+# @Time    :
+# @Author  :
+# @Email   :
 # @FileName: demo_agent_template.py
+
 from agentuniverse.agent.input_object import InputObject
 from agentuniverse.agent.template.agent_template import AgentTemplate
 

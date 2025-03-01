@@ -1,9 +1,11 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
-# @Time    : 2024/3/31 11:00
-# @Author  : wangchongshi
-# @Email   : wangchongshi.wcs@antgroup.com
+
+# @Time    :
+# @Author  :
+# @Email   :
 # @FileName: google_search_tool.py
+
 from agentuniverse.agent.action.tool.tool import Tool, ToolInput
 
 
@@ -38,4 +40,3 @@ class MockSearchTool(Tool):
          事实上，在汽车业务转暖的同时，比亚迪 ...
         """
         return res
-

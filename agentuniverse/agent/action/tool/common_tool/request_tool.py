@@ -1,26 +1,25 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-# @Time    : 2024/6/24 10:19
-# @Author  : weizjajj 
-# @Email   : weizhongjie.wzj@antgroup.com
+# @Time    :
+# @Author  :
+# @Email   :
 # @FileName: request_tool.py
 
 
 from typing import Optional
 
-from langchain_community.utilities.requests import GenericRequestsWrapper
-from langchain_core.utils.json import parse_json_markdown
-
 from agentuniverse.agent.action.tool.tool import Tool, ToolInput
 from agentuniverse.base.config.component_configer.configers.tool_configer import ToolConfiger
 from agentuniverse.base.util.logging.logging_util import LOGGER
+from langchain_community.utilities.requests import GenericRequestsWrapper
+from langchain_core.utils.json import parse_json_markdown
 
 
 class RequestTool(Tool):
-    method:Optional[str] = 'GET'
-    headers: Optional[dict]= {}
-    response_content_type:Optional[str] = 'text'
+    method: Optional[str] = 'GET'
+    headers: Optional[dict] = {}
+    response_content_type: Optional[str] = 'text'
     requests_wrapper: Optional[GenericRequestsWrapper] = None
     json_parser: Optional[bool] = False
 

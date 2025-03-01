@@ -168,6 +168,8 @@ cython_debug/
 
 *.pyc
 __pycache__/
+/poetry.lock
+
 
 # vscode
 .vscode/launch.json
