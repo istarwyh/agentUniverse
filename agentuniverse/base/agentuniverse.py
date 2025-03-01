@@ -6,8 +6,8 @@
 # @Email   : jerry.zzw@antgroup.com
 # @FileName: agentuniverse.py
 import importlib
+import os
 import sys
-import threading
 from pathlib import Path
 
 from agentuniverse.base.annotation.singleton import singleton
@@ -19,10 +19,12 @@ from agentuniverse.base.config.component_configer.component_configer import Comp
 from agentuniverse.base.component.component_configer_util import ComponentConfigerUtil
 from agentuniverse.base.config.config_type_enum import ConfigTypeEnum
 from agentuniverse.base.config.configer import Configer
+from agentuniverse.base.config.custom_configer.agent_llm_configer import AgentLLMConfiger
 from agentuniverse.base.config.custom_configer.custom_key_configer import CustomKeyConfiger
 from agentuniverse.base.component.component_enum import ComponentEnum
 from agentuniverse.base.util.monitor.monitor import Monitor
-from agentuniverse.base.util.system_util import get_project_root_path
+from agentuniverse.base.util.system_util import get_project_root_path, is_api_key_missing, \
+    is_system_builtin
 from agentuniverse.base.util.logging.logging_util import init_loggers
 from agentuniverse.agent_serve.web.request_task import RequestLibrary
 from agentuniverse.agent_serve.web.rpc.grpc.grpc_server_booster import set_grpc_config
@@ -79,6 +81,13 @@ class AgentUniverse(object):
             config_path)
         CustomKeyConfiger(custom_key_configer_path)
 
+        # load agent llm configuration file
+        agent_llm_config_path = self.__parse_sub_config_path(
+            configer.value.get('SUB_CONFIG_PATH', {}).get('agent_llm_config_path'),
+            config_path)
+        if agent_llm_config_path:
+            self.__config_container.app_configer.agent_llm_configer = AgentLLMConfiger(agent_llm_config_path)
+
         # init loguru loggers
         log_config_path = self.__parse_sub_config_path(
             configer.value.get('SUB_CONFIG_PATH', {}).get('log_config_path'),
@@ -113,7 +122,10 @@ class AgentUniverse(object):
         ext_classes = configer.value.get('EXTENSION_MODULES', {}).get('class_list')
         if isinstance(ext_classes, list):
             for ext_class in ext_classes:
-                self.__dynamic_import_and_init(ext_class, configer)
+                if "YamlFuncExtension" in ext_class:
+                    self.__config_container.app_configer.yaml_func_instance = self.__dynamic_import_and_init(ext_class)
+                else:
+                    self.__dynamic_import_and_init(ext_class, configer)
 
         # init monitor module
         Monitor(configer=configer)
@@ -121,7 +133,6 @@ class AgentUniverse(object):
         # scan and register the components
         self.__scan_and_register(self.__config_container.app_configer)
         if core_mode:
-
             for _func, args, kwargs in POST_FORK_QUEUE:
                 _func(*args, **kwargs)
 
@@ -239,11 +250,23 @@ class AgentUniverse(object):
         for component_configer in component_configer_list:
             configer_clz = ComponentConfigerUtil.get_component_config_clz_by_type(component_enum)
             configer_instance: ComponentConfiger = configer_clz().load_by_configer(component_configer.configer)
+            configer_instance.yaml_func_instance = self.__config_container.app_configer.yaml_func_instance
+            if component_enum.value == ComponentEnum.AGENT.value:
+                if hasattr(configer_instance, 'agent_llm_configer'):
+                    configer_instance.agent_llm_configer = self.__config_container.app_configer.agent_llm_configer
             component_clz = ComponentConfigerUtil.get_component_object_clz_by_component_configer(configer_instance)
             component_instance: ComponentBase = component_clz().initialize_by_component_configer(configer_instance)
             if component_instance is None:
                 continue
             component_instance.component_config_path = component_configer.configer.path
+            if component_enum.value == ComponentEnum.LLM.value:
+                if is_system_builtin(component_instance):
+                    if is_api_key_missing(component_instance, "api_key"):
+                        continue
+                else:
+                    if is_api_key_missing(component_instance, "api_key"):
+                        raise ValueError(
+                            f"Missing required API key for LLM component {component_instance.get_instance_code()}.")
             component_manager_clz().register(component_instance.get_instance_code(), component_instance)
 
     def __package_name_to_path(self, package_name: str) -> str:
@@ -285,7 +308,7 @@ class AgentUniverse(object):
 
         return str(combined_path)
 
-    def __dynamic_import_and_init(self, class_path: str, configer: Configer):
+    def __dynamic_import_and_init(self, class_path: str, configer: Configer = None):
         """Resolve a sub config file path according to main config file.
 
             Args:
@@ -296,7 +319,7 @@ class AgentUniverse(object):
         module_path, _, class_name = class_path.rpartition('.')
         module = importlib.import_module(module_path)
         cls = getattr(module, class_name)
-        cls(configer)
+        return cls(configer) if configer else cls()
 
     def _add_to_sys_path(self, root_path, sub_dirs):
         for sub_dir in sub_dirs:
