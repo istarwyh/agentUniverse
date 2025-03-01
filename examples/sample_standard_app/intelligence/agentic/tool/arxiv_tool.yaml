@@ -16,5 +16,5 @@ tool_type: 'api'
 input_keys: ['input', 'mode']
 metadata:
   type: 'TOOL'
-  module: 'agentuniverse.agent.action.tool.arxiv_tool'
+  module: 'agentuniverse.agent.action.tool.common_tool.arxiv_tool'
   class: 'ArxivTool'

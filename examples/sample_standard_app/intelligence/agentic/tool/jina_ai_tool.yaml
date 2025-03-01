@@ -4,5 +4,5 @@ tool_type: api
 input_keys: [input]
 metadata:
   type: TOOL
-  module: sample_standard_app.intelligence.agentic.tool.jina_ai_tool
+  module: agentuniverse.agent.action.tool.common_tool.jina_ai_tool
   class: JinaAITool

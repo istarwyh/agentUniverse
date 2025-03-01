@@ -7,7 +7,7 @@
 # @FileName: test_arxiv_tool.py
 
 import unittest
-from agentuniverse.agent.action.tool.arxiv_tool import ArxivTool, SearchMode
+from agentuniverse.agent.action.tool.common_tool.arxiv_tool import ArxivTool, SearchMode
 from agentuniverse.agent.action.tool.tool import ToolInput
 
 
