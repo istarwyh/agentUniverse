@@ -22,19 +22,19 @@ class GeminiEmbedding(Embedding):
     gemini_api_key: Optional[str] = Field(default_factory=lambda: get_from_env("GOOGLE_API_KEY"))
 
     def __init__(self, **kwargs):
+         super().__init__(**kwargs)
+        # Gemini does not have a native proxy solution.
+
+    def get_embeddings(self, texts: List[str], **kwargs) -> List[List[float]]:
+        """Get embeddings for a list of texts using the Gemini API."""
         try:
             from google import genai
         except ImportError as e:
             raise ImportError(
                 "genai is required. Install with: pip install google-genai"
             ) from e
-
-        super().__init__(**kwargs)
         self.client = genai.Client(api_key=self.gemini_api_key)
-        # Gemini does not have a native proxy solution.
 
-    def get_embeddings(self, texts: List[str], **kwargs) -> List[List[float]]:
-        """Get embeddings for a list of texts using the Gemini API."""
         model_name = self.embedding_model_name or "text-embedding-004"  # default model
 
         try:
