@@ -29,7 +29,8 @@ class KIMIOpenAIStyleLLM(OpenAIStyleLLM):
             api_base (Optional[str]): The base URL to use for the API. Defaults to None.
     """
     api_key: Optional[str] = Field(default_factory=lambda: get_from_env("KIMI_API_KEY"))
-    api_base: Optional[str] = "https://api.moonshot.cn/v1"
+    api_base: Optional[str] = Field(default_factory=lambda: get_from_env(
+        "KIMI_API_BASE") or "https://api.moonshot.cn/v1")
     proxy: Optional[str] = Field(default_factory=lambda: get_from_env("KIMI_PROXY"))
     organization: Optional[str] = Field(default_factory=lambda: get_from_env("KIMI_ORGANIZATION"))
 

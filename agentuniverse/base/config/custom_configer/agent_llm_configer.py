@@ -12,9 +12,15 @@ from ..configer import Configer
 
 
 @singleton
-class AgentLLMConfiger(Configer):
+class DefaultLLMConfiger(Configer):
+    """
+    A singleton class responsible for managing the default LLM configuration
+    used in the agent system.
+
+    This class reads and parses a TOML configuration file to determine the default LLM instance
+    that will be used in the agent when no specific model is manually designated.
+    """
     default_llm: Optional[str] = None
-    agent_llm_config: Optional[dict] = {}
 
     def __init__(self, config_path: str = None):
         super().__init__(config_path)
@@ -22,8 +28,8 @@ class AgentLLMConfiger(Configer):
             try:
                 self.load()
             except FileNotFoundError as e:
-                print(f"Custom key file {config_path} read error, "
-                      f"skip load custom key.")
+                print(f"Configuration file not found at path: {config_path}. "
+                      f"The default LLM configuration will not be loaded. "
+                      f"Error is {str(e)}")
         if self.value:
             self.default_llm = self.value.get('DEFAULT', {}).get('default_llm', None)
-            self.agent_llm_config = self.value.get('AGENT_LLM_CONFIG', {})

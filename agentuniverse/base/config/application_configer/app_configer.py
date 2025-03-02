@@ -41,7 +41,9 @@ class AppConfiger(object):
         self.__conversation_memory_configer: Optional[dict] = {}
         self.__root_package_name: Optional[str] = None
         self.__yaml_func_instance = None
-        self.__agent_llm_configer = None
+        self.__default_llm_configer = None
+        self.__tool_configer_map = {}
+        self.__llm_configer_map = {}
 
     @property
     def base_info_appname(self) -> Optional[str]:
@@ -172,12 +174,28 @@ class AppConfiger(object):
         self.__yaml_func_instance = value
 
     @property
-    def agent_llm_configer(self):
-        return self.__agent_llm_configer
+    def default_llm_configer(self):
+        return self.__default_llm_configer
 
-    @agent_llm_configer.setter
-    def agent_llm_configer(self, value):
-        self.__agent_llm_configer = value
+    @default_llm_configer.setter
+    def default_llm_configer(self, value):
+        self.__default_llm_configer = value
+
+    @property
+    def tool_configer_map(self):
+        return self.__tool_configer_map
+
+    @tool_configer_map.setter
+    def tool_configer_map(self, value):
+        self.__tool_configer_map = value
+
+    @property
+    def llm_configer_map(self):
+        return self.__llm_configer_map
+
+    @llm_configer_map.setter
+    def llm_configer_map(self, value):
+        self.__llm_configer_map = value
 
     def load_by_configer(self, configer: Configer) -> 'AppConfiger':
         """Load the AppConfiger by the given Configer.
@@ -212,5 +230,5 @@ class AppConfiger(object):
         self.__core_memory_storage_package_list = configer.value.get('CORE_PACKAGE', {}).get('memory_storage')
         self.__core_work_pattern_package_list = configer.value.get('CORE_PACKAGE', {}).get('work_pattern')
         self.__core_log_sink_package_list = configer.value.get('CORE_PACKAGE', {}).get('log_sink')
-        self.__conversation_memory_configer = configer.value.get('CONVERSATION_MEMORY',{})
+        self.__conversation_memory_configer = configer.value.get('CONVERSATION_MEMORY', {})
         return self

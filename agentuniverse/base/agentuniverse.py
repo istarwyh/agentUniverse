@@ -6,7 +6,6 @@
 # @Email   : jerry.zzw@antgroup.com
 # @FileName: agentuniverse.py
 import importlib
-import os
 import sys
 from pathlib import Path
 
@@ -19,12 +18,12 @@ from agentuniverse.base.config.component_configer.component_configer import Comp
 from agentuniverse.base.component.component_configer_util import ComponentConfigerUtil
 from agentuniverse.base.config.config_type_enum import ConfigTypeEnum
 from agentuniverse.base.config.configer import Configer
-from agentuniverse.base.config.custom_configer.agent_llm_configer import AgentLLMConfiger
+from agentuniverse.base.config.custom_configer.agent_llm_configer import DefaultLLMConfiger
 from agentuniverse.base.config.custom_configer.custom_key_configer import CustomKeyConfiger
 from agentuniverse.base.component.component_enum import ComponentEnum
 from agentuniverse.base.util.monitor.monitor import Monitor
 from agentuniverse.base.util.system_util import get_project_root_path, is_api_key_missing, \
-    is_system_builtin
+    is_system_builtin, find_default_llm_config
 from agentuniverse.base.util.logging.logging_util import init_loggers
 from agentuniverse.agent_serve.web.request_task import RequestLibrary
 from agentuniverse.agent_serve.web.rpc.grpc.grpc_server_booster import set_grpc_config
@@ -80,13 +79,6 @@ class AgentUniverse(object):
             configer.value.get('SUB_CONFIG_PATH', {}).get('custom_key_path'),
             config_path)
         CustomKeyConfiger(custom_key_configer_path)
-
-        # load agent llm configuration file
-        agent_llm_config_path = self.__parse_sub_config_path(
-            configer.value.get('SUB_CONFIG_PATH', {}).get('agent_llm_config_path'),
-            config_path)
-        if agent_llm_config_path:
-            self.__config_container.app_configer.agent_llm_configer = AgentLLMConfiger(agent_llm_config_path)
 
         # init loguru loggers
         log_config_path = self.__parse_sub_config_path(
@@ -226,6 +218,10 @@ class AgentUniverse(object):
             list: the component configer list
         """
         component_configer_list = []
+        if component_enum.value == ComponentEnum.LLM.value:
+            default_llm_config_path = find_default_llm_config(package_list)
+            if default_llm_config_path:
+                self.__config_container.app_configer.default_llm_configer = DefaultLLMConfiger(default_llm_config_path)
         for package_name in package_list:
             package_path = self.__package_name_to_path(package_name)
             path = Path(package_path)
@@ -247,26 +243,44 @@ class AgentUniverse(object):
             component_configer_list(list): the component configer list
         """
         component_manager_clz = ComponentConfigerUtil.get_component_manager_clz_by_type(component_enum)
+
+        agent_llm_name_list = []
+        agent_tool_name_list = []
+
+        default_llm_configer = self.__config_container.app_configer.default_llm_configer
+        yaml_func_instance = self.__config_container.app_configer.yaml_func_instance
+        if default_llm_configer and default_llm_configer.default_llm:
+            agent_llm_name_list.append(default_llm_configer.default_llm)
+
         for component_configer in component_configer_list:
             configer_clz = ComponentConfigerUtil.get_component_config_clz_by_type(component_enum)
             configer_instance: ComponentConfiger = configer_clz().load_by_configer(component_configer.configer)
-            configer_instance.yaml_func_instance = self.__config_container.app_configer.yaml_func_instance
+            configer_instance.yaml_func_instance = yaml_func_instance
+            configer_instance.default_llm_configer = default_llm_configer
             if component_enum.value == ComponentEnum.AGENT.value:
-                if hasattr(configer_instance, 'agent_llm_configer'):
-                    configer_instance.agent_llm_configer = self.__config_container.app_configer.agent_llm_configer
+                if hasattr(configer_instance, 'profile') and configer_instance.profile:
+                    llm_name = configer_instance.profile.get('llm_model', {}).get('name')
+                    if llm_name:
+                        agent_llm_name_list.append(llm_name)
+                if hasattr(configer_instance, 'action') and configer_instance.action:
+                    tool_name_list = configer_instance.action.get('tool', [])
+                    if tool_name_list:
+                        agent_tool_name_list.extend(tool_name_list)
+            if component_enum.value == ComponentEnum.LLM.value:
+                if hasattr(configer_instance, 'name') and configer_instance.name:
+                    if configer_instance.name not in agent_llm_name_list:
+                        self.__config_container.app_configer.llm_configer_map[configer_instance.name] = configer_instance
+                        continue
+            if component_enum.value == ComponentEnum.TOOL.value:
+                if hasattr(configer_instance, 'name') and configer_instance.name:
+                    if configer_instance.name not in agent_tool_name_list:
+                        self.__config_container.app_configer.tool_configer_map[configer_instance.name] = configer_instance
+                        continue
             component_clz = ComponentConfigerUtil.get_component_object_clz_by_component_configer(configer_instance)
             component_instance: ComponentBase = component_clz().initialize_by_component_configer(configer_instance)
             if component_instance is None:
                 continue
             component_instance.component_config_path = component_configer.configer.path
-            if component_enum.value == ComponentEnum.LLM.value:
-                if is_system_builtin(component_instance):
-                    if is_api_key_missing(component_instance, "api_key"):
-                        continue
-                else:
-                    if is_api_key_missing(component_instance, "api_key"):
-                        raise ValueError(
-                            f"Missing required API key for LLM component {component_instance.get_instance_code()}.")
             component_manager_clz().register(component_instance.get_instance_code(), component_instance)
 
     def __package_name_to_path(self, package_name: str) -> str:
