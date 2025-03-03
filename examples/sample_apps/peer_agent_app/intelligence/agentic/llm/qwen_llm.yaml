@@ -1,7 +1,6 @@
 name: 'qwen_llm'
 description: 'demo qwen llm with spi'
 model_name: 'qwen2.5-72b-instruct'
-max_content_length: 32000
 max_tokens: 2000
 api_key: '${DASHSCOPE_API_KEY}'
 metadata:
