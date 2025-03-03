@@ -14,7 +14,6 @@ from typing import Any
 
 from agentuniverse.base.component.component_base import ComponentBase
 from agentuniverse.base.component.component_enum import ComponentEnum
-from agentuniverse.base.config.custom_configer.agent_llm_configer import AgentLLMConfiger
 
 PROJECT_ROOT_PATH = None
 
@@ -198,38 +197,6 @@ def process_dict_with_funcs(input_dict: dict, yaml_func_instance: Any) -> dict:
     return processed_dict
 
 
-def process_agent_llm_config(agent_id: str, agent_profile: dict, agent_llm_configer: AgentLLMConfiger) -> dict:
-    """
-    Process the Agent-LLM configuration by updating the LLM model name in the agent profile.
-
-    Args:
-        agent_id (str): The ID of the agent.
-        agent_profile (dict): The profile of the agent, containing configuration details.
-        agent_llm_configer (AgentLLMConfiger): The configuration manager for Agent-LLM mappings.
-
-    Returns:
-        dict: The updated agent profile with the LLM model name configured.
-    """
-    if not agent_id or agent_llm_configer is None:
-        return agent_profile
-
-    if not agent_profile:
-        agent_profile = {}
-
-    llm_model = agent_profile.setdefault('llm_model', {})
-
-    llm_name = agent_profile.get('llm_model').get('name')
-
-    if not llm_name:
-        return agent_profile
-
-    if agent_llm_configer.agent_llm_config and agent_id in agent_llm_configer.agent_llm_config:
-        llm_model['name'] = agent_llm_configer.agent_llm_config.get(agent_id)
-    elif agent_llm_configer.default_llm:
-        llm_model['name'] = agent_llm_configer.default_llm
-    return agent_profile
-
-
 def is_system_builtin(component_instance: ComponentBase) -> bool:
     """
     Determine if a component is system-built-in based on its type and configuration.
@@ -240,6 +207,8 @@ def is_system_builtin(component_instance: ComponentBase) -> bool:
     Returns:
         bool: True if the component is system-built-in, False otherwise.
     """
+    if component_instance is None:
+        return False
     component_enum: ComponentEnum = component_instance.component_type
     if component_enum is None or not component_instance.component_config_path:
         return False
@@ -264,3 +233,41 @@ def is_api_key_missing(component_instance: ComponentBase, api_key_name: str) -> 
         bool: True if the API key is missing or empty, False otherwise.
     """
     return hasattr(component_instance, api_key_name) and not getattr(component_instance, api_key_name)
+
+
+def find_default_llm_config(package_list: list[str]):
+    """
+    Traverse the package_list to find the path containing 'agentic.llm'
+    and return the absolute path of 'default_llm.toml'.
+
+    Args:
+        package_list (list[str]): The list of package paths
+
+    Returns:
+        str: The absolute path of 'default_llm.toml', or None if not found
+    """
+    try:
+        if not package_list:
+            return None
+
+        # Iterate through each package path in the provided list
+        for package_path in package_list:
+            # Check if the current path contains 'agentic.llm'
+            if 'agentic.llm' in package_path:
+                # Try to import the module to get its actual path
+                try:
+                    spec = importlib.util.find_spec(package_path)
+                    if spec and spec.origin:
+                        # Get the directory containing the module
+                        module_dir = os.path.dirname(spec.origin)
+                        # Construct the full path to default_llm.toml
+                        default_llm_toml_path = os.path.join(module_dir, 'default_llm.toml')
+
+                        if os.path.exists(default_llm_toml_path):
+                            return os.path.abspath(default_llm_toml_path)
+                except Exception as e:
+                    continue
+        return None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None

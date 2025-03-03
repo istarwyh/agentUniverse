@@ -1,0 +1,19 @@
+name: 'openai_o3_mini_llm'
+description: 'openai_o3_mini_llm'
+model_name: 'o3-mini'
+temperature: 0.5
+max_tokens: 2000
+#
+# When agentUniverse starts, it will automatically read the `OPENAI_API_KEY` from the environment variables
+# and assign its value to api_key during YAML configuration parsing.
+# The same logic applies to other parameters with placeholders below, such as organization, api_base, and proxy.
+#
+api_key: '${OPENAI_API_KEY}'
+api_base: 'https://api.openai.com/v1'
+organization: '${OPENAI_ORGANIZATION}'
+proxy: '${OPENAI_PROXY}'
+streaming: True
+metadata:
+  type: 'LLM'
+  module: 'agentuniverse.llm.default.default_openai_llm'
+  class: 'DefaultOpenAILLM'

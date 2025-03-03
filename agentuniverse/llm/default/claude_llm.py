@@ -44,7 +44,7 @@ class ClaudeLLM(LLM):
     """
     api_key: Optional[str] = Field(default_factory=lambda: get_from_env('ANTHROPIC_API_KEY'))
     api_url: Optional[str] = Field(default_factory=lambda: get_from_env('ANTHROPIC_API_URL'))
-    proxy: Optional[str] = None
+    proxy: Optional[str] = Field(default_factory=lambda: get_from_env('ANTHROPIC_PROXY'))
     connection_pool_limits: Optional[int] = None
 
     def _new_client(self):

@@ -36,11 +36,12 @@ from agentuniverse.base.config.application_configer.application_config_manager \
     import ApplicationConfigManager
 from agentuniverse.base.config.component_configer.configers.agent_configer \
     import AgentConfiger
+from agentuniverse.base.util.agent_util import process_agent_llm_config
 from agentuniverse.base.util.common_util import stream_output
 from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
 from agentuniverse.base.util.logging.logging_util import LOGGER
 from agentuniverse.base.util.memory_util import generate_messages, get_memory_string
-from agentuniverse.base.util.system_util import process_dict_with_funcs, is_system_builtin, process_agent_llm_config
+from agentuniverse.base.util.system_util import process_dict_with_funcs, is_system_builtin
 from agentuniverse.llm.llm import LLM
 from agentuniverse.llm.llm_manager import LLMManager
 from agentuniverse.prompt.chat_prompt import ChatPrompt
@@ -195,7 +196,7 @@ class Agent(ComponentBase, ABC):
         info: Optional[dict] = agent_config.info
         profile: Optional[dict] = agent_config.profile
         profile = process_dict_with_funcs(profile, component_configer.yaml_func_instance)
-        profile = process_agent_llm_config(info.get('name'), profile, component_configer.agent_llm_configer)
+        profile = process_agent_llm_config(info.get('name'), profile, component_configer.default_llm_configer)
         plan: Optional[dict] = agent_config.plan
         memory: Optional[dict] = agent_config.memory
         memory = process_dict_with_funcs(memory, component_configer.yaml_func_instance)
