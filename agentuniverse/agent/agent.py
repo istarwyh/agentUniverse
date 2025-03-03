@@ -286,18 +286,6 @@ class Agent(ComponentBase, ABC):
             result.append(token)
         return self.generate_result(result)
 
-    def invoke_chain_openai_output(self, chain: RunnableSerializable[Any, str], agent_input: dict,
-                                   input_object: InputObject,
-                                   **kwargs):
-        if not input_object.get_data('output_stream'):
-            res = chain.invoke(input=agent_input, config=self.get_run_config())
-            return res
-        result = []
-        for token in chain.stream(input=agent_input, config=self.get_run_config()):
-            stream_output(input_object.get_data('output_stream', None), token)
-            result.append(token)
-        return self.generate_result(result)
-
     async def async_invoke_chain(self, chain: RunnableSerializable[Any, str], agent_input: dict,
                                  input_object: InputObject, **kwargs):
         if not input_object.get_data('output_stream'):
