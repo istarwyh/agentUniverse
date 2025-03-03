@@ -27,7 +27,7 @@ profile:
   #
   # Example default_llm.toml:
   #   [DEFAULT]
-  #   default_llm = 'qwen_25_72b_llm'
+  #   default_llm = 'qwen2.5-72b-instruct'
   #
   # Note: The current configuration uses Way 1, as shown below
   llm_model:
