@@ -17,13 +17,8 @@ def chat(question: str):
 
     The peer agents in agentUniverse become a chatbot and can ask questions to get the answer.
     """
-    messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": question},
-    ]
     instance: Agent = AgentManager().get_instance_obj('demo_peer_agent')
-    res = instance.run(messages=messages, stream=True)
-    print(res.to_dict())
+    instance.run(input=question)
 
 
 if __name__ == '__main__':
