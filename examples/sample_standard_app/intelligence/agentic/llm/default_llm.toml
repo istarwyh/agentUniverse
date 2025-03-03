@@ -9,4 +9,4 @@
 # For example, if 'default_llm' is set to 'qwen_25_72b_llm', the agent will use the
 # 'qwen_25_72b_llm' model instance as the default unless explicitly overridden by user configuration.
 [DEFAULT]
-default_llm = 'qwen_25_72b_llm'
+default_llm = 'qwen2.5-72b-instruct'
