@@ -207,6 +207,8 @@ def is_system_builtin(component_instance: ComponentBase) -> bool:
     Returns:
         bool: True if the component is system-built-in, False otherwise.
     """
+    if component_instance is None:
+        return False
     component_enum: ComponentEnum = component_instance.component_type
     if component_enum is None or not component_instance.component_config_path:
         return False
@@ -245,23 +247,26 @@ def find_default_llm_config(package_list: list[str]):
         str: The absolute path of 'default_llm.toml', or None if not found
     """
     try:
+        if not package_list:
+            return None
+
         # Iterate through each package path in the provided list
         for package_path in package_list:
             # Check if the current path contains 'agentic.llm'
             if 'agentic.llm' in package_path:
-                truncated_path = package_path.split('llm')[0] + 'llm'
+                # Try to import the module to get its actual path
+                try:
+                    spec = importlib.util.find_spec(package_path)
+                    if spec and spec.origin:
+                        # Get the directory containing the module
+                        module_dir = os.path.dirname(spec.origin)
+                        # Construct the full path to default_llm.toml
+                        default_llm_toml_path = os.path.join(module_dir, 'default_llm.toml')
 
-                file_system_path = truncated_path.replace('.', os.sep)
-
-                # Construct the full path to the target file 'default_llm.toml'
-                # Use the current working directory as the base
-                default_llm_toml_path = os.path.join(os.getcwd(), file_system_path, 'default_llm.toml')
-
-                # Check if the file exists at the constructed path
-                if os.path.exists(default_llm_toml_path):
-                    return os.path.abspath(default_llm_toml_path)
-
-        # If no matching file is found after iterating through all paths, return None
+                        if os.path.exists(default_llm_toml_path):
+                            return os.path.abspath(default_llm_toml_path)
+                except Exception as e:
+                    continue
         return None
     except Exception as e:
         print(f"An error occurred: {e}")

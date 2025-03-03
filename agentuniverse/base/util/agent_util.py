@@ -7,7 +7,7 @@
 # @FileName: agent_util.py
 from agentuniverse.agent.memory.memory import Memory
 from agentuniverse.agent.memory.message import Message
-from agentuniverse.base.config.custom_configer.agent_llm_configer import DefaultLLMConfiger
+from agentuniverse.base.config.custom_configer.default_llm_configer import DefaultLLMConfiger
 from agentuniverse.base.util.memory_util import get_memory_string
 
 
@@ -74,8 +74,7 @@ def process_agent_llm_config(agent_id: str, agent_profile: dict, default_llm_con
         agent_profile = {}
 
     llm_model = agent_profile.setdefault('llm_model', {})
-
-    llm_name = agent_profile.get('llm_model').get('name')
+    llm_name = llm_model.get('name')
 
     # If LLM model name is specified, return the agent profile unchanged
     if llm_name:

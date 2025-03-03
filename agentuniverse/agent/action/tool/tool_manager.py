@@ -31,16 +31,22 @@ class ToolManager(ComponentManagerBase):
         appname = appname or ApplicationConfigManager().app_configer.base_info_appname
         instance_code = f'{appname}.{self._component_type.value.lower()}.{component_instance_name}'
         instance_obj = self._instance_obj_map.get(instance_code)
+        # If the instance does not exist, try to create it using the configuration
         if instance_obj is None:
+            # Retrieve the tool configuration map
             tool_configer_map: dict[str, ToolConfiger] = ApplicationConfigManager().app_configer.tool_configer_map
             if tool_configer_map and component_instance_name in tool_configer_map.keys():
                 tool_configer = tool_configer_map.get(component_instance_name)
-                module = importlib.import_module(tool_configer.metadata_module)
-                component_clz = getattr(module, tool_configer.metadata_class)
-                instance_obj: Tool = component_clz().initialize_by_component_configer(tool_configer)
-                if instance_obj:
-                    instance_obj.component_config_path = tool_configer.configer.path
-                    self.register(instance_obj.get_instance_code(), instance_obj)
+                if tool_configer:
+                    # Dynamically import the module and retrieve the class specified in the configuration
+                    module = importlib.import_module(tool_configer.metadata_module)
+                    component_clz = getattr(module, tool_configer.metadata_class)
+                    # Initialize the tool instance using the configuration
+                    instance_obj: Tool = component_clz().initialize_by_component_configer(tool_configer)
+                    if instance_obj:
+                        instance_obj.component_config_path = tool_configer.configer.path
+                        self.register(instance_obj.get_instance_code(), instance_obj)
+        # Return a new copy of the instance if required, otherwise return the existing instance
         if instance_obj and new_instance:
             return instance_obj.create_copy()
         return instance_obj
