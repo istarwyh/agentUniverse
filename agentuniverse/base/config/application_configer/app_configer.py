@@ -6,7 +6,7 @@
 # @Email   : jerry.zzw@antgroup.com
 # @FileName: app_configer.py
 from typing import Optional
-from agentuniverse.base.config.configer import Configer
+from agentuniverse.base.config.configer import Configer, PlaceholderResolver
 
 
 class AppConfiger(object):
@@ -39,6 +39,11 @@ class AppConfiger(object):
         self.__core_work_pattern_package_list: Optional[list[str]] = None
         self.__core_log_sink_package_list: Optional[list[str]] = None
         self.__conversation_memory_configer: Optional[dict] = {}
+        self.__root_package_name: Optional[str] = None
+        self.__yaml_func_instance = None
+        self.__default_llm_configer = None
+        self.__tool_configer_map = {}
+        self.__llm_configer_map = {}
 
     @property
     def base_info_appname(self) -> Optional[str]:
@@ -155,6 +160,43 @@ class AppConfiger(object):
     @property
     def conversation_memory_configer(self) -> dict:
         return self.__conversation_memory_configer
+
+    @property
+    def root_package_name(self) -> str:
+        return self.__root_package_name
+
+    @property
+    def yaml_func_instance(self):
+        return self.__yaml_func_instance
+
+    @yaml_func_instance.setter
+    def yaml_func_instance(self, value):
+        self.__yaml_func_instance = value
+
+    @property
+    def default_llm_configer(self):
+        return self.__default_llm_configer
+
+    @default_llm_configer.setter
+    def default_llm_configer(self, value):
+        self.__default_llm_configer = value
+
+    @property
+    def tool_configer_map(self):
+        return self.__tool_configer_map
+
+    @tool_configer_map.setter
+    def tool_configer_map(self, value):
+        self.__tool_configer_map = value
+
+    @property
+    def llm_configer_map(self):
+        return self.__llm_configer_map
+
+    @llm_configer_map.setter
+    def llm_configer_map(self, value):
+        self.__llm_configer_map = value
+
     def load_by_configer(self, configer: Configer) -> 'AppConfiger':
         """Load the AppConfiger by the given Configer.
 
@@ -165,6 +207,7 @@ class AppConfiger(object):
         """
         self.__configer = configer
         self.__base_info_appname = configer.value.get('BASE_INFO', {}).get('appname')
+        self.__root_package_name = configer.value.get('PACKAGE_PATH_INFO', {}).get('ROOT_PACKAGE')
         self.__core_default_package_list = configer.value.get('CORE_PACKAGE', {}).get('default')
         self.__core_agent_package_list = configer.value.get('CORE_PACKAGE', {}).get('agent')
         self.__core_knowledge_package_list = configer.value.get('CORE_PACKAGE', {}).get('knowledge')
@@ -187,5 +230,5 @@ class AppConfiger(object):
         self.__core_memory_storage_package_list = configer.value.get('CORE_PACKAGE', {}).get('memory_storage')
         self.__core_work_pattern_package_list = configer.value.get('CORE_PACKAGE', {}).get('work_pattern')
         self.__core_log_sink_package_list = configer.value.get('CORE_PACKAGE', {}).get('log_sink')
-        self.__conversation_memory_configer = configer.value.get('CONVERSATION_MEMORY',{})
+        self.__conversation_memory_configer = configer.value.get('CONVERSATION_MEMORY', {})
         return self

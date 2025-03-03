@@ -2,6 +2,7 @@ name: 'default_zhipu_llm'
 description: 'default default_zhipu_llm llm with spi'
 model_name: 'glm-4-flash'
 max_tokens: 1000
+api_key: '${ZHIPU_API_KEY}'
 metadata:
   type: 'LLM'
   module: 'agentuniverse.llm.default.zhipu_openai_style_llm'

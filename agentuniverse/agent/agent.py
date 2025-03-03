@@ -36,10 +36,12 @@ from agentuniverse.base.config.application_configer.application_config_manager \
     import ApplicationConfigManager
 from agentuniverse.base.config.component_configer.configers.agent_configer \
     import AgentConfiger
+from agentuniverse.base.util.agent_util import process_agent_llm_config
 from agentuniverse.base.util.common_util import stream_output
 from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
 from agentuniverse.base.util.logging.logging_util import LOGGER
 from agentuniverse.base.util.memory_util import generate_messages, get_memory_string
+from agentuniverse.base.util.system_util import process_dict_with_funcs, is_system_builtin
 from agentuniverse.llm.llm import LLM
 from agentuniverse.llm.llm_manager import LLMManager
 from agentuniverse.prompt.chat_prompt import ChatPrompt
@@ -193,9 +195,13 @@ class Agent(ComponentBase, ABC):
         agent_config: Optional[AgentConfiger] = component_configer.load()
         info: Optional[dict] = agent_config.info
         profile: Optional[dict] = agent_config.profile
+        profile = process_dict_with_funcs(profile, component_configer.yaml_func_instance)
+        profile = process_agent_llm_config(info.get('name'), profile, component_configer.default_llm_configer)
         plan: Optional[dict] = agent_config.plan
         memory: Optional[dict] = agent_config.memory
+        memory = process_dict_with_funcs(memory, component_configer.yaml_func_instance)
         action: Optional[dict] = agent_config.action
+        action = process_dict_with_funcs(action, component_configer.yaml_func_instance)
         agent_model: Optional[AgentModel] = AgentModel(info=info, profile=profile,
                                                        plan=plan, memory=memory, action=action)
         self.agent_model = agent_model
@@ -235,7 +241,11 @@ class Agent(ComponentBase, ABC):
 
     def process_llm(self, **kwargs) -> LLM:
         llm_name = kwargs.get('llm_name') or self.agent_model.profile.get('llm_model', {}).get('name')
-        return LLMManager().get_instance_obj(llm_name)
+        llm: LLM = LLMManager().get_instance_obj(llm_name)
+        if is_system_builtin(llm):
+            LOGGER.warn("The system built-in LLM configuration YAML will be removed in the next version. "
+                        "Please configure your own LLM model in the application's YAML file.")
+        return llm
 
     def process_memory(self, agent_input: dict, **kwargs) -> Memory | None:
         memory_name = kwargs.get('memory_name') or self.agent_model.memory.get('name')

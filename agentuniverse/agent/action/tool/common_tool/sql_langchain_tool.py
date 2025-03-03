@@ -1,18 +1,16 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-# @Time    : 2024/7/9 20:04
-# @Author  : weizjajj 
-# @Email   : weizhongjie.wzj@antgroup.com
+# @Time    :
+# @Author  :
+# @Email   :
 # @FileName: sql_langchain_tool.py
 
 from typing import Type, Optional
-
-from langchain_core.tools import BaseTool, Tool as LangchainTool
-
 from agentuniverse.agent.action.tool.common_tool.langchain_tool import LangChainTool
 from agentuniverse.agent.action.tool.tool import ToolInput
 from agentuniverse.database.sqldb_wrapper_manager import SQLDBWrapperManager
+from langchain_core.tools import BaseTool, Tool as LangchainTool
 
 
 class SqlLangchainTool(LangChainTool):

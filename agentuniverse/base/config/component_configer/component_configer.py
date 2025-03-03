@@ -21,6 +21,8 @@ class ComponentConfiger(object):
         self.__metadata_type: Optional[str] = None
         self.__metadata_module: Optional[str] = None
         self.__metadata_class: Optional[str] = None
+        self.__yaml_func_instance = None
+        self.__default_llm_configer = None
 
     @property
     def configer(self) -> Optional[Configer]:
@@ -49,6 +51,22 @@ class ComponentConfiger(object):
     @metadata_class.setter
     def metadata_class(self, metadata_class: str):
         self.__metadata_class = metadata_class
+
+    @property
+    def yaml_func_instance(self):
+        return self.__yaml_func_instance
+
+    @yaml_func_instance.setter
+    def yaml_func_instance(self, value):
+        self.__yaml_func_instance = value
+
+    @property
+    def default_llm_configer(self):
+        return self.__default_llm_configer
+
+    @default_llm_configer.setter
+    def default_llm_configer(self, value):
+        self.__default_llm_configer = value
 
     def load(self) -> 'ComponentConfiger':
         """Load the configuration by the Configer object.

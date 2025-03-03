@@ -7,6 +7,7 @@
 # @FileName: agent_util.py
 from agentuniverse.agent.memory.memory import Memory
 from agentuniverse.agent.memory.message import Message
+from agentuniverse.base.config.custom_configer.agent_llm_configer import DefaultLLMConfiger
 from agentuniverse.base.util.memory_util import get_memory_string
 
 
@@ -56,3 +57,33 @@ def assemble_memory_output(memory: Memory, agent_input: dict,
         memory_messages = []
     memory_messages.append(cur_memory_message)
     return memory_messages
+
+
+def process_agent_llm_config(agent_id: str, agent_profile: dict, default_llm_configer: DefaultLLMConfiger) -> dict:
+    """
+    Update the LLM model name in the agent's profile based on the default LLM configuration.
+
+    If the agent's profile does not specify an LLM
+    model name, and if a default LLM is provided by default LLM configuration, the profile will
+    be updated accordingly.
+    """
+    if not agent_id or default_llm_configer is None:
+        return agent_profile
+
+    if not agent_profile:
+        agent_profile = {}
+
+    llm_model = agent_profile.setdefault('llm_model', {})
+
+    llm_name = agent_profile.get('llm_model').get('name')
+
+    # If LLM model name is specified, return the agent profile unchanged
+    if llm_name:
+        return agent_profile
+
+    # Update the LLM model name with the default LLM from the config manager, if available
+    if default_llm_configer.default_llm:
+        llm_model['name'] = default_llm_configer.default_llm
+
+    # Return the updated agent profile
+    return agent_profile

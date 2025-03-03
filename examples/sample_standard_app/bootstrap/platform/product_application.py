@@ -1,10 +1,11 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-# @Time    : 2024/7/24 15:35
-# @Author  : wangchongshi
-# @Email   : wangchongshi.wcs@antgroup.com
+# @Time    :
+# @Author  :
+# @Email   :
 # @FileName: product_application.py
+
 from agentuniverse.base.agentuniverse import AgentUniverse
 from agentuniverse_product.agentuniverse_product import AgentUniverseProduct
 

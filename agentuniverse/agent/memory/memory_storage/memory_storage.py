@@ -70,3 +70,5 @@ class MemoryStorage(ComponentBase):
         """
         pass
 
+    def create_copy(self):
+        return self

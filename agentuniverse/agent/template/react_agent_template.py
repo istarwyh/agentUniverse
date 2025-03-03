@@ -140,6 +140,7 @@ class ReActAgentTemplate(AgentTemplate):
         tool_names = []
         for lc_tool in lc_tools:
             tools_context += f"tool name: {lc_tool.name}, tool description: {lc_tool.description}\n"
+            tool_names.append(lc_tool.name)
         return tools_context, "|".join(tool_names)
 
     def _convert_to_langchain_tool(self) -> list[LangchainTool]:

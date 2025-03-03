@@ -7,9 +7,18 @@ profile:
   prompt_version: demo_agent.cn
   # Please select the llm.
   llm_model:
-    # you can change this config to a customized LLM
-    # e.g. demo_llm, which defined in /intelligence/agentic/llm/demo_llm.yaml
-    name: 'default_deepseek_llm'
+    #
+    # you can change this config to a customized LLM.
+    # e.g. demo_customized_llm, which defined in /intelligence/agentic/llm/custom/demo_customized_llm.yaml
+    #
+    # This section allows you to configure a customized LLM instance,
+    # and bind specific runtime settings such as temperature, streaming, and max_tokens
+    # to control the behavior of the LLM during execution.
+    #
+    name: 'qwen_25_72b_llm'
+    temperature: 0.3
+    streaming: True
+    max_tokens: 3000
 action:
   # Please select the tools and knowledge base.
   tool:

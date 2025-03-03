@@ -32,7 +32,8 @@ class BAICHUANOpenAIStyleLLM(OpenAIStyleLLM):
     """
 
     api_key: Optional[str] = Field(default_factory=lambda: get_from_env("BAICHUAN_API_KEY"))
-    api_base: Optional[str] = "https://api.baichuan-ai.com/v1"
+    api_base: Optional[str] = Field(default_factory=lambda: get_from_env(
+        "BAICHUAN_API_BASE") or "https://api.baichuan-ai.com/v1")
     proxy: Optional[str] = Field(default_factory=lambda: get_from_env("BAICHUAN_PROXY"))
     organization: Optional[str] = Field(default_factory=lambda: get_from_env("BAICHUAN_ORGANIZATION"))
 

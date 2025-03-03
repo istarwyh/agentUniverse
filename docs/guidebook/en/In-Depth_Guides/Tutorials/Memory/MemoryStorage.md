@@ -87,17 +87,17 @@ memory_storage = ['sample_standard_app.intelligence.agentic.memory.memory_storag
 
 ## agentUniverse currently has the following built-in MemoryStorage components:
 
-### [local_memory_storage](../../../../../../agentuniverse/agent/memory/memory_storage/local_memory_storage.py)
+### [ram_memory_storage](../../../../../../agentuniverse/agent/memory/memory_storage/ram_memory_storage.py)
 
-Local memory storage, the system's built-in component configuration file is as follows:
+Ram memory storage, the system's built-in component configuration file is as follows:
 
 ```yaml
-name: 'local_memory_storage'
-description: 'local memory storage'
+name: 'ram_memory_storage'
+description: 'ram memory storage'
 metadata:
   type: 'MEMORY_STORAGE'
-  module: 'agentuniverse.agent.memory.memory_storage.local_memory_storage'
-  class: 'LocalMemoryStorage'
+  module: 'agentuniverse.agent.memory.memory_storage.ram_memory_storage'
+  class: 'RamMemoryStorage'
 ```
 
 ### [chroma_memory_storage](../../../../../../agentuniverse/agent/memory/memory_storage/chroma_memory_storage.py)

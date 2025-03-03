@@ -1,10 +1,11 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-# @Time    : 2024/7/1 21:09
-# @Author  : wangchongshi
-# @Email   : wangchongshi.wcs@antgroup.com
+# @Time    :
+# @Author  :
+# @Email   :
 # @FileName: jsonl_file_util.py
+
 import json
 import os
 import sys
