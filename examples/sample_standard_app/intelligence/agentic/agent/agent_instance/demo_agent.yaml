@@ -5,17 +5,33 @@ info:
 profile:
   # Please fill in the profile of your agent. The following is a sample.
   prompt_version: demo_agent.cn
-  # Please select the llm.
+  # Please select the LLM configuration for your agent.
+  #
+  # There are two ways to configure the LLM for your agent:
+  #
+  # Way 1:
+  # Explicitly specify the LLM configuration in the llm_model section:
+  # - name (Required): Specify the name of the LLM component
+  # - Runtime parameters (Optional): temperature, streaming, max_tokens, etc.
+  #   These parameters control the behavior of the LLM during execution.
+  #
+  # Example:
+  #   llm_model:
+  #     name: 'demo_customized_llm'    # Defined in /intelligence/agentic/llm/custom/demo_customized_llm.yaml
+  #     temperature: 0.5
+  #
+  # Way 2:
+  # Omit the llm_model section entirely:
+  # - System will automatically look for 'default_llm.toml' in the LLM directory
+  # - The default LLM specified in this file will be used to assemble the agent
+  #
+  # Example default_llm.toml:
+  #   [DEFAULT]
+  #   default_llm = 'qwen_25_72b_llm'
+  #
+  # Note: The current configuration uses Way 1, as shown below
   llm_model:
-    #
-    # you can change this config to a customized LLM.
-    # e.g. demo_customized_llm, which defined in /intelligence/agentic/llm/custom/demo_customized_llm.yaml
-    #
-    # This section allows you to configure a customized LLM instance,
-    # and bind specific runtime settings such as temperature, streaming, and max_tokens
-    # to control the behavior of the LLM during execution.
-    #
-    name: 'qwen_25_72b_llm'
+    name: 'qwen2.5-72b-instruct'
     temperature: 0.3
     streaming: True
     max_tokens: 3000
