@@ -16,9 +16,6 @@ from agentuniverse.agent.action.knowledge.rag_router.rag_router import \
 from agentuniverse.agent.action.knowledge.store.query import Query
 from agentuniverse.base.config.component_configer.component_configer import \
     ComponentConfiger
-from agentuniverse.base.util.system_util import is_api_key_missing
-from agentuniverse.llm.llm import LLM
-from agentuniverse.llm.llm_manager import LLMManager
 
 
 class NluRagRouter(RagRouter):
@@ -52,6 +49,7 @@ class NluRagRouter(RagRouter):
         super()._initialize_by_component_configer(rag_router_config)
         if hasattr(rag_router_config, "llm"):
             self.llm = rag_router_config.llm
+        if hasattr(rag_router_config, "agent_name"):
             self.agent_name = rag_router_config.agent_name
         if hasattr(rag_router_config, "store_amount"):
             self.store_amount = rag_router_config.store_amount
