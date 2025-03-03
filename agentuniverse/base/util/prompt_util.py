@@ -130,7 +130,8 @@ def generate_chat_template(agent_prompt_model: AgentPromptModel, prompt_assemble
     return message_list
 
 
-def process_llm_token(agent_llm: LLM, lc_prompt_template, profile: dict, planner_input: dict):
+def process_llm_token(agent_llm: LLM, lc_prompt_template, profile: dict, planner_input: dict,
+                      var_to_process: str = 'background'):
     """Process the prompt template based on the prompt processor.
 
     Args:
@@ -138,6 +139,7 @@ def process_llm_token(agent_llm: LLM, lc_prompt_template, profile: dict, planner
         lc_prompt_template: The langchain prompt template.
         profile (dict): The profile.
         planner_input (dict): The planner input.
+        var_to_process (str): The variable needs to be processed in the prompt, the default is 'background'
     """
     llm_model: dict = profile.get('llm_model')
 
@@ -172,20 +174,20 @@ def process_llm_token(agent_llm: LLM, lc_prompt_template, profile: dict, planner
 
     process_prompt_type_enum = PromptProcessEnum.from_value(prompt_processor_type)
 
-    # compress the background in the prompt
-    content = planner_input.get('background')
+    # process the specific variable in the prompt
+    content = planner_input.get(var_to_process)
 
     if content:
         if process_prompt_type_enum == PromptProcessEnum.TRUNCATE:
-            planner_input['background'] = truncate_content(content, input_tokens, agent_llm)
+            planner_input[var_to_process] = truncate_content(content, input_tokens, agent_llm)
         elif process_prompt_type_enum == PromptProcessEnum.STUFF:
-            planner_input['background'] = summarize_by_stuff(texts=[content], llm=prompt_llm,
-                                                             summary_prompt=PromptManager().get_instance_obj(
-                                                                 summary_prompt_version))
+            planner_input[var_to_process] = summarize_by_stuff(texts=[content], llm=prompt_llm,
+                                                               summary_prompt=PromptManager().get_instance_obj(
+                                                                   summary_prompt_version))
         elif process_prompt_type_enum == PromptProcessEnum.MAP_REDUCE:
-            planner_input['background'] = summarize_by_map_reduce(texts=split_texts([content], agent_llm),
-                                                                  llm=prompt_llm,
-                                                                  summary_prompt=PromptManager().get_instance_obj(
-                                                                      summary_prompt_version),
-                                                                  combine_prompt=PromptManager().get_instance_obj(
-                                                                      combine_prompt_version))
+            planner_input[var_to_process] = summarize_by_map_reduce(texts=split_texts([content], agent_llm),
+                                                                    llm=prompt_llm,
+                                                                    summary_prompt=PromptManager().get_instance_obj(
+                                                                        summary_prompt_version),
+                                                                    combine_prompt=PromptManager().get_instance_obj(
+                                                                        combine_prompt_version))

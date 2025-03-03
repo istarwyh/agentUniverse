@@ -10,7 +10,7 @@ body:
   attributes:
     label: Version
     description: What is the version of your agentUniverse? | 您使用的agentUniverse版本是多少？
-    placeholder: "Example: version 0.0.13"
+    placeholder: "Example: version 0.0.15"
   validations:
     required: true
 - type: textarea

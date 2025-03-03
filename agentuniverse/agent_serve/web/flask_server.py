@@ -11,7 +11,8 @@ from .web_util import request_param, service_run_queue, make_standard_response, 
 from .thread_with_result import ThreadPoolExecutorWithReturnValue
 from ...base.util.logging.logging_util import LOGGER
 from agentuniverse.base.util.logging.log_type_enum import LogTypeEnum
-from agentuniverse.base.util.logging.general_logger import _get_context_prefix
+from agentuniverse.base.util.logging.general_logger import get_context_prefix
+from agentuniverse.base.util.tracing.au_trace_manager import AuTraceManager
 
 from werkzeug.local import LocalProxy
 
@@ -51,7 +52,7 @@ def timed_generator(generator, start_time):
             log_type=LogTypeEnum.flask_response,
             flask_response="Stream finished",
             elapsed_time=elapsed_time,
-            context_prefix=_get_context_prefix()
+            context_prefix=get_context_prefix()
         ).info("Stream finished.")
 
 
@@ -65,8 +66,9 @@ def before():
     logger.bind(
         log_type=LogTypeEnum.flask_request,
         flask_request=request,
-        context_prefix=_get_context_prefix()
+        context_prefix=get_context_prefix()
     ).info("Before request.")
+    AuTraceManager().set_log_context()
     g.start_time = time.time()
 
 
@@ -77,7 +79,7 @@ def after_request(response):
             log_type=LogTypeEnum.flask_response,
             flask_response=response,
             elapsed_time=time.time() - g.start_time,
-            context_prefix=_get_context_prefix()
+            context_prefix=get_context_prefix()
         ).info("After request.")
     return response
 

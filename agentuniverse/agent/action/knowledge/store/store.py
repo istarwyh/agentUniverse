@@ -99,3 +99,7 @@ class Store(ComponentBase):
     async def async_update_document(self, documents: List[Document], **kwargs):
         """Asynchronously update documents into the store."""
         raise NotImplementedError
+
+    def create_copy(self):
+        # TODO: Store copy need to solve thread lock problem
+        return self

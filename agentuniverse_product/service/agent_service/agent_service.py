@@ -64,8 +64,8 @@ class AgentService:
         Returns:
             AgentDTO | None: AgentDTO or None.
         """
-        product: Product = ProductManager().get_instance_obj(id)
-        agent: Agent = AgentManager().get_instance_obj(id)
+        product: Product = ProductManager().get_instance_obj(id, new_instance=False)
+        agent: Agent = AgentManager().get_instance_obj(id, new_instance=False)
         if agent is None:
             raise ValueError("The agent instance corresponding to the agent id cannot be found.")
         agent_dto = AgentDTO(id=id,
@@ -82,7 +82,7 @@ class AgentService:
         if agent_dto.id is None:
             raise ValueError("Agent id cannot be None.")
         product: Product = ProductManager().get_instance_obj(agent_dto.id)
-        agent: Agent = AgentManager().get_instance_obj(agent_dto.id)
+        agent: Agent = AgentManager().get_instance_obj(agent_dto.id, new_instance=False)
         if agent is None:
             raise ValueError("The agent instance corresponding to the agent id cannot be found.")
         # update agent product yaml configuration file
@@ -104,12 +104,12 @@ class AgentService:
         """
         if agent_id is None or session_id is None:
             raise ValueError("Agent id or session id cannot be None.")
-        agent: Agent = AgentManager().get_instance_obj(agent_id)
+        agent: Agent = AgentManager().get_instance_obj(agent_id, new_instance=False)
         if agent is None:
             raise ValueError("The agent instance corresponding to the agent id cannot be found.")
 
         # init the invocation chain and token usage of the monitor module
-        Monitor.init_invocation_chain()
+        Monitor.init_invocation_chain_bak()
         Monitor.init_token_usage()
 
         # invoke agent
@@ -121,7 +121,7 @@ class AgentService:
         output = output_object.get_data('output')
 
         # get and clear invocation chain and token usage.
-        invocation_chain = Monitor.get_invocation_chain()
+        invocation_chain = Monitor.get_invocation_chain_bak()
         token_usage = Monitor.get_token_usage()
         Monitor.clear_invocation_chain()
         Monitor.clear_token_usage()
@@ -150,7 +150,7 @@ class AgentService:
                                                              AgentService().get_agent_chat_history(session_id))
 
         # init the invocation chain and token usage of the monitor module
-        Monitor.init_invocation_chain()
+        Monitor.init_invocation_chain_bak()
         Monitor.init_token_usage()
 
         # invoke agent
@@ -179,7 +179,7 @@ class AgentService:
                         agent_id, session_id, input, output, datetime.fromtimestamp(end_time)
                     )
                     # get and clear contexts
-                    invocation_chain = Monitor.get_invocation_chain()
+                    invocation_chain = Monitor.get_invocation_chain_bak()
                     token_usage = Monitor.get_token_usage()
                     Monitor.clear_invocation_chain()
                     Monitor.clear_token_usage()
@@ -216,7 +216,7 @@ class AgentService:
                                                              AgentService().get_agent_chat_history(session_id))
 
         # init the invocation chain and token usage of the monitor module
-        Monitor.init_invocation_chain()
+        Monitor.init_invocation_chain_bak()
         Monitor.init_token_usage()
 
         # invoke agent
@@ -244,7 +244,7 @@ class AgentService:
                         agent_id, session_id, input, output, datetime.fromtimestamp(end_time)
                     )
                     # get and clear contexts
-                    invocation_chain = Monitor.get_invocation_chain()
+                    invocation_chain = Monitor.get_invocation_chain_bak()
                     token_usage = Monitor.get_token_usage()
                     Monitor.clear_invocation_chain()
                     Monitor.clear_token_usage()

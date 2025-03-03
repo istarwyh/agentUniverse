@@ -13,8 +13,9 @@ from pydantic import Field
 from qianfan import QfResponse
 from qianfan.resources.tools import tokenizer
 
-from agentuniverse.base.annotation.trace import trace_llm
+from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
 from agentuniverse.base.util.env_util import get_from_env
+from agentuniverse.base.util.system_util import process_yaml_func
 from agentuniverse.llm.llm import LLM
 from agentuniverse.llm.llm_output import LLMOutput
 from agentuniverse.llm.wenxin_langchain_instance import WenXinLangChainInstance
@@ -38,17 +39,17 @@ class WenXinLLM(LLM):
         It can be used with any other LangChain tools or agents.
 
         Attributes:
-            qianfan_ak (str): The access key of the Qianfan API.
+            api_key (str): The access key of the Qianfan API.
                 Defaults to the value of the QIANFAN_AK environment variable.
-            qianfan_sk (str): The secret key of the Qianfan API.
+            secret_key (str): The secret key of the Qianfan API.
                 Defaults to the value of the QIANFAN_SK environment variable.
     """
-    qianfan_ak: str = Field(default_factory=lambda: get_from_env("QIANFAN_AK"))
-    qianfan_sk: str = Field(default_factory=lambda: get_from_env("QIANFAN_SK"))
+    api_key: str = Field(default_factory=lambda: get_from_env("QIANFAN_AK"))
+    secret_key: str = Field(default_factory=lambda: get_from_env("QIANFAN_SK"))
 
     def _new_client(self):
         if self.client is None:
-            self.client = qianfan.ChatCompletion(ak=self.qianfan_ak, sk=self.qianfan_sk)
+            self.client = qianfan.ChatCompletion(ak=self.api_key, sk=self.secret_key)
         """Create a new Qianfan client."""
         return self.client
 
@@ -137,3 +138,13 @@ class WenXinLLM(LLM):
     def as_langchain(self) -> BaseLanguageModel:
         """Return an instance of the LangChain `BaseLanguageModel` class."""
         return WenXinLangChainInstance(llm=self)
+
+    def initialize_by_component_configer(self, component_configer: LLMConfiger) -> 'WenXinLLM':
+        super().initialize_by_component_configer(component_configer)
+        if 'api_key' in component_configer.configer.value:
+            api_key = component_configer.configer.value.get('api_key')
+            self.api_key = process_yaml_func(api_key, component_configer.yaml_func_instance)
+        if 'secret_key' in component_configer.configer.value:
+            secret_key = component_configer.configer.value.get('secret_key')
+            self.secret_key = process_yaml_func(secret_key, component_configer.yaml_func_instance)
+        return self

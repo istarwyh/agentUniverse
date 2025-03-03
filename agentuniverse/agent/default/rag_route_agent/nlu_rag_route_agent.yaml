@@ -3,8 +3,8 @@ info:
   description: 'agent used to route query to different store'
 profile:
   llm_model:
-    name: 'default_openai_llm'
-    model_name: 'gpt-4o'
+    name: 'default_qwen_llm'
+    model_name: 'qwen2.5-72b-instruct'
 metadata:
   type: 'AGENT'
   module: 'agentuniverse.agent.default.rag_route_agent.nlu_rag_route_agent'

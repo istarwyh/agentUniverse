@@ -57,7 +57,7 @@ instance are obtained. The memory message list, agent ID (agent_id), session ID 
 and other information are stored in multiple storages.
 
 Currently, agentUniverse comes with three built-in memory storage
-methods: [ChromaDB](../../../../../../agentuniverse/agent/memory/memory_storage/chroma_memory_storage.py), [SqlAlchemy](../../../../../../agentuniverse/agent/memory/memory_storage/sql_alchemy_memory_storage.py), [LocalMemory](../../../../../../agentuniverse/agent/memory/memory_storage/local_memory_storage.py).
+methods: [ChromaDB](../../../../../../agentuniverse/agent/memory/memory_storage/chroma_memory_storage.py), [SqlAlchemy](../../../../../../agentuniverse/agent/memory/memory_storage/sql_alchemy_memory_storage.py), [RamMemory](../../../../../../agentuniverse/agent/memory/memory_storage/ram_memory_storage.py).
 Users can choose the appropriate memory storage method based on their actual needs.
 
 Special Reminder: In the `pre_parse_input` method of the agent base class, aU will automatically read the `name`
@@ -84,7 +84,7 @@ Memory is retrieved based on the agent ID (agent_id), session ID (session_id), a
 [ChromaDB](../../../../../../agentuniverse/agent/memory/memory_storage/chroma_memory_storage.py) can perform vector retrieval
 based on the query,
 [SqlAlchemy](../../../../../../agentuniverse/agent/memory/memory_storage/sql_alchemy_memory_storage.py)
-and [LocalMemory](../../../../../../agentuniverse/agent/memory/memory_storage/local_memory_storage.py) filter based on
+and [RamMemory](../../../../../../agentuniverse/agent/memory/memory_storage/ram_memory_storage.py) filter based on
 chronological conditions to retrieve the specified memory information.
 
 ### Memory Pruning and Compression Process

@@ -15,7 +15,9 @@ from langchain_core.language_models import BaseLanguageModel
 from pydantic import Field
 
 from agentuniverse.base.annotation.trace import trace_llm
+from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
 from agentuniverse.base.util.env_util import get_from_env
+from agentuniverse.base.util.system_util import process_yaml_func
 from agentuniverse.llm.claude_langchain_instance import ClaudeLangChainInstance
 from agentuniverse.llm.llm import LLM
 from agentuniverse.llm.llm_output import LLMOutput
@@ -42,7 +44,7 @@ class ClaudeLLM(LLM):
     """
     api_key: Optional[str] = Field(default_factory=lambda: get_from_env('ANTHROPIC_API_KEY'))
     api_url: Optional[str] = Field(default_factory=lambda: get_from_env('ANTHROPIC_API_URL'))
-    proxy: Optional[str] = None
+    proxy: Optional[str] = Field(default_factory=lambda: get_from_env('ANTHROPIC_PROXY'))
     connection_pool_limits: Optional[int] = None
 
     def _new_client(self):
@@ -151,3 +153,17 @@ class ClaudeLLM(LLM):
         """Async close the client."""
         if hasattr(self, 'async_client') and self.async_client:
             await self.async_client.aclose()
+
+    def initialize_by_component_configer(self, component_configer: LLMConfiger) -> 'ClaudeLLM':
+        super().initialize_by_component_configer(component_configer)
+        if 'api_key' in component_configer.configer.value:
+            api_key = component_configer.configer.value.get('api_key')
+            self.api_key = process_yaml_func(api_key, component_configer.yaml_func_instance)
+        if 'api_url' in component_configer.configer.value:
+            api_url = component_configer.configer.value.get('api_url')
+            self.api_url = process_yaml_func(api_url, component_configer.yaml_func_instance)
+        if 'proxy' in component_configer.configer.value:
+            self.proxy = component_configer.configer.value.get('proxy')
+        if 'connection_pool_limits' in component_configer.configer.value:
+            self.connection_pool_limits = component_configer.configer.value.get('connection_pool_limits')
+        return self

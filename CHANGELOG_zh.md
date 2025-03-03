@@ -24,6 +24,45 @@ Note - 对于版本的额外说明。
 ***************************************************
 
 # 版本更新记录
+## [0.0.15] - 2025-03-03
+### Added
+- embedding组件新增  
+  - 新增azure-openai embedding组件  
+  - 新增gemini embedding组件  
+  - 新增豆包embedding标准组件 
+- 知识加载reader组件新增  
+  - 新增基于bs4的网页读取组件
+  - 新增基于OCR技术的图像加载组件
+  - 新增csv格式表格加载组件
+- 工具插件新增  
+  - 新增Arxiv文献检索查询工具插件
+  - 新增Jina AI智能搜索工具插件
+- 新增reasoning类模型标准LLM输出解析器
+- 新增agent、llm、tool相关日志采集标准logger
+- 新增retry函数注解
+
+### Changed  
+- 项目配置体验优化，主要优化点如下
+  - 项目配置支持全局PACKAGE路径替换，详情见样例工程config.toml文件PACKAGE_PATH_INFO参数部分
+  - 支持用户自定义配置扩展与yaml函数扩展，详情见样例工程config.toml文件EXTENSION_MODULES参数部分
+  - custom_key.toml.sample更新，提供更详细与全面的参数内容
+  - 内置一批常用模型配置yaml，详情见样例工程llm目录
+  - yaml配置支持用户使用环境变量与扩展函数自定义加载对应属性，详情见样例工程llm样例中api_key注释说明部分
+  - llm配置简化，默认读取全局default_llm配置，详情见样例工程llm样例default_llm.toml配置内容
+  - 组件扩展配置简化，组件metadata中module部分可不填写，默认寻找同层级同名py扩展文件
+- 项目启动流程优化，主要优化点如下
+  - LLM组件启动注册优化，只启动用户在agent、tool等组件中依赖启动的LLM实例
+  - 项目启动报错提示优化
+- 其他变更
+  - 内存记忆存储对象LocalMemoryStorage更名RamMemoryStorage
+
+### Note 
+- 新增应用工程image_build镜像打包文件与教程文档
+- 新增项目贡献者开发文档
+- 规范项目PR与ISSUE模版
+- 新增基于模型多模态能力的agent样例实践，详情见项目examples/multimodal_app
+- 项目于2月收录于deepseek发布的awesome-deepseek-integration榜单
+
 ## [0.0.14] - 2025-01-26
 ### Added
 - aU记忆机制全面改版升级  

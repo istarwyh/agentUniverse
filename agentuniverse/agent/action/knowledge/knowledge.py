@@ -8,6 +8,7 @@
 import os
 import re
 import traceback
+from copy import deepcopy
 from typing import Optional, Dict, List, Any
 from concurrent.futures import wait, ALL_COMPLETED
 
@@ -64,6 +65,7 @@ class Knowledge(ComponentBase):
 
         ext_info (Optional[Dict]): The extended information of the knowledge.
     """
+
     class Config:
         arbitrary_types_allowed = True
 
@@ -78,6 +80,7 @@ class Knowledge(ComponentBase):
     readers: Dict[str, str] = dict()
     insert_executor: Optional[ThreadPoolExecutorWithReturnValue] = None
     query_executor: Optional[ThreadPoolExecutorWithReturnValue] = None
+    tracing: Optional[bool] = None
     ext_info: Optional[Dict] = None
 
     def __init__(self, **kwargs):
@@ -263,6 +266,8 @@ class Knowledge(ComponentBase):
             self.post_processors = knowledge_configer.post_processors
         if hasattr(knowledge_configer, "readers"):
             self.readers = knowledge_configer.readers
+        if hasattr(knowledge_configer, "tracing"):
+            self.tracing = knowledge_configer.tracing
         return self
 
     def langchain_query(self, query: str) -> str:
@@ -294,3 +299,15 @@ class Knowledge(ComponentBase):
             description=self.description or '' + args_description,
             func=self.langchain_query,
         )
+
+    def create_copy(self):
+        copied = self.model_copy()
+        copied.stores = self.stores.copy()
+        copied.query_paraphrasers = self.query_paraphrasers.copy()
+        copied.insert_processors = self.insert_processors.copy()
+        copied.update_processors = self.update_processors.copy()
+        copied.post_processors = self.post_processors.copy()
+        copied.readers = deepcopy(self.readers)
+        if self.ext_info is not None:
+            copied.ext_info = deepcopy(self.ext_info)
+        return copied

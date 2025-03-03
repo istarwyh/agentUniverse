@@ -53,6 +53,3 @@ class NluRagRouter(RagRouter):
             self.agent_name = rag_router_config.agent_name
         if hasattr(rag_router_config, "store_amount"):
             self.store_amount = rag_router_config.store_amount
-
-
-

@@ -11,6 +11,8 @@ from typing import TypeVar, Generic
 from agentuniverse.base.config.application_configer.application_config_manager import ApplicationConfigManager
 from agentuniverse.base.component.component_base import ComponentBase
 from agentuniverse.base.component.component_enum import ComponentEnum
+from agentuniverse.base.util.logging.logging_util import LOGGER
+from agentuniverse.base.util.system_util import is_system_builtin
 
 # 添加类型范型限定
 ComponentTypeVar = TypeVar("ComponentTypeVar", bound=ComponentBase)
@@ -29,6 +31,10 @@ class ComponentManagerBase(Generic[ComponentTypeVar]):
     def register(self, component_instance_name: str, component_instance_obj: ComponentTypeVar):
         """Register the component instance."""
         if component_instance_name in self._instance_obj_map.keys():
+            if is_system_builtin(component_instance_obj):
+                LOGGER.info(f"Component name '{component_instance_name}' is already registered. "
+                            f"Skipping system built-in component in favor of user-configured component.")
+                return
             raise ValueError(f"{self._component_type.value} component object instance with name "
                              f"'{component_instance_name}' already exists.")
         self._instance_obj_map[component_instance_name] = component_instance_obj
@@ -40,14 +46,16 @@ class ComponentManagerBase(Generic[ComponentTypeVar]):
         self._instance_obj_map.pop(component_instance_name)
 
     def get_instance_obj(self, component_instance_name: str,
-                         appname: str = None, new_instance: bool = False) -> ComponentTypeVar:
+                         appname: str = None, new_instance: bool = True) -> ComponentTypeVar:
         """Return the component instance object."""
         if component_instance_name == "__default_instance__":
             return self.get_default_instance(new_instance)
         appname = appname or ApplicationConfigManager().app_configer.base_info_appname
         instance_code = f'{appname}.{self._component_type.value.lower()}.{component_instance_name}'
         if new_instance:
-            return copy.deepcopy(self._instance_obj_map.get(instance_code))
+            instance = self._instance_obj_map.get(instance_code)
+            if instance:
+                return instance.create_copy()
         return self._instance_obj_map.get(instance_code)
 
     def get_default_instance(self, new_instance: bool = False) -> ComponentTypeVar:

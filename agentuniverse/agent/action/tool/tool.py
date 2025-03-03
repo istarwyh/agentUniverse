@@ -58,6 +58,7 @@ class Tool(ComponentBase):
     description: Optional[str] = None
     tool_type: ToolTypeEnum = ToolTypeEnum.FUNC
     input_keys: Optional[List] = None
+    tracing: Optional[bool] = None
 
     def __init__(self, **kwargs):
         super().__init__(component_type=ComponentEnum.TOOL, **kwargs)
@@ -115,8 +116,15 @@ class Tool(ComponentBase):
         Args:
             component_configer(LLMConfiger): the ComponentConfiger object
         Returns:
-            LLM: the LLM object
+            Tool: the Tool object
         """
+        try:
+            # First handle the main configuration values
+            for key, value in component_configer.configer.value.items():
+                if key != 'metadata':  # Skip metadata field
+                    setattr(self, key, value)
+        except Exception as e:
+            print(f"Error during configuration initialization: {str(e)}")
         if component_configer.name:
             self.name = component_configer.name
         if component_configer.description:
@@ -125,4 +133,12 @@ class Tool(ComponentBase):
             self.tool_type = next((member for member in ToolTypeEnum if member.value == component_configer.tool_type))
         if component_configer.input_keys:
             self.input_keys = component_configer.input_keys
+        if hasattr(component_configer, "tracing"):
+            self.tracing = component_configer.tracing
         return self
+
+    def create_copy(self):
+        copied = self.model_copy()
+        if self.input_keys is not None:
+            copied.input_keys = self.input_keys.copy()
+        return copied

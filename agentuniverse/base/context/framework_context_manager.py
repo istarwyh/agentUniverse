@@ -64,14 +64,19 @@ class FrameworkContextManager:
             return default_value
         return self.__context_dict[var_name].get(default_value)
 
-    def del_context(self, var_name: str):
+    def del_context(self, var_name: str, force: bool = False):
         """Set a context variable to None.
 
         Args:
             var_name (`str`): Name of the context variable.
+            force (`bool`): Also delete key in dict while value is True
         """
+
         if self.is_context_exist(var_name):
-            self.__context_dict[var_name].set(None)
+            if force:
+                del self.__context_dict[var_name]
+            else:
+                self.__context_dict[var_name].set(None)
 
     def reset_context(self, var_name: str, token: Token):
         """Reset a context variable using given token.
@@ -95,3 +100,13 @@ class FrameworkContextManager:
         """Set all context variables using the provided dictionary."""
         for var_name, var_value in context_values.items():
             self.set_context(var_name, var_value)
+
+    def set_log_context(self, context_key: str, context_value: Any):
+        log_context = self.get_context("LOG_CONTEXT")
+        if not log_context:
+            log_context = {
+                context_key: context_value
+            }
+            self.set_context("LOG_CONTEXT", log_context)
+        else:
+            log_context[context_key] = context_value
