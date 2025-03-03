@@ -18,6 +18,7 @@ class LLMModelEnum(Enum):
     ZHIPU = "zhipu"
     BAICHUAN = "baichuan"
     GEMINI = "gemini"
+    WENXIN = "wenxin"
 
 
 class YamlFuncExtension:
@@ -61,5 +62,7 @@ class YamlFuncExtension:
             return os.getenv("BAICHUAN_API_KEY")
         elif model_name == LLMModelEnum.GEMINI.value:
             return os.getenv("GEMINI_API_KEY")
+        elif model_name == LLMModelEnum.WENXIN.value:
+            return os.getenv("QIANFAN_AK")
         else:
             return ""
