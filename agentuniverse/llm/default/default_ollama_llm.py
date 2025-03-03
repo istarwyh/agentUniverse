@@ -8,6 +8,7 @@ from pydantic import Field
 
 from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
 from agentuniverse.base.util.env_util import get_from_env
+from agentuniverse.base.util.system_util import process_yaml_func
 from agentuniverse.llm.llm import LLM
 from agentuniverse.llm.llm_output import LLMOutput
 from agentuniverse.llm.ollama_langchain_instance import OllamaLangchainInstance
@@ -84,7 +85,8 @@ class OllamaLLM(LLM):
     def initialize_by_component_configer(self, component_configer: LLMConfiger) -> 'LLM':
         super().initialize_by_component_configer(component_configer)
         if 'base_url' in component_configer.configer.value:
-            self.base_url = component_configer.configer.value['base_url']
+            base_url = component_configer.configer.value['base_url']
+            self.base_url = process_yaml_func(base_url, component_configer.yaml_func_instance)
         if 'max_context_length' in component_configer.configer.value:
             self._max_context_length = component_configer.configer.value['max_context_length']
         return self

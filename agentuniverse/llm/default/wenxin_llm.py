@@ -15,6 +15,7 @@ from qianfan.resources.tools import tokenizer
 
 from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
 from agentuniverse.base.util.env_util import get_from_env
+from agentuniverse.base.util.system_util import process_yaml_func
 from agentuniverse.llm.llm import LLM
 from agentuniverse.llm.llm_output import LLMOutput
 from agentuniverse.llm.wenxin_langchain_instance import WenXinLangChainInstance
@@ -141,7 +142,9 @@ class WenXinLLM(LLM):
     def initialize_by_component_configer(self, component_configer: LLMConfiger) -> 'WenXinLLM':
         super().initialize_by_component_configer(component_configer)
         if 'api_key' in component_configer.configer.value:
-            self.api_key = component_configer.configer.value.get('api_key')
+            api_key = component_configer.configer.value.get('api_key')
+            self.api_key = process_yaml_func(api_key, component_configer.yaml_func_instance)
         if 'secret_key' in component_configer.configer.value:
-            self.secret_key = component_configer.configer.value.get('secret_key')
+            secret_key = component_configer.configer.value.get('secret_key')
+            self.secret_key = process_yaml_func(secret_key, component_configer.yaml_func_instance)
         return self

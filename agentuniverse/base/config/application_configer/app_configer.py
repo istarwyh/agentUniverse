@@ -48,6 +48,8 @@ class AppConfiger(object):
         self.__default_llm_configer: DefaultLLMConfiger = None
         self.__tool_configer_map: Dict[str, ToolConfiger] = {}
         self.__llm_configer_map: Dict[str, LLMConfiger] = {}
+        self.__agent_llm_set: Optional[set[str]] = set()
+        self.__agent_tool_set: Optional[set[str]] = set()
 
     @property
     def base_info_appname(self) -> Optional[str]:
@@ -200,6 +202,22 @@ class AppConfiger(object):
     @llm_configer_map.setter
     def llm_configer_map(self, value: Dict[str, LLMConfiger]):
         self.__llm_configer_map = value
+
+    @property
+    def agent_llm_set(self) -> set:
+        return self.__agent_llm_set
+
+    @agent_llm_set.setter
+    def agent_llm_set(self, value: set):
+        self.__agent_llm_set = value
+
+    @property
+    def agent_tool_set(self) -> set:
+        return self.__agent_tool_set
+
+    @agent_tool_set.setter
+    def agent_tool_set(self, value: set):
+        self.__agent_tool_set = value
 
     def load_by_configer(self, configer: Configer) -> 'AppConfiger':
         """Load the AppConfiger by the given Configer.
