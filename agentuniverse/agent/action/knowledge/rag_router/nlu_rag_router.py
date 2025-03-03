@@ -52,12 +52,6 @@ class NluRagRouter(RagRouter):
         super()._initialize_by_component_configer(rag_router_config)
         if hasattr(rag_router_config, "llm"):
             self.llm = rag_router_config.llm
-            if self.llm and isinstance(self.llm, dict) and self.llm.get('name'):
-                llm: LLM = LLMManager().get_instance_obj(self.llm.get('name'))
-                if llm and is_api_key_missing(llm, "api_key"):
-                    raise ValueError(
-                        f"Missing required API key for LLM component {llm.get_instance_code()}.")
-        if hasattr(rag_router_config, "agent_name"):
             self.agent_name = rag_router_config.agent_name
         if hasattr(rag_router_config, "store_amount"):
             self.store_amount = rag_router_config.store_amount
