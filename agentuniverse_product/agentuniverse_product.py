@@ -48,8 +48,6 @@ class AgentUniverseProduct(object):
 
         # load the configuration file
         configer = Configer(path=config_path).load()
-        app_configer = AppConfiger().load_by_configer(configer)
-        self.__config_container.app_configer = app_configer
 
         # init product tables (session and message)
         self.__init_product_tables()

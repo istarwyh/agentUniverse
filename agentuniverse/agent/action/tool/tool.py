@@ -116,8 +116,15 @@ class Tool(ComponentBase):
         Args:
             component_configer(LLMConfiger): the ComponentConfiger object
         Returns:
-            LLM: the LLM object
+            Tool: the Tool object
         """
+        try:
+            # First handle the main configuration values
+            for key, value in component_configer.configer.value.items():
+                if key != 'metadata':  # Skip metadata field
+                    setattr(self, key, value)
+        except Exception as e:
+            print(f"Error during configuration initialization: {str(e)}")
         if component_configer.name:
             self.name = component_configer.name
         if component_configer.description:
