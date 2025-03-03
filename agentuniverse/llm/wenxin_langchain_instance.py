@@ -22,7 +22,7 @@ class WenXinLangChainInstance(QianfanChatEndpoint):
     llm: LLM = None
 
     def __init__(self, llm: LLM):
-        init_params = {"qianfan_ak": llm.qianfan_ak, "qianfan_sk": llm.qianfan_sk, "model": llm.model_name,
+        init_params = {"qianfan_ak": llm.api_key, "qianfan_sk": llm.secret_key, "model": llm.model_name,
                        "max_tokens": llm.max_tokens, "timeout": llm.request_timeout,
                        'max_retries': llm.max_retries if llm.max_retries else 2,
                        'streaming': llm.streaming if llm.streaming else False,
