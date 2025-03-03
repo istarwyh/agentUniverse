@@ -17,8 +17,8 @@ profile:
   #
   # Example:
   #   llm_model:
-  #     name: 'demo_customized_llm'    # Defined in /intelligence/agentic/llm/custom/demo_customized_llm.yaml
-  #     temperature: 0.5
+  #     name: 'demo_customized_llm'
+  #   Defined in /intelligence/agentic/llm/custom/demo_customized_llm.yaml
   #
   # Way 2:
   # Omit the llm_model section entirely:
@@ -32,9 +32,6 @@ profile:
   # Note: The current configuration uses Way 1, as shown below
   llm_model:
     name: 'qwen2.5-72b-instruct'
-    temperature: 0.3
-    streaming: True
-    max_tokens: 3000
 action:
   # Please select the tools and knowledge base.
   tool:
