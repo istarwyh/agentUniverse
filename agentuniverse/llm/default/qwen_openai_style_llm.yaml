@@ -1,5 +1,5 @@
 name: 'default_qwen_llm'
-description: 'default openai llm with spi'
+description: 'default qwen llm with spi'
 model_name: 'qwen-turbo'
 max_tokens: 1000
 metadata:
