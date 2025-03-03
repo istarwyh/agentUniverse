@@ -22,7 +22,6 @@ class AgentConfiger(ComponentConfiger):
         self.__plan: Optional[dict] = dict()
         self.__memory: Optional[dict] = dict()
         self.__action: Optional[dict] = dict()
-        self.__agent_llm_configer = None
 
     @property
     def memory(self) -> Optional[dict]:
@@ -48,14 +47,6 @@ class AgentConfiger(ComponentConfiger):
     def info(self) -> Optional[dict]:
         """Return the name of the Agent."""
         return self.__info
-
-    @property
-    def agent_llm_configer(self):
-        return self.__agent_llm_configer
-
-    @agent_llm_configer.setter
-    def agent_llm_configer(self, value):
-        self.__agent_llm_configer = value
 
     def load(self) -> 'AgentConfiger':
         """Load the configuration by the Configer object.

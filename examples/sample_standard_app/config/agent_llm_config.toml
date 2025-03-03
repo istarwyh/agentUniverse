@@ -1,6 +1,0 @@
-[DEFAULT]
-default_llm = 'demo_llm'
-
-[AGENT_LLM_CONFIG]
-demo_agent = "deepseek_chat_llm"
-demo_agent_b = "deepseek_reasoner_llm"

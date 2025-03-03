@@ -6,7 +6,6 @@ from langchain_core.language_models import BaseLanguageModel
 from ollama import Options
 from pydantic import Field
 
-from agentuniverse.base.annotation.trace import trace_llm
 from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
 from agentuniverse.base.util.env_util import get_from_env
 from agentuniverse.llm.llm import LLM

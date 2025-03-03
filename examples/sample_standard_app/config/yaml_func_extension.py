@@ -7,8 +7,6 @@
 # @FileName: yaml_func_extension.py
 import os
 
-from agentuniverse.base.config.configer import Configer
-
 
 class YamlFuncExtension:
     """

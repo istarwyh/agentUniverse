@@ -35,7 +35,8 @@ class QWenOpenAIStyleLLM(OpenAIStyleLLM):
     """
 
     api_key: Optional[str] = Field(default_factory=lambda: get_from_env("DASHSCOPE_API_KEY"))
-    api_base: Optional[str] = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    api_base: Optional[str] = Field(default_factory=lambda: get_from_env(
+        "DASHSCOPE_API_BASE") or "https://dashscope.aliyuncs.com/compatible-mode/v1")
     proxy: Optional[str] = Field(default_factory=lambda: get_from_env("DASHSCOPE_PROXY"))
     organization: Optional[str] = Field(default_factory=lambda: get_from_env("DASHSCOPE_ORGANIZATION"))
 

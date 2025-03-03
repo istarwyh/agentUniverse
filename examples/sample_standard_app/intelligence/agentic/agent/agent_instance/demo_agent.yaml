@@ -7,21 +7,18 @@ profile:
   prompt_version: demo_agent.cn
   # Please select the llm.
   llm_model:
-    # you can change this config to a customized LLM
-    # e.g. demo_llm, which defined in /intelligence/agentic/llm/demo_llm.yaml
     #
-    # The `name` field specifies the LLM to be used by the agent.
+    # you can change this config to a customized LLM.
+    # e.g. demo_customized_llm, which defined in /intelligence/agentic/llm/custom/demo_customized_llm.yaml
     #
-    #   name: '@FUNC(get_llm_by_agent_id("demo_agent"))'
+    # This section allows you to configure a customized LLM instance,
+    # and bind specific runtime settings such as temperature, streaming, and max_tokens
+    # to control the behavior of the LLM during execution.
     #
-    # - In this configuration, the `@FUNC` annotation can be used to dynamically determine the LLM name at runtime.
-    # - The `@FUNC` syntax allows users to call a custom function, in this case, `get_llm_by_agent_id`,
-    #   which is defined in the `YamlFuncExtension` class within the `yaml_func_extension.py` file.
-    # - When the application loads this YAML configuration, agentUniverse will parse the `@FUNC` annotation,
-    #   execute the `get_llm_by_agent_id` function with the provided argument (`"demo_agent"`),
-    #   and replace the annotation with the function's return value.
-    #
-    name: 'demo_llm'
+    name: 'qwen_25_72b_llm'
+    temperature: 0.3
+    streaming: True
+    max_tokens: 3000
 action:
   # Please select the tools and knowledge base.
   tool:
