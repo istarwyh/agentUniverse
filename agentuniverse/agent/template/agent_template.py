@@ -92,8 +92,9 @@ class AgentTemplate(Agent, ABC):
             if isinstance(agent_input.get('chat_history'), list):
                 agent_input['chat_history'] = get_memory_string(agent_input.get('chat_history'),
                                                                 agent_input.get('agent_id'))
+                return None
             else:
-                return agent_input.get('chat_history')
+                return None
         return super().process_memory(agent_input=agent_input, memory_name=self.memory_name, llm_name=self.llm_name)
 
     def invoke_tools(self, input_object: InputObject, **kwargs) -> str:

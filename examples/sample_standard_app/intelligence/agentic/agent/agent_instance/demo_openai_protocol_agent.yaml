@@ -1,6 +1,6 @@
 info:
   #  Please fill in the basic info of your agent. The following is a sample.
-  name: 'openai_agent_template'
+  name: 'openai_protocol_agent'
   description: 'demo agent'
 profile:
   # Please fill in the profile of your agent. The following is a sample.
@@ -25,5 +25,4 @@ memory:
   name: 'demo_memory'
 metadata:
   type: AGENT
-  module: agentuniverse.agent.template.openai_protocol_template
-  class: OpenAIProtocolTemplate
+  class: DemoOpenAIProtocolAgent

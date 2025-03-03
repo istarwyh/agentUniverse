@@ -122,7 +122,8 @@ class RequestTask:
                     cost_time=cost_time,
                     context_prefix=get_context_prefix()
                 ).info("Agent first token generated.")
-            yield "data:" + output + "\n\n"
+            if isinstance(output, str):
+                yield "data:" + output + "\n\n"
         try:
             self.thread.result()
         except Exception as e:
