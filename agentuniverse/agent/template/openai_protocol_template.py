@@ -16,8 +16,8 @@ from agentuniverse.agent.input_object import InputObject
 from agentuniverse.agent.memory.memory import Memory
 from agentuniverse.agent.memory.message import Message
 from agentuniverse.agent.output_object import OutputObject
-from agentuniverse.agent.plan.planner.react_planner.stream_callback import StreamOutPutCallbackHandler, \
-    InvokeCallbackHandler, OpenAIProtocolStreamOutPutCallbackHandler
+from agentuniverse.agent.plan.planner.react_planner.stream_callback import InvokeCallbackHandler, \
+    OpenAIProtocolStreamOutPutCallbackHandler
 
 from agentuniverse.agent.template.agent_template import AgentTemplate
 from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
@@ -43,9 +43,21 @@ class OpenAIProtocolTemplate(AgentTemplate):
             if key not in agent_input:
                 raise ValueError(f"{key} is not in agent input")
         messages = agent_input.get('messages')
-        convert_messages = self.convert_message(messages)
-        input = messages[-1].get('content')
-        agent_input['input'] = input
+        convert_messages, image_urls = self.convert_message(messages)
+        content = messages[-1].get('content')
+
+        if isinstance(content, str):
+            agent_input['input'] = content
+        elif isinstance(content, list):
+            for item in content:
+                if item.get('type') == 'text':
+                    agent_input['input'] = item.get('text')
+                elif item.get('type') == 'image_url':
+                    agent_input['image_urls'] = image_urls.append(item.get('image_url'))
+                else:
+                    raise ValueError(f"{item} is not support")
+        else:
+            raise ValueError(f"{content} is not support")
         if len(convert_messages) > 1:
             agent_input['chat_history'] = convert_messages[0:len(convert_messages) - 1]
         return agent_input
@@ -56,12 +68,22 @@ class OpenAIProtocolTemplate(AgentTemplate):
         ]
 
     def convert_message(self, messages: List[Dict]):
+        image_urls = []
         for message in messages:
+            content = message.get('content')
+            if isinstance(content, list):
+                text = ""
+                for item in content:
+                    if item.get('type') == 'text':
+                        text = item.get('text')
+                    elif item.get('type') == 'image_url':
+                        image_urls.append(item.get('image_url'))
+                message['content'] = text
             if message.get('role') == 'user':
                 message['type'] = 'human'
             elif message.get('role') == 'assistant':
                 message['type'] = 'ai'
-        return [Message.from_dict(message) for message in messages]
+        return [Message.from_dict(message) for message in messages], image_urls
 
     def parse_openai_protocol_input(self, input_object: InputObject, agent_input: dict) -> dict:
         for key in self.input_keys():
