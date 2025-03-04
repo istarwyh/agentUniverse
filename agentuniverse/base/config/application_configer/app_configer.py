@@ -5,8 +5,12 @@
 # @Author  : jerry.zzw 
 # @Email   : jerry.zzw@antgroup.com
 # @FileName: app_configer.py
-from typing import Optional
-from agentuniverse.base.config.configer import Configer, PlaceholderResolver
+from typing import Optional, Dict
+
+from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
+from agentuniverse.base.config.component_configer.configers.tool_configer import ToolConfiger
+from agentuniverse.base.config.configer import Configer
+from agentuniverse.base.config.custom_configer.default_llm_configer import DefaultLLMConfiger
 
 
 class AppConfiger(object):
@@ -41,9 +45,11 @@ class AppConfiger(object):
         self.__conversation_memory_configer: Optional[dict] = {}
         self.__root_package_name: Optional[str] = None
         self.__yaml_func_instance = None
-        self.__default_llm_configer = None
-        self.__tool_configer_map = {}
-        self.__llm_configer_map = {}
+        self.__default_llm_configer: DefaultLLMConfiger = None
+        self.__tool_configer_map: Dict[str, ToolConfiger] = {}
+        self.__llm_configer_map: Dict[str, LLMConfiger] = {}
+        self.__agent_llm_set: Optional[set[str]] = set()
+        self.__agent_tool_set: Optional[set[str]] = set()
 
     @property
     def base_info_appname(self) -> Optional[str]:
@@ -174,28 +180,44 @@ class AppConfiger(object):
         self.__yaml_func_instance = value
 
     @property
-    def default_llm_configer(self):
+    def default_llm_configer(self) -> DefaultLLMConfiger:
         return self.__default_llm_configer
 
     @default_llm_configer.setter
-    def default_llm_configer(self, value):
+    def default_llm_configer(self, value: DefaultLLMConfiger):
         self.__default_llm_configer = value
 
     @property
-    def tool_configer_map(self):
+    def tool_configer_map(self) -> Dict[str, ToolConfiger]:
         return self.__tool_configer_map
 
     @tool_configer_map.setter
-    def tool_configer_map(self, value):
+    def tool_configer_map(self, value: Dict[str, ToolConfiger]):
         self.__tool_configer_map = value
 
     @property
-    def llm_configer_map(self):
+    def llm_configer_map(self) -> Dict[str, LLMConfiger]:
         return self.__llm_configer_map
 
     @llm_configer_map.setter
-    def llm_configer_map(self, value):
+    def llm_configer_map(self, value: Dict[str, LLMConfiger]):
         self.__llm_configer_map = value
+
+    @property
+    def agent_llm_set(self) -> set:
+        return self.__agent_llm_set
+
+    @agent_llm_set.setter
+    def agent_llm_set(self, value: set):
+        self.__agent_llm_set = value
+
+    @property
+    def agent_tool_set(self) -> set:
+        return self.__agent_tool_set
+
+    @agent_tool_set.setter
+    def agent_tool_set(self, value: set):
+        self.__agent_tool_set = value
 
     def load_by_configer(self, configer: Configer) -> 'AppConfiger':
         """Load the AppConfiger by the given Configer.

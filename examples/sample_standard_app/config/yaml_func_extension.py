@@ -6,6 +6,19 @@
 # @Email   : wangchongshi.wcs@antgroup.com
 # @FileName: yaml_func_extension.py
 import os
+from enum import Enum
+
+
+class LLMModelEnum(Enum):
+    QWEN = "qwen"
+    DEEPSEEK = "deepseek"
+    OPENAI = "openai"
+    CLAUDE = "claude"
+    KIMI = "kimi"
+    ZHIPU = "zhipu"
+    BAICHUAN = "baichuan"
+    GEMINI = "gemini"
+    WENXIN = "wenxin"
 
 
 class YamlFuncExtension:
@@ -33,23 +46,23 @@ class YamlFuncExtension:
        Returns:
            str: The API key for the specified model if found; otherwise, an empty string.
        """
-        if model_name == "qwen":
+        if model_name == LLMModelEnum.QWEN.value:
             return os.getenv("DASHSCOPE_API_KEY")
-        elif model_name == "deepseek":
+        elif model_name == LLMModelEnum.DEEPSEEK.value:
             return os.getenv("DEEPSEEK_API_KEY")
+        elif model_name == LLMModelEnum.OPENAI.value:
+            return os.getenv("OPENAI_API_KEY")
+        elif model_name == LLMModelEnum.CLAUDE.value:
+            return os.getenv("ANTHROPIC_API_KEY")
+        elif model_name == LLMModelEnum.KIMI.value:
+            return os.getenv("KIMI_API_KEY")
+        elif model_name == LLMModelEnum.ZHIPU.value:
+            return os.getenv("ZHIPU_API_KEY")
+        elif model_name == LLMModelEnum.BAICHUAN.value:
+            return os.getenv("BAICHUAN_API_KEY")
+        elif model_name == LLMModelEnum.GEMINI.value:
+            return os.getenv("GEMINI_API_KEY")
+        elif model_name == LLMModelEnum.WENXIN.value:
+            return os.getenv("QIANFAN_AK")
         else:
             return ""
-
-    def get_llm_by_agent_id(self, agent_id: str):
-        """
-        Retrieve the LLM ID associated with the given agent ID.
-
-        Args:
-            agent_id (str): The ID of the agent for which the LLM is required.
-
-        Returns:
-            str: The ID of the LLM component instance associated with the agent ID.
-        """
-        if agent_id == "demo_agent":
-            return 'demo_llm'
-        return 'demo_llm'
