@@ -10,9 +10,10 @@
 from agentuniverse.agent.input_object import InputObject
 
 from agentuniverse.agent.template.openai_protocol_template import OpenAIProtocolTemplate
+from agentuniverse.agent.template.rag_agent_template import RagAgentTemplate
 
 
-class DemoOpenAIProtocolAgent(OpenAIProtocolTemplate):
+class DemoOpenAIProtocolAgent(RagAgentTemplate,OpenAIProtocolTemplate):
 
     def input_keys(self) -> list[str]:
         return ['input']
