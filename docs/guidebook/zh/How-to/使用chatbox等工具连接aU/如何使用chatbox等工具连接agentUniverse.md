@@ -41,7 +41,7 @@ class DemoOpenAIProtocolAgent(OpenAIProtocolTemplate):
     def parse_result(self, agent_result: dict) -> dict:
         return {**agent_result, 'output': agent_result['output']}
 ```
-
+为了让智能体的输出遵循 OpenAI 协议，必须要继承 OpenAIProtocolTemplate 类。
 ### 2. 配置智能体实例
 在 intelligence/agentic/agent/agent_instance/ 目录创建 openai_protocol_agent.yaml：
 ```yaml
