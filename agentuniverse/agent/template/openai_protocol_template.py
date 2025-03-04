@@ -139,16 +139,6 @@ class OpenAIProtocolTemplate(AgentTemplate):
         }
         output_stream.put(json.dumps(output))
 
-    def customized_execute(self, input_object: InputObject, agent_input: dict, memory: Memory, llm: LLM, prompt: Prompt,
-                           **kwargs) -> dict:
-        self.load_memory(memory, agent_input)
-        process_llm_token(llm, prompt.as_langchain(), self.agent_model.profile, agent_input)
-        chain = prompt.as_langchain() | llm.as_langchain_runnable(
-            self.agent_model.llm_params()) | StrOutputParser()
-        res = self.invoke_chain(chain, agent_input, input_object, **kwargs)
-        self.add_memory(memory, f"Human: {agent_input.get('input')}, AI: {res}", agent_input=agent_input)
-        return {**agent_input, 'output': res}
-
     def _get_run_config(self, input_object: InputObject) -> RunnableConfig:
         config = RunnableConfig()
         callbacks = []
