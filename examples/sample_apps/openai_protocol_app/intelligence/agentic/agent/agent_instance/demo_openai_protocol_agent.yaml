@@ -9,7 +9,7 @@ profile:
   llm_model:
     # you can change this config to a customized LLM
     # e.g. demo_llm, which defined in /intelligence/agentic/llm/demo_llm.yaml
-    name: 'qwen_25_72b_llm'
+    name: 'qwen_llm'
 action:
   # Please select the tools and knowledge base.
   tool:
