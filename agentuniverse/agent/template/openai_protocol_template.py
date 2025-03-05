@@ -53,13 +53,15 @@ class OpenAIProtocolTemplate(AgentTemplate):
                 if item.get('type') == 'text':
                     agent_input['input'] = item.get('text')
                 elif item.get('type') == 'image_url':
-                    agent_input['image_urls'] = image_urls.append(item.get('image_url'))
+                    image_urls.append(item.get('image_url'))
                 else:
                     raise ValueError(f"{item} is not support")
         else:
             raise ValueError(f"{content} is not support")
         if len(convert_messages) > 1:
             agent_input['chat_history'] = convert_messages[0:len(convert_messages) - 1]
+        if len(image_urls) > 0:
+            agent_input['image_urls'] = image_urls
         return agent_input
 
     def openai_protocol_input_keys(self) -> list[str]:
@@ -85,17 +87,6 @@ class OpenAIProtocolTemplate(AgentTemplate):
                 message['type'] = 'ai'
         return [Message.from_dict(message) for message in messages], image_urls
 
-    def parse_openai_protocol_input(self, input_object: InputObject, agent_input: dict) -> dict:
-        for key in self.input_keys():
-            if input_object.get_data(key):
-                agent_input[key] = input_object.get_data(key)
-        messages = agent_input.get('messages')
-        convert_messages = self.convert_message(messages)
-        input = messages[-1].get('content')
-        agent_input['input'] = input
-        if len(convert_messages) > 1:
-            agent_input['chat_history'] = convert_messages[0:len(convert_messages) - 1]
-        return agent_input
 
     def parse_openai_protocol_output(self, output_object: OutputObject) -> OutputObject:
         res = {
