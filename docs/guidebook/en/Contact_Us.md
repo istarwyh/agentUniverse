@@ -6,7 +6,10 @@
 😊 Join our [Discord Channel](https://discord.gg/DHFcdkWAhn) to interact with us.
 
 #### Contact Us via Administrator Email
-😊 Email: [jerry.zzw@antgroup.com](mailto:jerry.zzw@antgroup.com)
+😊 Email: 
+[jihan.hanji@antgroup.com](mailto:jihan.hanji@antgroup.com)
+[jerry.zzw@antgroup.com](mailto:jerry.zzw@antgroup.com)
+[jinshi.zjs@antgroup.com](mailto:jinshi.zjs@antgroup.com)
 
 #### twitter
 ID: [@agentuniverse_](https://x.com/agentuniverse_)
