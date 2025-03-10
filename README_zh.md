@@ -194,9 +194,9 @@ https://private-user-images.githubusercontent.com/39180831/355437700-192f712d-1b
 #### 通过管理员Email联系我们
 😊 Email: 
 
-[jihan.hanji@antgroup.com](mailto:jihan.hanji@antgroup.com)
-[jerry.zzw@antgroup.com](mailto:jerry.zzw@antgroup.com)
-[jinshi.zjs@antgroup.com](mailto:jinshi.zjs@antgroup.com)
+* [jihan.hanji@antgroup.com](mailto:jihan.hanji@antgroup.com)
+* [jerry.zzw@antgroup.com](mailto:jerry.zzw@antgroup.com)
+* [jinshi.zjs@antgroup.com](mailto:jinshi.zjs@antgroup.com)
 
 #### 微信公众号
 
