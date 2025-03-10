@@ -1,10 +1,11 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-# @Time    : 2024/12/10 17:07
-# @Author  : fanen.lhy
-# @Email   : fanen.lhy@antgroup.com
+# @Time    :
+# @Author  :
+# @Email   :
 # @FileName: custom_flask_request_sink.py
+
 from agentuniverse.base.util.logging.log_sink.flask_request_log_sink import \
     FlaskRequestLogSink
 

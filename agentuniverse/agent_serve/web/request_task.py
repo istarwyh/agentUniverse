@@ -84,7 +84,7 @@ class RequestTask:
                 break
             if first_chunk:
                 first_chunk = False
-                cost_time = time.time()-start_time
+                cost_time = time.time() - start_time
                 logger.bind(
                     log_type=LogTypeEnum.agent_first_token,
                     cost_time=cost_time,
@@ -101,7 +101,33 @@ class RequestTask:
             yield "data:" + json.dumps({"result": result},
                                        ensure_ascii=False) + "\n\n "
         except Exception as e:
-            LOGGER.error("request task execute Fail: " + str(e)+traceback.format_exc())
+            LOGGER.error("request task execute Fail: " + str(e) + traceback.format_exc())
+            yield "data:" + json.dumps({"error": {"error_msg": str(e)}}) + "\n\n "
+
+    def user_receive_steps(self):
+        """Yield the stream data by getting data from the queue."""
+        first_chunk = True
+        start_time = time.time()
+        while True:
+            output: str = self.queue.get()
+            if output is None:
+                break
+            if output == EOF_SIGNAL:
+                break
+            if first_chunk:
+                first_chunk = False
+                cost_time = time.time() - start_time
+                logger.bind(
+                    log_type=LogTypeEnum.agent_first_token,
+                    cost_time=cost_time,
+                    context_prefix=get_context_prefix()
+                ).info("Agent first token generated.")
+            if isinstance(output, str):
+                yield "data:" + output + "\n\n"
+        try:
+            self.thread.result()
+        except Exception as e:
+            LOGGER.error("request task execute Fail: " + str(e) + traceback.format_exc())
             yield "data:" + json.dumps({"error": {"error_msg": str(e)}}) + "\n\n "
 
     async def async_receive_steps(self) -> AsyncIterator[str]:
@@ -186,6 +212,13 @@ class RequestTask:
                                             kwargs=self.kwargs)
         self.thread.start()
         return self.receive_steps()
+
+    def user_stream_run(self):
+        self.kwargs['output_stream'] = self.queue
+        self.thread = ThreadWithReturnValue(target=self.func,
+                                            kwargs=self.kwargs)
+        self.thread.start()
+        return self.user_receive_steps()
 
     async def async_stream_run(self) -> AsyncIterator[str]:
         self.kwargs['output_stream'] = self.async_queue

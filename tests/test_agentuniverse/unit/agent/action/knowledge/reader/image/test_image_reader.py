@@ -1,39 +1,48 @@
-# !/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-# @Time    : 2025/2/12 12:01
-# @Author  : wozhapen
-# @Email   : wozhapen@gmail.com
-# @FileName: test_image_reader.py
-
-import os.path
 import unittest
+from pathlib import Path
+from PIL import Image
 from agentuniverse.agent.action.knowledge.reader.image.image_reader import ImageReader
 
 
 class TestImageReader(unittest.TestCase):
+    """Test cases for ImageReader."""
 
-    def test_load_mix_language_success(self):
-        """Test successful loading and parsing of image content."""
-        reader = ImageReader(['en', 'ch_sim'], False)
-        image_file_path = os.path.join(os.path.dirname(__file__), "test_en_and_zh.jpeg")
-        documents = reader._load_data(file=image_file_path)
-        if documents:
-            print(documents[0].text)
-        else:
-            print("No content loaded or error occurred.")
-        self.assertEqual(documents[0].text, "PEER 模式组件:\n该pattern通过计划\n(Plan)\n执行 (Execute)\n表达 (Express)\n评价 (Review) 四个不同职责的智能体,实现对复杂\n问题的多步拆解_\n分步执行。并基于评价反馈进行自主迭代。最终提升推理分析类任务表现。典型适用场景:  事件解读:\n行业分析")
+    def setUp(self):
+        """Set up test fixtures."""
+        self.reader = ImageReader()
+        self.test_dir = Path(__file__).parent / "test_images"
+        self.test_image = self.test_dir / "test.jpg"
+        if not self.test_image.exists():
+            raise FileNotFoundError(
+                f"Test image not found at {self.test_image}. "
+                f"Please place a test.jpg file in the {self.test_dir} directory."
+            )
 
-    def test_load_en_language_success(self):
-        """Test successful loading and parsing of image content."""
-        reader = ImageReader()
-        image_file_path = os.path.join(os.path.dirname(__file__), "test_image.jpeg")
-        documents = reader._load_data(file=image_file_path)
-        if documents:
-            print(documents[0].text)
-        else:
-            print("No content loaded or error occurred.")
-        self.assertEqual(documents[0].text, "Run your first example; and you can quickly experience the performance of the agents (or agent groups) built by\nagentUniverse through the tutorial:")
+    def test_extract_text(self):
+        """Test OCR text extraction."""
+        image = Image.open(self.test_image)
+        result = self.reader.extract_text(image)
+        assert "Cute" in result
+
+    def test_generate_description(self):
+        """Test image description generation."""
+        image = Image.open(self.test_image)
+        result = self.reader.generate_description(image)
+        assert "dog" in result
+
+    def test_load_data(self):
+        """Test successful data loading."""
+        documents = self.reader._load_data(self.test_image)
+        self.assertEqual(len(documents), 1)
+        self.assertIn("Cute", documents[0].text)
+        self.assertIn("dog", documents[0].text)
+        self.assertEqual(documents[0].metadata['format'], 'jpg')
+        self.assertTrue('image_size' in documents[0].metadata)
+        self.assertTrue('channel' in documents[0].metadata)
+
 
 if __name__ == '__main__':
-        unittest.main()
+    unittest.main()

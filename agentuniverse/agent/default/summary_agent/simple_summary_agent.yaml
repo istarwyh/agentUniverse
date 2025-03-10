@@ -3,8 +3,8 @@ info:
   description: 'agent used to summary a long text'
 profile:
   llm_model:
-    name: 'default_openai_llm'
-    model_name: 'gpt-4o'
+    name: 'default_qwen_llm'
+    model_name: 'qwen2.5-72b-instruct'
 plan:
   planner:
     name: 'rag_planner'

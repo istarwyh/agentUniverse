@@ -5,11 +5,11 @@
 # @Author  : jerry.zzw 
 # @Email   : jerry.zzw@antgroup.com
 # @FileName: component_configer.py
-
 from typing import Optional
 
 from agentuniverse.base.component.component_enum import ComponentEnum
 from agentuniverse.base.config.configer import Configer
+from agentuniverse.base.config.custom_configer.default_llm_configer import DefaultLLMConfiger
 
 
 class ComponentConfiger(object):
@@ -21,6 +21,8 @@ class ComponentConfiger(object):
         self.__metadata_type: Optional[str] = None
         self.__metadata_module: Optional[str] = None
         self.__metadata_class: Optional[str] = None
+        self.__yaml_func_instance = None
+        self.__default_llm_configer: DefaultLLMConfiger = None
 
     @property
     def configer(self) -> Optional[Configer]:
@@ -49,6 +51,22 @@ class ComponentConfiger(object):
     @metadata_class.setter
     def metadata_class(self, metadata_class: str):
         self.__metadata_class = metadata_class
+
+    @property
+    def yaml_func_instance(self):
+        return self.__yaml_func_instance
+
+    @yaml_func_instance.setter
+    def yaml_func_instance(self, value):
+        self.__yaml_func_instance = value
+
+    @property
+    def default_llm_configer(self) -> DefaultLLMConfiger:
+        return self.__default_llm_configer
+
+    @default_llm_configer.setter
+    def default_llm_configer(self, value: DefaultLLMConfiger):
+        self.__default_llm_configer = value
 
     def load(self) -> 'ComponentConfiger':
         """Load the configuration by the Configer object.

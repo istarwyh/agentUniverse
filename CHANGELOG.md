@@ -24,6 +24,45 @@ Note - Additional remarks regarding the version.
 ***************************************************
 
 # Version Update History
+## [0.0.15] - 2025-03-03
+### Added
+- New embedding components  
+  - Azure-OpenAI embedding component
+  - Gemini embedding component
+  - Doubao embedding component
+- New knowledge loading reader components
+  - Web page reader component based on BeautifulSoup (bs4)
+  - Image reader component based on OCR technology
+  - CSV format reader component
+- New tool plugins
+  - Arxiv paper retrieval and query tool plugin
+  - Jina AI intelligent search tool plugin
+- Added standard LLM output parser for reasoning-type models
+- Added standard logger sink for agents, LLMs, and tools
+- Added retry function annotation
+
+### Changed  
+- Improved project configuration experience, with the following key optimizations:
+  - Project configuration now supports global PACKAGE path replacement. For details, see the PACKAGE_PATH_INFO parameter in the sample project's config.toml file.
+  - Supports user-defined configuration extensions and YAML function extensions. For details, see the EXTENSION_MODULES parameter in the sample project's config.toml file.
+  - Updated custom_key.toml.sample with more detailed parameter content.
+  - Submit a set of commonly used model configuration YAML files. For details, see the llm directory in the sample project.
+  - YAML configuration now supports user-defined loading of attributes using environment variables and extension functions. For details, see the api_key comments in the llm sample of the sample project.
+  - Simplified LLM configuration. By default, it reads the global default_llm configuration. For details, see the default_llm.toml configuration in the llm sample of the sample project.
+  - Simplified component extension configuration. The module part in the component metadata can be left blank, and it will default to searching for a Python extension file with the same name in the same directory.
+- Optimized project startup process, with the following key improvements:
+  - Improved LLM component startup registration. Only LLM instances that are dependent on by components like agents and tools are started.
+  - Enhanced error info during project startup.
+- Other changes:
+  - Renamed LocalMemoryStorage to RamMemoryStorage for memory storage objects.
+
+### Note 
+- Added image_build image packaging files and tutorial documents for application projects.
+- Added CONTRIBUTING.md documentation for the project.
+- Standardized PR and ISSUE templates for the project.
+- Added a sample practice for agents based on multimodal capabilities. For details, see the examples/multimodal_app directory in the project.
+- Our project was included in the awesome-deepseek-integration list released by DeepSeek in February.
+
 ## [0.0.14] - 2025-01-26
 ### Added
 - aU Memory Component Version Update   

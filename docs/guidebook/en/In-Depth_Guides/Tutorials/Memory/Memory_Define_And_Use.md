@@ -36,7 +36,7 @@ metadata:
 - memory_key: The key of the memory component, corresponding to the memory variable name in the agent's prompt
 - max_tokens: The token limit for memory information in the prompt; if exceeded, the memory component will automatically compress
 - memory_compressor: The compressor of the memory component, used for compressing memory
-- memory_storages: A list of memory storages for the memory component, used for multi-route storage of memory; if not configured by the user, the default local_memory_storage local memory storage is used
+- memory_storages: A list of memory storages for the memory component, used for multi-route storage of memory; if not configured by the user, the default ram_memory_storage ram memory storage is used
 - memory_retrieval_storage: The storage retrieval of the memory component, representing the source of memory retrieval; if not configured by the user, the first memory storage component in memory_storages is used by default
 - metadata: The metadata of the memory component, used to identify the type, module, and class name of the memory component
 

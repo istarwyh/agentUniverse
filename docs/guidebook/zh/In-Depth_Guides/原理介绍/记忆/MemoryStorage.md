@@ -79,17 +79,17 @@ memory_storage = ['sample_standard_app.intelligence.agentic.memory.memory_storag
 
 ## agentUniverse目前内置有以下MemoryStorage组件:
 
-### [local_memory_storage](../../../../../../agentuniverse/agent/memory/memory_storage/local_memory_storage.py)
+### [ram_memory_storage](../../../../../../agentuniverse/agent/memory/memory_storage/ram_memory_storage.py)
 
 本地内存记忆存储器，系统内置组件配置文件如下：
 
 ```yaml
-name: 'local_memory_storage'
-description: 'local memory storage'
+name: 'ram_memory_storage'
+description: 'ram memory storage'
 metadata:
   type: 'MEMORY_STORAGE'
-  module: 'agentuniverse.agent.memory.memory_storage.local_memory_storage'
-  class: 'LocalMemoryStorage'
+  module: 'agentuniverse.agent.memory.memory_storage.ram_memory_storage'
+  class: 'RamMemoryStorage'
 ```
 
 ### [chroma_memory_storage](../../../../../../agentuniverse/agent/memory/memory_storage/chroma_memory_storage.py)
