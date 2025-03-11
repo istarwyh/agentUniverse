@@ -264,9 +264,11 @@ class AgentUniverse(object):
                 # Extract LLM names and tool names from the agent's profile and action attributes
                 if (hasattr(configer_instance, 'profile') and configer_instance.profile
                         and isinstance(configer_instance.profile, dict)):
-                    llm_name = configer_instance.profile.get('llm_model', {}).get('name')
-                    if llm_name and isinstance(llm_name, str):
-                        self.__config_container.app_configer.agent_llm_set.add(llm_name)
+                    llm_model = configer_instance.profile.get('llm_model', {})
+                    if isinstance(llm_model, dict):
+                        llm_name = llm_model.get('name')
+                        if llm_name and isinstance(llm_name, str):
+                            self.__config_container.app_configer.agent_llm_set.add(llm_name)
                 if (hasattr(configer_instance, 'action') and configer_instance.action
                         and isinstance(configer_instance.action, dict)):
                     tool_name_list = configer_instance.action.get('tool')
