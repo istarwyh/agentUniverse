@@ -76,7 +76,7 @@ Add: Markdown format knowledge loading component, document chapter and paragraph
 
 ### Changed
 - Standard Project Scaffolding Update   
-The scaffolding Project Scaffolding has been standardized. You can read the [「Application Project Structure and Explanation」](./docs/guidebook/en/Get_Start/1.Application_Project_Structure_and_Explanation.md)  for more details. For users of older versions, we have provided some guidelines and tools for this update. 
+The scaffolding Project Scaffolding has been standardized. You can read the [「Application Project Structure and Explanation」](./docs/guidebook/en/Get_Start/1.Application_Project_Structure_and_Explanation.md)  for more details. For users of older versions, we have provided some guidelines and tools for this update, detailed information can be found in [「aU Old and New Project Migration Guide」](./docs/guidebook/en/Get_Start/7.aU_Old_and_New_Project_Migration_Guide.md).
 
 ### Note 
 - Update docs for new memory version
