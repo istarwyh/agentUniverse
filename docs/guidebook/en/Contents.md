@@ -10,8 +10,11 @@
 * 1.5 [Quick Guide to Build Single Agent](Get_Start/3.Quick_Guide_to_Build_Single_Agent.md)
 * 1.6 [Building Typical Multi-Agent App](Get_Start/4.Building_Typical_Multi-Agent_App.md)
 * 1.7 [Creating and Using Agent Templates](Get_Start/5.Creating_and_Using_Agent_Templates.md)
-* 1.8 [Other Tips and Techniques](Get_Start/6.Other_Tips_and_Techniques.md)
-
+* 1.8 Advanced Usage Techniques
+  * 1.8.1 [Advanced Techniques: Using Memory](Get_Start/7.Advanced_Techniques-Using_Memory.md)
+  * 1.8.2 [Advanced Techniques: Prompt Management](Get_Start/8.Advanced_Techniques-Prompt_Manager.md)
+  * 1.8.2 [Advanced Techniques: Multimodal Agent](Get_Start/9.Advanced_Techniques-Multimodal_Agents.md)
+  
 **2. Principle Introduction**
 
 * 2.1 Framework Principles
