@@ -1,5 +1,5 @@
 # K8S集群部署
-AgentUniverse 提供标准的工作环境镜像，并且支持在 Kubernetes (K8S) 集群上容器化部署。本指南将指导您如何利用这些工作环境镜像，在 K8S 上部署和搭建集群。镜像tag列表您可以在[这里获取](https://cr.console.aliyun.com/repository/cn-hangzhou/agent_universe/agent_universe/images)。如果您希望打包一个基于自己工程的镜像，请参考[工程镜像打包](./工程镜像打包.md)。
+agentUniverse 提供标准的工作环境镜像，并且支持在 Kubernetes (K8S) 集群上容器化部署。本指南将指导您如何利用这些工作环境镜像，在 K8S 上部署和搭建集群。镜像tag列表您可以在[这里获取](https://cr.console.aliyun.com/repository/cn-hangzhou/agent_universe/agent_universe/images)。如果您希望打包一个基于自己工程的镜像，请参考[工程镜像打包](./工程镜像打包.md)。
 
 官方K8S使用文档：[Kubernetes Setup Documentation](https://kubernetes.io/docs/setup/)
 
@@ -56,7 +56,7 @@ spec:
     targetPort: 8888
 ```
 
-### 1.1 AgentUniverse项目环境变量设置
+### 1.1 agentUniverse项目环境变量设置
 
 #### 方式1（推荐）
 
@@ -82,9 +82,9 @@ kubectl apply -f agentuniverse.yaml
 kubectl get all -n agent-namespace
 ```
 ![资源部署情况](../../../../_picture/k8s_resource.png)
-## 4. 从集群内部访问AgentUniverse 服务
+## 4. 从集群内部访问agentUniverse 服务
 
-要从集群内部访问 AgentUniverse 服务，请使用以下命令行示例：
+要从集群内部访问 agentUniverse 服务，请使用以下命令行示例：
 
 ```
 kubectl exec -it [Pod名称] -n agent-namespace -- curl http://agentuniverse-service:9999
