@@ -22,6 +22,7 @@ class AuTraceManager:
 
     def reset_context(self):
         FrameworkContextManager().del_context("__au_trace_context__")
+        FrameworkContextManager().del_context("LOG_CONTEXT")
 
     @property
     def trace_context(self) -> AuTraceContext:
