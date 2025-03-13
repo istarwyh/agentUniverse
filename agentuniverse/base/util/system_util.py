@@ -207,21 +207,25 @@ def is_system_builtin(component_instance: ComponentBase) -> bool:
     Returns:
         bool: True if the component is system-built-in, False otherwise.
     """
-    if component_instance is None:
-        return False
-    component_enum: ComponentEnum = component_instance.component_type
-    if component_enum is None or not component_instance.component_config_path:
-        return False
+    try:
+        if component_instance is None:
+            return False
+        component_enum: ComponentEnum = component_instance.component_type
+        if component_enum is None or not component_instance.component_config_path:
+            return False
 
-    config_path = os.path.normpath(component_instance.component_config_path).replace(os.sep, '/').lower()
+        config_path = os.path.normpath(component_instance.component_config_path).replace(os.sep, '/').lower()
 
-    if component_enum.value == ComponentEnum.LLM.value:
-        # Check if the LLM component is system-built-in
-        return "agentuniverse/llm/default" in config_path
-    elif component_enum.value == ComponentEnum.TOOL.value:
-        # Check if the Tool component is system-built-in
-        return "agentuniverse/agent/action/tool" in config_path
-    return False
+        if component_enum.value == ComponentEnum.LLM.value:
+            # Check if the LLM component is system-built-in
+            return "agentuniverse/llm/default" in config_path
+        elif component_enum.value == ComponentEnum.TOOL.value:
+            # Check if the Tool component is system-built-in
+            return "agentuniverse/agent/action/tool" in config_path
+        return False
+    except Exception as e:
+        print(f"An error occurred while checking if the component is system-built-in: {str(e)}")
+        return False
 
 
 def is_api_key_missing(component_instance: ComponentBase, api_key_name: str) -> bool:
