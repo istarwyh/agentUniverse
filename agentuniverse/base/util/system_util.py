@@ -212,12 +212,15 @@ def is_system_builtin(component_instance: ComponentBase) -> bool:
     component_enum: ComponentEnum = component_instance.component_type
     if component_enum is None or not component_instance.component_config_path:
         return False
+
+    config_path = os.path.normpath(component_instance.component_config_path).replace(os.sep, '/').lower()
+
     if component_enum.value == ComponentEnum.LLM.value:
         # Check if the LLM component is system-built-in
-        return "agentuniverse/llm/default" in component_instance.component_config_path
+        return "agentuniverse/llm/default" in config_path
     elif component_enum.value == ComponentEnum.TOOL.value:
         # Check if the Tool component is system-built-in
-        return "agentuniverse/agent/action/tool" in component_instance.component_config_path
+        return "agentuniverse/agent/action/tool" in config_path
     return False
 
 
