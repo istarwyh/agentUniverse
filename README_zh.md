@@ -14,7 +14,7 @@
 
 **agentUniverse 是一个基于大型语言模型的多智能体框架。** agentUniverse为您提供灵活易拓展的单智能体构建能力；agentUniverse核心拥有丰富的多智能体协同模式组件（可视为一个协同模式工厂Pattern Factory），它能让智能体们各司其职在解决不同领域问题时发挥最大的能力；同时agentUniverse专注于领域经验的融合，帮助您轻松将领域经验融入到智能体的工作中。🎉🎉🎉
 
-**🌈🌈🌈agentUniverse源自于蚂蚁集团(https://github.com/antgroup)的真实金融业务实践，致力于帮助开发者、企业轻松构建出领域专家级别的强大智能体，协同完成工作。**
+**🌈🌈🌈agentUniverse源自于蚂蚁集团(https://github.com/antgroup) 的真实金融业务实践，致力于帮助开发者、企业轻松构建出领域专家级别的强大智能体，协同完成工作。**
 
 ![](docs/guidebook/_picture/agent_universe_framework_resize.jpg)
 
