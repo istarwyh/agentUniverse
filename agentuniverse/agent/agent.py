@@ -303,11 +303,12 @@ class Agent(ComponentBase, ABC):
             result.append(token)
         return self.generate_result(result)
 
-    def judge_chain_stream(self, chain: RunnableSerializable[Any, str]) -> bool:
+    def judge_chain_stream(self,
+                           chain: RunnableSerializable[Any, str]) -> bool:
         streaming = False
         for _step in chain.steps:
             if hasattr(_step, "llm"):
-                return _step.llm.streaming
+                return _step.kwargs.get('streaming', _step.llm.streaming)
         return streaming
 
     def generate_result(self, data: list[dict | str]):
