@@ -10,7 +10,7 @@ import inspect
 import os
 from pathlib import Path
 import importlib
-from typing import Any
+from typing import Any, Dict, List
 
 from agentuniverse.base.component.component_base import ComponentBase
 from agentuniverse.base.component.component_enum import ComponentEnum
@@ -207,18 +207,37 @@ def is_system_builtin(component_instance: ComponentBase) -> bool:
     Returns:
         bool: True if the component is system-built-in, False otherwise.
     """
-    if component_instance is None:
+    try:
+        if component_instance is None:
+            return False
+        component_enum: ComponentEnum = component_instance.component_type
+        if component_enum is None or not component_instance.component_config_path:
+            return False
+
+        # Define system paths for different component types
+        system_paths: Dict[str, List[str]] = {
+            ComponentEnum.LLM.value: ["agentuniverse", "llm", "default"],
+            ComponentEnum.TOOL.value: ["agentuniverse", "agent", "action", "tool"]
+        }
+
+        # Get the system path components for this component type
+        path_components = system_paths.get(component_enum.value)
+
+        # If this component type doesn't have defined system paths, it's not a system builtin
+        if not path_components:
+            return False
+
+        # Join the path components using OS-specific separator
+        system_path = os.path.join(*path_components)
+
+        # Normalize the config path to handle platform-specific separators
+        normalized_config_path = os.path.normpath(component_instance.component_config_path)
+
+        # Check if the system path is part of the normalized config path
+        return system_path in normalized_config_path
+    except Exception as e:
+        print(f"An error occurred while checking if the component is system-built-in: {str(e)}")
         return False
-    component_enum: ComponentEnum = component_instance.component_type
-    if component_enum is None or not component_instance.component_config_path:
-        return False
-    if component_enum.value == ComponentEnum.LLM.value:
-        # Check if the LLM component is system-built-in
-        return "agentuniverse/llm/default" in component_instance.component_config_path
-    elif component_enum.value == ComponentEnum.TOOL.value:
-        # Check if the Tool component is system-built-in
-        return "agentuniverse/agent/action/tool" in component_instance.component_config_path
-    return False
 
 
 def is_api_key_missing(component_instance: ComponentBase, api_key_name: str) -> bool:

@@ -143,6 +143,7 @@ def service_run_stream(service_id: str, params: dict, saved: bool = False):
     """
     params = {} if params is None else params
     params['service_id'] = service_id
+    params['streaming'] = True
     task = RequestTask(service_run_queue, saved, **params)
     response = Response(timed_generator(task.stream_run(), g.start_time), mimetype="text/event-stream")
     response.headers['X-Request-ID'] = task.request_id
