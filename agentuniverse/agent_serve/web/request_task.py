@@ -155,9 +155,6 @@ class RequestTask:
                 result = self.thread.result()
                 if isinstance(result, OutputObject):
                     result = result.to_dict()
-
-                yield "data:" + json.dumps({"result": result},
-                                           ensure_ascii=False) + "\n\n "
                 self.__request_do__.result['result'] = result
                 self.next_state(TaskStateEnum.FINISHED)
             if self.saved:
