@@ -8,12 +8,12 @@
 
 import tomli
 from gunicorn.app.base import BaseApplication
-from agentuniverse.base.util.tracing.au_trace_manager import AuTraceManager
 
 from .flask_server import app
 from .post_fork_queue import POST_FORK_QUEUE
 from ...base.annotation.singleton import singleton
-
+from ...base.context.framework_context_manager import FrameworkContextManager
+from ...base.util.tracing.au_trace_manager import AuTraceManager
 
 DEFAULT_GUNICORN_CONFIG = {
     'bind': '127.0.0.1:8888',
@@ -40,8 +40,8 @@ class ContextVarResetMiddleware:
         try:
             return self.app(environ, start_response)
         finally:
-            AuTraceManager().reset_context()
-
+            FrameworkContextManager().clear_all_contexts()
+            AuTraceManager().reset_trace()
 @singleton
 class GunicornApplication(BaseApplication):
     """Use gunicorn to wrap the flask web server."""

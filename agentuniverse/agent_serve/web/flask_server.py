@@ -4,7 +4,7 @@ from flask import Flask, Response, g, request, make_response, jsonify
 from werkzeug.exceptions import HTTPException
 from loguru import logger
 from concurrent.futures import TimeoutError
-
+import opentracing
 from ..service_instance import ServiceInstance, ServiceNotFoundError
 from .request_task import RequestTask
 from .web_util import request_param, service_run_queue, make_standard_response, FlaskServerManager
@@ -42,8 +42,11 @@ LocalProxy.__reduce_ex__ = localproxy_reduce_ex
 
 
 # log stream response
-def timed_generator(generator, start_time):
+def timed_generator(generator, start_time, span):
     try:
+        opentracing.tracer.scope_manager.activate(
+            span, finish_on_close=False
+        )
         for data in generator:
             yield data
     finally:
@@ -68,7 +71,6 @@ def before():
         flask_request=request,
         context_prefix=get_context_prefix()
     ).info("Before request.")
-    AuTraceManager().set_log_context()
     g.start_time = time.time()
 
 
@@ -145,8 +147,10 @@ def service_run_stream(service_id: str, params: dict, saved: bool = False):
     params['service_id'] = service_id
     params['streaming'] = True
     task = RequestTask(service_run_queue, saved, **params)
-    response = Response(timed_generator(task.stream_run(), g.start_time), mimetype="text/event-stream")
+    span = opentracing.tracer.active_span
+    response = Response(timed_generator(task.stream_run(), g.start_time, span), mimetype="text/event-stream")
     response.headers['X-Request-ID'] = task.request_id
+    LOGGER.info("au_test")
     return response
 
 
