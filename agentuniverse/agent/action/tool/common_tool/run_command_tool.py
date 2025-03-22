@@ -40,6 +40,18 @@ class CommandResult:
             return time.time() - self.start_time
         return self.end_time - self.start_time
 
+    @property
+    def message(self) -> str:
+        result_dict = {
+            'thread_id': self.thread_id,
+            'status': self.status.value,
+            'stdout': self.stdout,
+            'stderr': self.stderr,
+            'exit_code': self.exit_code,
+            'duration': self.duration
+        }
+        return json.dumps(result_dict)
+
 
 _command_results: Dict[int, CommandResult] = {}
 
@@ -99,23 +111,7 @@ class RunCommandTool(Tool):
             result.thread_id = thread.ident
             _command_results[result.thread_id] = result
 
-        return self._format_result(result)
-
-    def _format_result(self, result: CommandResult) -> str:
-        result_dict = {
-            'thread_id': result.thread_id,
-            'status': result.status.value,
-            'stdout': result.stdout,
-            'stderr': result.stderr,
-            'exit_code': result.exit_code,
-            'duration': result.duration
-        }
-        return json.dumps(result_dict)
-
-    def _escape_for_json(self, text: str) -> str:
-        if not text:
-            return ""
-        return text.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\r', '\\r')
+        return result.message
 
 
 def get_command_result(thread_id: int) -> Optional[CommandResult]:
