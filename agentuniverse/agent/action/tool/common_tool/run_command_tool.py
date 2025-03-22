@@ -42,15 +42,29 @@ class CommandResult:
 
     @property
     def message(self) -> str:
+        # Truncate stdout and stderr if they are too long
+        max_output_length = 2000
+        truncated_stdout = self._truncate_output(
+            self.stdout, max_output_length)
+        truncated_stderr = self._truncate_output(
+            self.stderr, max_output_length)
+
         result_dict = {
             'thread_id': self.thread_id,
             'status': self.status.value,
-            'stdout': self.stdout,
-            'stderr': self.stderr,
+            'stdout': truncated_stdout,
+            'stderr': truncated_stderr,
             'exit_code': self.exit_code,
             'duration': self.duration
         }
         return json.dumps(result_dict)
+
+    def _truncate_output(self, output: str, max_length: int) -> str:
+        """Truncate output to keep beginning and end, removing middle when too long"""
+        if not output or len(output) <= max_length:
+            return output
+        half_length = max_length // 2
+        return output[:half_length] + "\n... [truncated output] ...\n" + output[-half_length:]
 
 
 _command_results: Dict[int, CommandResult] = {}
