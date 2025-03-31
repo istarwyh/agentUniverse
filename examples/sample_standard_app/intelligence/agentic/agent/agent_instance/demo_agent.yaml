@@ -4,7 +4,11 @@ info:
   description: 'demo agent'
 profile:
   # Please fill in the profile of your agent. The following is a sample.
-  prompt_version: demo_agent.cn
+  # the prompt files are located under intelligence/agentic/prompt/
+  # you can manage the agent's prompt version by selecting different prompt file
+  # here we selected cn_v2.yaml as this agent's prompt
+  # the format to referring the prompt file is {dir_name}.{file_name}
+  prompt_version: demo_agent.cn_v2
   # Please select the LLM configuration for your agent.
   #
   # There are two ways to configure the LLM for your agent:

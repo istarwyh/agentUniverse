@@ -14,7 +14,7 @@
 
 **agentUniverse 是一个基于大型语言模型的多智能体框架。** agentUniverse为您提供灵活易拓展的单智能体构建能力；agentUniverse核心拥有丰富的多智能体协同模式组件（可视为一个协同模式工厂Pattern Factory），它能让智能体们各司其职在解决不同领域问题时发挥最大的能力；同时agentUniverse专注于领域经验的融合，帮助您轻松将领域经验融入到智能体的工作中。🎉🎉🎉
 
-**🌈🌈🌈agentUniverse帮助开发者、企业轻松构建出领域专家级别的强大智能体协同为您工作。**
+**🌈🌈🌈agentUniverse源自于蚂蚁集团(https://github.com/antgroup) 的真实金融业务实践，致力于帮助开发者、企业轻松构建出领域专家级别的强大智能体，协同完成工作。**
 
 ![](docs/guidebook/_picture/agent_universe_framework_resize.jpg)
 
@@ -31,8 +31,8 @@
 |  &nbsp; [快速安装](#快速安装) &nbsp; |
 &nbsp; [运行案例](#运行第一个教程案例) &nbsp; |
 * [如何搭建一个智能体应用](#如何搭建一个智能体应用)  
-| &nbsp; [工程化搭建](#工程化搭建) &nbsp; |
-&nbsp; [产品化搭建](#平台化搭建) &nbsp; |
+| &nbsp; [标准工程脚手架搭建](#标准工程脚手架) &nbsp; |
+&nbsp; [画布式研发平台搭建](#画布式研发平台搭建) &nbsp; |
 * [为什么使用agentUniverse](#为什么使用agentUniverse)  
 | &nbsp; [设计思路](#设计思路) &nbsp; | 
 &nbsp; [协同机制](#多智能体协同机制) &nbsp; | 
@@ -93,7 +93,7 @@ pip install magent-ui ruamel.yaml
 
 **一键运行**
 
-运行sample_standard_app/bootstrap下的[product_application.py](examples/sample_standard_app/bootstrap/platform/product_application.py)文件，一键启动。
+运行sample_apps/workflow_agent_app/bootstrap/platform下的[product_application.py](examples/sample_apps/workflow_agent_app/bootstrap/platform/product_application.py)文件，一键启动。
 
 更多详情参考 [产品化平台快速开始](./docs/guidebook/zh/How-to/画布式研发平台使用/画布式研发平台快速开始.md)
 与 [产品化平台进阶指南](./docs/guidebook/zh/How-to/画布式研发平台使用/画布式研发平台进阶指南.md) 。本功能由 🔗[difizen](https://github.com/difizen/magent) 项目组 X agentUniverse 项目组联合推出。
@@ -182,7 +182,7 @@ https://private-user-images.githubusercontent.com/39180831/355437700-192f712d-1b
 
 ### 支持
 #### 通过github issue提交疑问
-😊 我们建议您使用[github issue](https://github.com/antgroup/agentUniverse/issues) 提交您的疑问, 我们通常会在2日内回复。
+😊 我们建议您使用[github issue](https://github.com/agentuniverse-ai/agentUniverse/issues) 提交您的疑问, 我们通常会在2日内回复。
 
 #### 通过Discord联系我们
 😊 加入我们的 [Discord频道](https://discord.gg/DHFcdkWAhn) 与我们进行交流。
@@ -194,9 +194,9 @@ https://private-user-images.githubusercontent.com/39180831/355437700-192f712d-1b
 #### 通过管理员Email联系我们
 😊 Email: 
 
-[jihan.hanji@antgroup.com](mailto:jihan.hanji@antgroup.com)
-[jerry.zzw@antgroup.com](mailto:jerry.zzw@antgroup.com)
-[jinshi.zjs@antgroup.com](mailto:jinshi.zjs@antgroup.com)
+* [jihan.hanji@antgroup.com](mailto:jihan.hanji@antgroup.com)
+* [jerry.zzw@antgroup.com](mailto:jerry.zzw@antgroup.com)
+* [jinshi.zjs@antgroup.com](mailto:jinshi.zjs@antgroup.com)
 
 #### 微信公众号
 

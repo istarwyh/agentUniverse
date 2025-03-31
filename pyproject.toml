@@ -4,7 +4,7 @@ version = "0.0.15"
 description = "agentUniverse is a framework for developing applications powered by multi-agent base on large language model."
 
 authors = ["AntGroup <jerry.zzw@antgroup.com>"]
-repository = "https://github.com/alipay/agentUniverse"
+repository = "https://github.com/agentuniverse-ai/agentUniverse"
 readme = "README_PYPI.md"
 
 packages = [
@@ -63,6 +63,7 @@ pillow = "^10.4.0"
 jieba = "^0.42.1"
 networkx = "^3.3"
 httpx = "0.27.2"
+tomli = "^2.2"
 
 [tool.poetry.extras]
 log_ext = ["aliyun-log-python-sdk"]

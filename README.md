@@ -14,7 +14,8 @@ Language version: [English](./README.md) | [中文](./README_zh.md) | [日本語
 
 **agentUniverse is a multi-agent framework based on large language models.** It provides flexible and easily extensible capabilities for building individual agents. The core of agentUniverse is a rich set of multi-agent collaborative pattern components (serving as a collaborative pattern factory), which allows agents to perform their respective duties and maximize their capabilities when solving problems in different fields; at the same time, agentUniverse focuses on the integration of domain experience, helping you smoothly integrate domain experience into the work of intelligent agents.🎉🎉🎉
 
-**🌈🌈🌈agentUniverse helps developers and enterprises easily build powerful agents at the domain expert level to work collaboratively for you.**
+**🌈🌈🌈agentUniverse originates from the real-world financial business practices of AntGroup (https://github.com/antgroup), dedicated to assisting developers and enterprises in effortlessly constructing domain-expert-level intelligent agents that collaborate to accomplish tasks.**
+
 
 ![](docs/guidebook/_picture/agent_universe_framework_resize.jpg)
 
@@ -42,7 +43,7 @@ The LLM model integration can be accomplished with simple configuration, current
 |<img src="https://github.com/user-attachments/assets/fe265f24-4ea6-4ff2-9b50-58ab6706a5f5" height="25">|BaiChuan|baichuan2-turbo、baichuan2-13b-chat-v1、…|
 |<img src="https://github.com/user-attachments/assets/41ffe268-392f-4ab9-b42d-e30dbd70d66b" height="25">|Doubao|Doubao-pro-128k、Doubao-pro-32k、Doubao-lite-128k、…|
 
-For example, to use deepseek model, you can simply set DEEPSEEK_API_KEY value in the custom_key.toml file, and set the llm_model name in the agent configuration file to 'default_deepseek_llm' and you're all set. For more infomation about llm configuration, please refer to [switch-the-llm](https://github.com/antgroup/agentUniverse/blob/master/docs/guidebook/en/Get_Start/2.Run_Your_First_Tutorial_Example.md#switch-the-llm).
+For example, to use deepseek model, you can simply set DEEPSEEK_API_KEY value in the custom_key.toml file, and set the llm_model name in the agent configuration file to 'default_deepseek_llm' and you're all set. For more infomation about llm configuration, please refer to [switch-the-llm](https://github.com/agentuniverse-ai/agentUniverse/blob/master/docs/guidebook/en/Get_Start/2.Run_Your_First_Tutorial_Example.md#switch-the-llm).
 
 
 ****************************************
@@ -72,7 +73,7 @@ Overview: This document introduces in detailed the mechanisms and principles und
 
 * [Quick Start](#Quick-Start)  
 * [How to build an agent application](#How-to-build-an-agent-application)
-* [Setup the visual agentic workflow platform](#Setup-the-visual-agentic-workflow-platform)
+* [Setup the visual agentic workflow platform](#Set-up-the-visual-agentic-workflow-platform)
 * [Why use agentUniverse](#Why-use-agentUniverse)  
 * [Sample Apps](#Sample-Apps)  
 * [Documents](#Documents)  
@@ -107,12 +108,11 @@ You can further understand how to break down intelligent capabilities into multi
 #### Creating and Using Agent Templates
 You can learn how to create effective agent patterns into templates through the chapter [Creating and Using Agent Templates](docs/guidebook/en/Get_Start/5.Creating_and_Using_Agent_Templates.md). This will greatly enhance the efficiency of constructing subsequent agents and facilitate dissemination.
 
-#### Other Tips and Techniques
-You can learn more tips and techniques during the process of building intelligent agent applications in the chapter [Other_Tips_and_Techniques](docs/guidebook/en/Get_Start/6.Other_Tips_and_Techniques.md), such as how to add a memory module into the intelligent agent process and how to effectively manage prompts within the project.
-
+#### Common Tips and Advanced Techniques
+You can learn more advanced techniques in the agent application building process through other documents in the [Get_Start](./docs/guidebook/en/Get_Start), such as how to add a memory module into the intelligent agent process and how to effectively manage prompts within the project.
 ****************************************
 
-## Setup the visual agentic workflow platform
+## Set up the visual agentic workflow platform
 
 agentUniverse provides a visual canvas platform for creating agentic workflow. Follow these steps for a quick start:
 
@@ -123,7 +123,7 @@ pip install magent-ui ruamel.yaml
 
 **One-click Run**
 
-Run [product_application.py](examples/sample_standard_app/bootstrap/platform/product_application.py) in sample_standard_app/bootstrap/platform for quick startup.
+Run [product_application.py](examples/sample_apps/workflow_agent_app/bootstrap/platform/product_application.py) in ample_apps/workflow_agent_app/bootstrap/platform for quick startup.
 
 For more details, refer to [Quick Start for Product Platform](docs/guidebook/en/How-to/Guide to Visual Agentic Workflow Platform/Product_Platform_Quick_Start.md) and the [Advanced Guide](docs/guidebook/en/How-to/Guide to Visual Agentic Workflow Platform/Product_Platform_Advancement_Guide.md).
 
@@ -198,7 +198,7 @@ https://private-user-images.githubusercontent.com/39180831/355437700-192f712d-1b
 ## Support
 
 ### Submit Questions via GitHub Issues
-😊 We recommend submitting your queries using [GitHub Issues](https://github.com/antgroup/agentUniverse/issues), we typically respond within 2 business days.
+😊 We recommend submitting your queries using [GitHub Issues](https://github.com/agentuniverse-ai/agentUniverse/issues), we typically respond within 2 business days.
 
 ### Contact Us via Discord
 😊 Join our [Discord Channel](https://discord.gg/DHFcdkWAhn) to interact with us.
