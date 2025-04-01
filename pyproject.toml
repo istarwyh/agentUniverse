@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agentUniverse"
-version = "0.0.16.beta5"
+version = "0.0.16.beta6"
 description = "agentUniverse is a framework for developing applications powered by multi-agent base on large language model."
 
 authors = ["AntGroup <jerry.zzw@antgroup.com>"]
@@ -55,7 +55,7 @@ langchain-anthropic = '^0.1.13'
 numpy = '^1.26.0'
 pandas = "^2.2.2"
 pyarrow = "^16.1.0"
-duckduckgo-search = "6.1.7"
+duckduckgo-search = "^6.3.5"
 primp = "0.5.5"
 wikipedia= "^1.4.0"
 openpyxl = "^3.1.5"
