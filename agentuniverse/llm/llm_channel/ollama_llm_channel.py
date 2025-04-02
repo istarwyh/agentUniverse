@@ -1,33 +1,44 @@
+# !/usr/bin/env python3
+# -*- coding:utf-8 -*-
+
+# @Time    : 2025/4/7 19:26
+# @Author  : wangchongshi
+# @Email   : wangchongshi.wcs@antgroup.com
+# @FileName: ollama_llm_channel.py
 import json
-from typing import Any, Union, AsyncIterator, Iterator, Optional, List, Sequence
+from typing import Optional, Union, Iterator, AsyncIterator
 
-import tiktoken
 from langchain_core.language_models import BaseLanguageModel
-from ollama import Options
 from pydantic import Field
+from ollama import Options
 
-from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
+from agentuniverse.base.config.component_configer.component_configer import ComponentConfiger
 from agentuniverse.base.util.env_util import get_from_env
-from agentuniverse.base.util.system_util import process_yaml_func
-from agentuniverse.llm.llm import LLM
+from agentuniverse.llm.llm_channel.langchain_instance.ollama_langchain_instance import OllamaLangchainInstance
+from agentuniverse.llm.llm_channel.llm_channel import LLMChannel
 from agentuniverse.llm.llm_output import LLMOutput
-from agentuniverse.llm.ollama_langchain_instance import OllamaLangchainInstance
 
 
-class OllamaLLM(LLM):
-    base_url: Optional[str] = Field(
-        default_factory=lambda: get_from_env("OLLAMA_BASE_URL") if get_from_env(
-            "OLLAMA_BASE_URL") else "http://localhost:11434")
-    """Base url the model is hosted under."""
+class OllamaLLMChannel(LLMChannel):
+    channel_api_key: Optional[str] = Field(default_factory=lambda: get_from_env("OLLAMA_CHANNEL_API_KEY"))
+    channel_organization: Optional[str] = Field(default_factory=lambda: get_from_env("OLLAMA_CHANNEL_ORGANIZATION"))
+    channel_api_base: Optional[str] = Field(default_factory=lambda: get_from_env("OLLAMA_BASE_URL") if get_from_env(
+        "OLLAMA_BASE_URL") else "http://localhost:11434")
+    channel_proxy: Optional[str] = Field(default_factory=lambda: get_from_env("OLLAMA_CHANNEL_PROXY"))
 
-    streaming: bool = True
+    def _initialize_by_component_configer(self, component_configer: ComponentConfiger) -> 'OllamaLLMChannel':
+        super()._initialize_by_component_configer(component_configer)
+        return self
+
+    def as_langchain(self) -> BaseLanguageModel:
+        return OllamaLangchainInstance(self)
 
     def _new_client(self):
         if self.client:
             return self.client
         from ollama import Client
         return Client(
-            host=self.base_url,
+            host=self.channel_api_base,
         )
 
     def _new_async_client(self):
@@ -35,7 +46,7 @@ class OllamaLLM(LLM):
             return self.async_client
         from ollama import AsyncClient
         return AsyncClient(
-            host=self.base_url,
+            host=self.channel_api_base,
         )
 
     def _options(self):
@@ -52,7 +63,7 @@ class OllamaLLM(LLM):
         client = self._new_client()
         options = self._options()
         options.setdefault("stop", stop)
-        res = client.chat(model=self.model_name, messages=messages, options=options, stream=should_stream)
+        res = client.chat(model=self.channel_model_name, messages=messages, options=options, stream=should_stream)
         if should_stream:
             return self.generate_result(res)
         else:
@@ -63,7 +74,7 @@ class OllamaLLM(LLM):
         should_stream = kwargs.pop("stream", self.streaming)
         options = self._options()
         options.setdefault("stop", stop)
-        res = await client.chat(model=self.model_name, messages=messages, options=options, stream=should_stream)
+        res = await client.chat(model=self.channel_model_name, messages=messages, options=options, stream=should_stream)
         if not should_stream:
             return LLMOutput(text=res.get("message").get('content'), raw=json.dumps(res))
         if should_stream:
@@ -76,27 +87,3 @@ class OllamaLLM(LLM):
     async def agenerate_result(self, data):
         async for line in data:
             yield LLMOutput(text=line.get("message").get('content'), raw=json.dumps(line))
-
-    def as_langchain(self) -> BaseLanguageModel:
-        self.init_channel()
-        if self._channel_instance:
-            return self._channel_instance.as_langchain()
-        return OllamaLangchainInstance(
-            self
-        )
-
-    def initialize_by_component_configer(self, component_configer: LLMConfiger) -> 'LLM':
-        super().initialize_by_component_configer(component_configer)
-        if 'base_url' in component_configer.configer.value:
-            base_url = component_configer.configer.value['base_url']
-            self.base_url = process_yaml_func(base_url, component_configer.yaml_func_instance)
-        if 'max_context_length' in component_configer.configer.value:
-            self._max_context_length = component_configer.configer.value['max_context_length']
-        return self
-
-    def get_num_tokens(self, text: str) -> int:
-        try:
-            encoding = tiktoken.encoding_for_model(self.model_name)
-        except KeyError:
-            encoding = tiktoken.get_encoding("cl100k_base")
-        return len(encoding.encode(text))
