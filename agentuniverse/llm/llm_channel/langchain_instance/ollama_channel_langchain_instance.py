@@ -4,7 +4,7 @@
 # @Time    : 2025/4/7 19:28
 # @Author  : wangchongshi
 # @Email   : wangchongshi.wcs@antgroup.com
-# @FileName: ollama_langchain_instance.py
+# @FileName: ollama_channel_langchain_instance.py
 from typing import List, Optional, Iterator, Any, AsyncIterator
 
 from langchain_community.chat_models import ChatOllama
@@ -13,7 +13,7 @@ from langchain_core.messages import BaseMessage
 from agentuniverse.llm.llm_channel.llm_channel import LLMChannel
 
 
-class OllamaLangchainInstance(ChatOllama):
+class OllamaChannelLangchainInstance(ChatOllama):
     llm_channel: LLMChannel = None
 
     def __init__(self, llm_channel: LLMChannel):

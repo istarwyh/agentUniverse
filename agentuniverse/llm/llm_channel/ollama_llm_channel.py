@@ -14,7 +14,8 @@ from ollama import Options
 
 from agentuniverse.base.config.component_configer.component_configer import ComponentConfiger
 from agentuniverse.base.util.env_util import get_from_env
-from agentuniverse.llm.llm_channel.langchain_instance.ollama_langchain_instance import OllamaLangchainInstance
+from agentuniverse.llm.llm_channel.langchain_instance.ollama_channel_langchain_instance import \
+    OllamaChannelLangchainInstance
 from agentuniverse.llm.llm_channel.llm_channel import LLMChannel
 from agentuniverse.llm.llm_output import LLMOutput
 
@@ -31,7 +32,7 @@ class OllamaLLMChannel(LLMChannel):
         return self
 
     def as_langchain(self) -> BaseLanguageModel:
-        return OllamaLangchainInstance(self)
+        return OllamaChannelLangchainInstance(self)
 
     def _new_client(self):
         if self.client:

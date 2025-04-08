@@ -4,7 +4,7 @@
 # @Time    : 2025/4/2 15:43
 # @Author  : wangchongshi
 # @Email   : wangchongshi.wcs@antgroup.com
-# @FileName: default_langchain_instance.py
+# @FileName: default_channel_langchain_instance.py
 from typing import Any, List, Optional, AsyncIterator, Iterator, Mapping, Dict, Type, Union
 
 from langchain.callbacks.manager import AsyncCallbackManagerForLLMRun, CallbackManagerForLLMRun
@@ -20,9 +20,7 @@ from langchain_community.chat_models import ChatOpenAI
 from pydantic.v1 import BaseModel
 
 
-class DefaultLangchainInstance(ChatOpenAI):
-    """Langchain OpenAI LLM wrapper."""
-
+class DefaultChannelLangchainInstance(ChatOpenAI):
     llm_channel: Optional[BaseModel] = None
 
     def __init__(self, llm_channel):

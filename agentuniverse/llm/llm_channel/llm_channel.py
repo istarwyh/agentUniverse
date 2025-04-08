@@ -18,7 +18,8 @@ from agentuniverse.base.component.component_base import ComponentBase
 from agentuniverse.base.component.component_enum import ComponentEnum
 from agentuniverse.base.config.application_configer.application_config_manager import ApplicationConfigManager
 from agentuniverse.base.config.component_configer.component_configer import ComponentConfiger
-from agentuniverse.llm.llm_channel.langchain_instance.default_langchain_instance import DefaultLangchainInstance
+from agentuniverse.llm.llm_channel.langchain_instance.default_channel_langchain_instance import \
+    DefaultChannelLangchainInstance
 from agentuniverse.llm.llm_output import LLMOutput
 
 
@@ -159,7 +160,7 @@ class LLMChannel(ComponentBase):
 
     def as_langchain(self) -> BaseLanguageModel:
         """Convert to the langchain llm class."""
-        return DefaultLangchainInstance(self)
+        return DefaultChannelLangchainInstance(self)
 
     def get_num_tokens(self, text: str) -> int:
         """Get the number of tokens present in the text.
