@@ -21,7 +21,6 @@ from langchain_community.chat_models import ChatOpenAI
 from pydantic.v1 import BaseModel
 
 from agentuniverse.llm.llm import LLM
-from agentuniverse.llm.llm_channel.llm_channel import LLMChannel
 
 
 async def acompletion_with_retry(
@@ -120,9 +119,9 @@ def convert_dict_to_message(_dict: Mapping[str, Any]) -> BaseMessage:
 class LangchainOpenAIStyleInstance(ChatOpenAI):
     """Langchain OpenAI LLM wrapper."""
 
-    llm: Optional[Union[LLM, LLMChannel]] = None
+    llm: Optional[LLM] = None
 
-    def __init__(self, llm: Union[LLM, LLMChannel]):
+    def __init__(self, llm: LLM):
         """The __init__ method.
 
         The agentUniverse LLM instance is passed to this class as an argument.

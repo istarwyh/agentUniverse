@@ -33,6 +33,7 @@ organization: '${DEEPSEEK_ORGANIZATION}'
 api_base: 'https://api.deepseek.com/v1'
 proxy: '${DEEPSEEK_PROXY}'
 streaming: True
+channel: deepseek-r1-dashscope
 metadata:
   type: 'LLM'
   module: 'agentuniverse.llm.default.deep_seek_openai_style_llm'
