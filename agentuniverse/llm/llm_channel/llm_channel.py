@@ -13,6 +13,7 @@ import tiktoken
 from openai import OpenAI, AsyncOpenAI
 from langchain_core.language_models import BaseLanguageModel
 
+from agentuniverse.agent.memory.message import Message
 from agentuniverse.base.annotation.trace import trace_llm
 from agentuniverse.base.component.component_base import ComponentBase
 from agentuniverse.base.component.component_enum import ComponentEnum
@@ -129,7 +130,9 @@ class LLMChannel(ComponentBase):
         )
         if not streaming:
             text = chat_completion.choices[0].message.content
-            return LLMOutput(text=text, raw=chat_completion.model_dump())
+            return LLMOutput(text=text, raw=chat_completion.model_dump(),
+                             message=Message(content=chat_completion.choices[0].message.content,
+                                             type=chat_completion.choices[0].message.role))
         return self.generate_stream_result(chat_completion)
 
     async def _acall(self, messages: list, **kwargs: Any) -> Union[LLMOutput, AsyncIterator[LLMOutput]]:
@@ -155,7 +158,9 @@ class LLMChannel(ComponentBase):
         )
         if not streaming:
             text = chat_completion.choices[0].message.content
-            return LLMOutput(text=text, raw=chat_completion.model_dump())
+            return LLMOutput(text=text, raw=chat_completion.model_dump(),
+                             message=Message(content=chat_completion.choices[0].message.content,
+                                             type=chat_completion.choices[0].message.role))
         return self.agenerate_stream_result(chat_completion)
 
     def as_langchain(self) -> BaseLanguageModel:
@@ -233,9 +238,10 @@ class LLMChannel(ComponentBase):
         choice = chunk["choices"][0]
         message = choice.get("delta")
         text = message.get("content")
+        role = message.get("role")
         if text is None:
             text = ""
-        return LLMOutput(text=text, raw=chat_completion.model_dump())
+        return LLMOutput(text=text, raw=chat_completion.model_dump(), message=Message(content=text, type=role))
 
     def get_instance_code(self) -> str:
         """Return the full name of the component."""

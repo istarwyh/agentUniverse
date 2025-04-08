@@ -10,7 +10,4 @@ memory_storages:
   # you can change to chroma_memory_storage, which will persist the memory into chroma db
   # for more info please refer to doc
   - ram_memory_storage
-metadata:
-  type: 'MEMORY'
-  module: 'agentuniverse.agent.memory.memory'
-  class: 'Memory'
+meta_class: 'agentuniverse.agent.memory.memory.Memory'

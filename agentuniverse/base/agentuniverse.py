@@ -297,10 +297,6 @@ class AgentUniverse(object):
             if component_instance is None:
                 continue
             component_instance.component_config_path = component_configer.configer.path
-            if component_enum.value == ComponentEnum.LLM.value:
-                if is_system_builtin(component_instance):
-                    if is_api_key_missing(component_instance, "api_key"):
-                        continue
             component_manager_clz().register(component_instance.get_instance_code(), component_instance)
 
     def __package_name_to_path(self, package_name: str) -> str:

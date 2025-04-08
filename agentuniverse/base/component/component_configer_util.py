@@ -120,9 +120,16 @@ class ComponentConfigerUtil(object):
         Returns:
             object: the component object
         """
-        module = importlib.import_module(component_configer.metadata_module)
-        clz = getattr(module, component_configer.metadata_class)
-        return clz
+        if component_configer.meta_class:
+            metadata_module = '.'.join(component_configer.meta_class.split('.')[:-1])
+            metadata_class = component_configer.meta_class.split('.')[-1]
+            module = importlib.import_module(metadata_module)
+            clz = getattr(module, metadata_class)
+            return clz
+        else:
+            module = importlib.import_module(component_configer.metadata_module)
+            clz = getattr(module, component_configer.metadata_class)
+            return clz
 
     @classmethod
     def get_component_manager_clz_by_type(cls, component_type_enum: ComponentEnum) -> Callable:

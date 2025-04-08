@@ -35,7 +35,7 @@ profile:
   #
   # Note: The current configuration uses Way 1, as shown below
   llm_model:
-    name: 'qwen2.5-72b-instruct'
+    name: 'deepseek-chat'
 action:
   # Please select the tools and knowledge base.
   tool:
@@ -46,9 +46,7 @@ action:
     # and config it into /config/custom_key.toml
     - 'mock_search_tool'
   knowledge:
-    # advantage feature，please refer to doc
+  # advantage feature，please refer to doc
 memory:
   name: 'demo_memory'
-metadata:
-  type: AGENT
-  class: DemoAgent
+meta_class: sample_standard_app.intelligence.agentic.agent.agent_instance.demo_agent.DemoAgent
