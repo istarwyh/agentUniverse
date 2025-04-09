@@ -309,8 +309,8 @@ class Agent(ComponentBase, ABC):
         for _step in chain.steps:
             if hasattr(_step, "llm"):
                 return _step.kwargs.get('streaming', _step.llm.streaming)
-            if hasattr(_step, "bound"):
-                return _step.bound.streaming
+            if hasattr(_step, "llm_channel"):
+                return _step.kwargs.get('streaming', _step.llm_channel.streaming)
         return streaming
 
     def generate_result(self, data: list[dict | str]):

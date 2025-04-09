@@ -3,9 +3,7 @@ description: 'qwen-max'
 model_name: 'qwen-max'
 temperature: 0.5
 max_tokens: 2000
-channel: qwen-max-official
+max_context_length: 32768
 streaming: True
-metadata:
-  type: 'LLM'
-  module: 'agentuniverse.llm.default.qwen_openai_style_llm'
-  class: 'QWenOpenAIStyleLLM'
+channel: qwen-max-official
+meta_class: 'agentuniverse.llm.default.qwen_openai_style_llm.QWenOpenAIStyleLLM'
