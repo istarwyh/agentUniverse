@@ -5,7 +5,6 @@
 # @Author  :
 # @Email   :
 # @FileName: google_search_tool.py
-
 from typing import Optional
 
 from agentuniverse.agent.action.tool.tool import Tool, ToolInput

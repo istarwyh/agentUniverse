@@ -5,7 +5,6 @@
 # @Author  : wangchongshi
 # @Email   : wangchongshi.wcs@antgroup.com
 # @FileName: llm.py
-
 from abc import abstractmethod
 from copy import deepcopy
 from typing import Optional, Any, AsyncIterator, Iterator, Union
@@ -18,6 +17,8 @@ from agentuniverse.base.component.component_enum import ComponentEnum
 from agentuniverse.base.config.application_configer.application_config_manager import ApplicationConfigManager
 from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
 from agentuniverse.base.util.logging.logging_util import LOGGER
+from agentuniverse.llm.llm_channel.llm_channel import LLMChannel
+from agentuniverse.llm.llm_channel.llm_channel_manager import LLMChannelManager
 from agentuniverse.llm.llm_output import LLMOutput
 
 
@@ -55,10 +56,29 @@ class LLM(ComponentBase):
     tracing: Optional[bool] = None
     _max_context_length: Optional[int] = None
     langchain_instance: Optional[BaseLanguageModel] = None
+    channel: Optional[str] = None
+    _channel_instance: Optional[LLMChannel] = None
 
     def __init__(self, **kwargs):
         """Initialize the llm."""
         super().__init__(component_type=ComponentEnum.LLM, **kwargs)
+
+    def init_channel(self):
+        if self.channel and not self._channel_instance:
+            llm_channel: LLMChannel = LLMChannelManager().get_instance_obj(
+                component_instance_name=self.channel)
+            if not llm_channel:
+                return
+
+            self._channel_instance = llm_channel
+
+            llm_attrs = vars(self)
+            channel_model_config = {}
+
+            for attr_name, attr_value in llm_attrs.items():
+                channel_model_config[attr_name] = attr_value
+
+            llm_channel.channel_model_config = channel_model_config
 
     def _new_client(self):
         """Initialize the client."""
@@ -78,6 +98,8 @@ class LLM(ComponentBase):
 
     def as_langchain(self) -> BaseLanguageModel:
         """Convert to the langchain llm class."""
+        if self._channel_instance:
+            return self._channel_instance.as_langchain()
         pass
 
     def get_instance_code(self) -> str:
@@ -115,6 +137,9 @@ class LLM(ComponentBase):
         self.tracing = component_configer.tracing
         if 'max_context_length' in component_configer.configer.value:
             self._max_context_length = component_configer.configer.value['max_context_length']
+        if 'channel' in component_configer.configer.value:
+            self.channel = component_configer.configer.value.get('channel')
+        self.init_channel()
         return self
 
     def set_by_agent_model(self, **kwargs):
@@ -167,6 +192,9 @@ class LLM(ComponentBase):
     def call(self, *args: Any, **kwargs: Any):
         """Run the LLM."""
         try:
+            self.init_channel()
+            if self._channel_instance:
+                return self._channel_instance.call(*args, **kwargs)
             return self._call(*args, **kwargs)
         except Exception as e:
             LOGGER.error(f'Error in LLM call: {e}')
@@ -176,6 +204,9 @@ class LLM(ComponentBase):
     async def acall(self, *args: Any, **kwargs: Any):
         """Asynchronously run the LLM."""
         try:
+            self.init_channel()
+            if self._channel_instance:
+                return await self._channel_instance.acall(*args, **kwargs)
             return await self._acall(*args, **kwargs)
         except Exception as e:
             LOGGER.error(f'Error in LLM acall: {e}')

@@ -171,6 +171,9 @@ class AgentUniverse(object):
         core_log_sink_package_list = ((app_configer.core_log_sink_package_list or app_configer.core_default_package_list)
                                           + self.__system_default_log_sink_package)
 
+        core_llm_channel_package_list = app_configer.core_llm_channel_package_list or app_configer.core_default_package_list
+
+
         component_package_map = {
             ComponentEnum.AGENT: core_agent_package_list,
             ComponentEnum.KNOWLEDGE: core_knowledge_package_list,
@@ -191,7 +194,8 @@ class AgentUniverse(object):
             ComponentEnum.MEMORY_COMPRESSOR: core_memory_compressor_package_list,
             ComponentEnum.MEMORY_STORAGE: core_memory_storage_package_list,
             ComponentEnum.WORK_PATTERN: core_work_pattern_package_list,
-            ComponentEnum.LOG_SINK: core_log_sink_package_list
+            ComponentEnum.LOG_SINK: core_log_sink_package_list,
+            ComponentEnum.LLM_CHANNEL: core_llm_channel_package_list
         }
 
         component_configer_list_map = {}
@@ -293,14 +297,6 @@ class AgentUniverse(object):
             if component_instance is None:
                 continue
             component_instance.component_config_path = component_configer.configer.path
-            if component_enum.value == ComponentEnum.LLM.value:
-                if is_system_builtin(component_instance):
-                    if is_api_key_missing(component_instance, "api_key"):
-                        continue
-                else:
-                    if is_api_key_missing(component_instance, "api_key"):
-                        raise ValueError(
-                            f"Missing required API key for LLM component {component_instance.get_instance_code()}.")
             component_manager_clz().register(component_instance.get_instance_code(), component_instance)
 
     def __package_name_to_path(self, package_name: str) -> str:
