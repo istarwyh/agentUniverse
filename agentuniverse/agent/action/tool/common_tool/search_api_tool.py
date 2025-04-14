@@ -57,6 +57,19 @@ class SearchAPITool(Tool):
             return self.search_api_wrapper.results(query=input, **search_params)
         return self.search_api_wrapper.run(query=input, **search_params)
 
+    async def async_execute(self, tool_input: ToolInput):
+        self._load_api_wapper()
+        search_params = {}
+        for k, v in self.search_params.items():
+            if k in tool_input.to_dict():
+                search_params[k] = tool_input.get_data(k)
+                continue
+            search_params[k] = v
+        input = tool_input.get_data("input")
+        if self.search_type == "json":
+            return await self.search_api_wrapper.aresults(query=input, **search_params)
+        return await self.search_api_wrapper.arun(query=input, **search_params)
+
     def initialize_by_component_configer(self, component_configer: ToolConfiger) -> 'Tool':
         """Initialize the tool by the component configer."""
         super().initialize_by_component_configer(component_configer)

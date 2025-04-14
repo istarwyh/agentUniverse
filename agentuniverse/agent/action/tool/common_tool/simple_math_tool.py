@@ -17,9 +17,21 @@ class AddTool(Tool):
         result = float(a) + float(b)
         return result
 
+    async def async_execute(self, tool_input: ToolInput):
+        input_params = tool_input.get_data('input')
+        a, b = input_params.split(',')
+        result = float(a) + float(b)
+        return result
+
 
 class SubtractTool(Tool):
     def execute(self, tool_input: ToolInput):
+        input_params = tool_input.get_data('input')
+        a, b = input_params.split(',')
+        result = float(a) - float(b)
+        return result
+
+    async def async_execute(self, tool_input: ToolInput):
         input_params = tool_input.get_data('input')
         a, b = input_params.split(',')
         result = float(a) - float(b)
@@ -33,9 +45,21 @@ class MultiplyTool(Tool):
         result = float(a) * float(b)
         return result
 
+    async def async_execute(self, tool_input: ToolInput):
+        input_params = tool_input.get_data('input')
+        a, b = input_params.split(',')
+        result = float(a) * float(b)
+        return result
+
 
 class DivideTool(Tool):
     def execute(self, tool_input: ToolInput):
+        input_params = tool_input.get_data('input')
+        a, b = input_params.split(',')
+        result = float(a) / float(b)
+        return result
+
+    async def async_execute(self, tool_input: ToolInput):
         input_params = tool_input.get_data('input')
         a, b = input_params.split(',')
         result = float(a) / float(b)

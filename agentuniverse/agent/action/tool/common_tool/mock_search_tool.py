@@ -19,6 +19,12 @@ class MockSearchTool(Tool):
         res = self.mock_api_res()
         return res
 
+    async def async_execute(self, tool_input: ToolInput):
+        input = tool_input.get_data("input")
+        # get top10 results from mock search.
+        res = self.mock_api_res()
+        return res
+
     def mock_api_res(self):
         res = f"""采访中谈及第十次减持比亚迪，巴菲特称是为了便于伯克希尔进行更好的资金配置。而在今年2月，
         芒格在美国报纸和软件公司Daily Journal举行的虚拟年会上也曾谈及减持比亚迪的 ... 
