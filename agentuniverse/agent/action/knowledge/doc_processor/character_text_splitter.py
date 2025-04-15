@@ -31,13 +31,17 @@ class CharacterTextSplitter(DocProcessor):
     chunk_size: int = 200
     chunk_overlap: int = 20
     separator: str = "/n/n"
-    splitter: Optional[Splitter] = None
+    __splitter: Optional[Splitter] = None
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.splitter = Splitter(separator=self.separator,
+
+    @property
+    def splitter(self) -> Splitter:
+        if not self.__splitter:
+            self.__splitter = Splitter(separator=self.separator,
                                  chunk_size=self.chunk_size,
                                  chunk_overlap=self.chunk_overlap)
+        return self.__splitter
+
 
     def _process_docs(self, origin_docs: List[Document], query: Query = None) -> \
             List[Document]:
@@ -72,7 +76,4 @@ class CharacterTextSplitter(DocProcessor):
             self.chunk_overlap = doc_processor_configer.chunk_overlap
         if hasattr(doc_processor_configer, "separator"):
             self.separator = doc_processor_configer.separator
-        self.splitter = Splitter(separator=self.separator,
-                                 chunk_size=self.chunk_size,
-                                 chunk_overlap=self.chunk_overlap)
         return self
