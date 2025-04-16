@@ -7,9 +7,6 @@
 # @FileName: openai_official_llm_channel.py
 from typing import Optional
 
-from pydantic import Field
-
-from agentuniverse.base.util.env_util import get_from_env
 from agentuniverse.llm.llm_channel.llm_channel import LLMChannel
 
 OPENAI_MAX_CONTEXT_LENGTH = {
@@ -35,12 +32,7 @@ OPENAI_MAX_CONTEXT_LENGTH = {
 
 
 class OpenAIOfficialLLMChannel(LLMChannel):
-    channel_api_key: Optional[str] = Field(default_factory=lambda: get_from_env("OPENAI_OFFICIAL_CHANNEL_API_KEY"))
-    channel_organization: Optional[str] = Field(
-        default_factory=lambda: get_from_env("OPENAI_OFFICIAL_CHANNEL_ORGANIZATION"))
-    channel_api_base: Optional[str] = Field(
-        default_factory=lambda: get_from_env("OPENAI_OFFICIAL_CHANNEL_API_BASE") or "https://api.openai.com/v1")
-    channel_proxy: Optional[str] = Field(default_factory=lambda: get_from_env("OPENAI_OFFICIAL_CHANNEL_PROXY"))
+    channel_api_base: Optional[str] = "https://api.openai.com/v1"
 
     def max_context_length(self) -> int:
         if super().max_context_length():

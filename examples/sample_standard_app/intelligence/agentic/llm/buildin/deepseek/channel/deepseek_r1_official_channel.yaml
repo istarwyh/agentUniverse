@@ -1,5 +1,5 @@
 channel_name: 'deepseek-r1-official'
-channel_api_key: '${DEEPSEEK_OFFICIAL_CHANNEL_API_KEY}'
+channel_api_key: '${DEEPSEEK_API_KEY}'
 channel_api_base: 'https://api.deepseek.com/v1'
 channel_model_name: 'deepseek-reasoner'
 model_support_stream: True

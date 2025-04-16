@@ -1,5 +1,5 @@
 channel_name: 'claude-3-5-haiku-official'
-channel_api_key: '${ANTHROPIC_OFFICIAL_CHANNEL_API_KEY}'
+channel_api_key: '${ANTHROPIC_API_KEY}'
 channel_api_base: 'https://api.anthropic.com/v1/'
 channel_model_name: 'claude-3-5-haiku-latest'
 model_support_stream: True

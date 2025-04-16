@@ -1,5 +1,5 @@
 channel_name: 'deepseek-v3-qianfan'
-channel_api_key: '${QIANFAN_CHANNEL_API_KEY}'
+channel_api_key: '${QIANFAN_API_KEY}'
 channel_api_base: 'https://qianfan.baidubce.com/v2/'
 channel_model_name: deepseek-v3
 model_support_stream: True

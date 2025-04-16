@@ -1,5 +1,5 @@
 channel_name: 'o3-mini-official'
-channel_api_key: '${OPENAI_OFFICIAL_CHANNEL_API_KEY}'
+channel_api_key: '${OPENAI_API_KEY}'
 channel_api_base: 'https://api.openai.com/v1/'
 channel_model_name: o3-mini
 model_support_stream: True
