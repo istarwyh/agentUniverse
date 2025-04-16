@@ -67,7 +67,7 @@ class LLMNode(Node):
             prompt = prompt.replace('{{' + variable + '}}', llm_input_params[variable])
 
         messages = [{'role': 'user', 'content': prompt}]
-        llm_output: LLMOutput = llm.call(messages=messages)
+        llm_output: LLMOutput = llm.call(messages=messages, streaming=False)
 
         # handle output parameters
         output_params: List[NodeOutputParams] = self._data.outputs
