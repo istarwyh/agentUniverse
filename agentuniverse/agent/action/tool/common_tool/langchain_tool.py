@@ -26,7 +26,7 @@ class LangChainTool(Tool):
     async def async_execute(self, **kwargs):
         input = kwargs.get("input")
         callbacks = kwargs.get("callbacks", None)
-        return self.tool.arun(input, callbacks=callbacks)
+        return await self.tool.arun(input, callbacks=callbacks)
 
     def initialize_by_component_configer(self, component_configer: ToolConfiger) -> 'Tool':
         super().initialize_by_component_configer(component_configer)
