@@ -40,6 +40,19 @@ class RequestTool(Tool):
         else:
             return self.execute_by_method(input_params)
 
+    async def async_execute_by_method(self, url: str, data: dict = None, **kwargs):
+        url = self._clean_url(url)
+        if self.method == 'GET':
+            return await self.requests_wrapper.aget(url)
+        elif self.method == 'POST':
+            return await self.requests_wrapper.apost(url, data=data)
+        elif self.method == 'PUT':
+            return await self.requests_wrapper.aput(url, data=data)
+        elif self.method == 'DELETE':
+            return await self.requests_wrapper.adelete(url)
+        else:
+            raise ValueError(f"Unsupported method: {self.method}")
+
     def execute_by_method(self, url: str, data: dict = None, **kwargs):
         url = self._clean_url(url)
         if self.method == 'GET':

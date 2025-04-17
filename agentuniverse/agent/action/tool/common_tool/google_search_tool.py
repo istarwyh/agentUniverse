@@ -29,3 +29,9 @@ class GoogleSearchTool(Tool):
         # get top10 results from Google search.
         search = GoogleSerperAPIWrapper(serper_api_key=self.serper_api_key, k=10, gl="us", hl="en", type="search")
         return search.run(query=input)
+
+    async def async_execute(self, tool_input: ToolInput):
+        input = tool_input.get_data("input")
+        # get top10 results from Google search.
+        search = GoogleSerperAPIWrapper(serper_api_key=self.serper_api_key, k=10, gl="us", hl="en", type="search")
+        return await search.arun(query=input)

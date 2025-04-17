@@ -9,6 +9,7 @@
 from agentuniverse.agent.agent import Agent
 from agentuniverse.agent.input_object import InputObject
 from agentuniverse.agent.memory.memory import Memory
+from agentuniverse.agent.template.rag_agent_template import RagAgentTemplate
 from agentuniverse.base.util.agent_util import assemble_memory_input, assemble_memory_output
 from agentuniverse.base.util.prompt_util import process_llm_token
 
