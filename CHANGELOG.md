@@ -24,6 +24,28 @@ Note - Additional remarks regarding the version.
 ***************************************************
 
 # Version Update History
+## [0.0.16] - 2025-04-17
+### Added
+- New Tool Plugins
+  - Added image text extraction tool based on OpenCV's OCR capabilities
+  - Added Shell command status query and execution tool
+  - Added universal file read/write tool
+  - Added Tavily intelligent search tool
+- Knowledge Reader and Processing Components
+  - Added Feishu cloud document loader component
+  - Added universal code loader component
+  - Added code processing component based on AST (Abstract Syntax Tree)
+- Support LLM model channel configuration, supporting model switching across different channel platform providers.
+- Added Google Gemini 2.5 Pro model configuration.
+- aU Agent supports integration with chatbox and CherryStudio clients. For details, refer to the [documentation](https://github.com/agentuniverse-ai/agentUniverse/blob/master/docs/guidebook/en/In-Depth_Guides/Tutorials/LLM/LLM_Channel.md).
+
+### Note
+- Change version constraints for third-party dependencies:
+  - tiktoken ('0.5.2' -> '<1.0.0')
+  - pydantic ('~2.6.4' -> '^2.6.4')
+- Main branch regression tests passed for Python 3.10, 3.11, and 3.12
+- Other code optimizations and documentation updates
+
 ## [0.0.15] - 2025-03-03
 ### Added
 - New embedding components  
