@@ -196,7 +196,7 @@ class LLMChannel(ComponentBase):
             timeout=self.channel_model_config.get('request_timeout'),
             max_retries=self.channel_model_config.get('max_retries'),
             http_client=httpx.Client(proxy=self.channel_proxy) if self.channel_proxy else None,
-            **(self.channel_model_config.get('client_args', {})),
+            **(self.channel_model_config.get('client_args') or {}),
         )
 
     def _new_async_client(self):
@@ -210,7 +210,7 @@ class LLMChannel(ComponentBase):
             timeout=self.channel_model_config.get('request_timeout'),
             max_retries=self.channel_model_config.get('max_retries'),
             http_client=httpx.AsyncClient(proxy=self.channel_proxy) if self.channel_proxy else None,
-            **(self.channel_model_config.get('client_args', {})),
+            **(self.channel_model_config.get('client_args') or {}),
         )
 
     def generate_stream_result(self, stream: openai.Stream):
