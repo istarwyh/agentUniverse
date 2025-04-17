@@ -25,5 +25,5 @@ def chat(question: str, session_id=None):
 
 
 if __name__ == '__main__':
-    # chat(question="分析下巴菲特减持比亚迪的原因", session_id="test-01")
+    chat(question="分析下巴菲特减持比亚迪的原因", session_id="test-01")
     chat(question="我刚才问了什么问题", session_id="test-01")
