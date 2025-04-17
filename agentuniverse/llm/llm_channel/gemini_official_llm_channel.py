@@ -7,9 +7,6 @@
 # @FileName: gemini_official_llm_channel.py
 from typing import Optional
 
-from pydantic import Field
-
-from agentuniverse.base.util.env_util import get_from_env
 from agentuniverse.llm.llm_channel.llm_channel import LLMChannel
 
 GEMINI_MAX_CONTEXT_LENGTH = {
@@ -18,11 +15,7 @@ GEMINI_MAX_CONTEXT_LENGTH = {
 
 
 class GeminiOfficialLLMChannel(LLMChannel):
-    channel_api_key: Optional[str] = Field(default_factory=lambda: get_from_env("GOOGLE_OFFICIAL_CHANNEL_API_KEY"))
-    channel_organization: Optional[str] = Field(
-        default_factory=lambda: get_from_env("GOOGLE_OFFICIAL_CHANNEL_ORGANIZATION"))
-    channel_api_base: Optional[str] = Field(default_factory=lambda: get_from_env("GOOGLE_OFFICIAL_CHANNEL_API_BASE"))
-    channel_proxy: Optional[str] = Field(default_factory=lambda: get_from_env("GOOGLE_OFFICIAL_CHANNEL_PROXY"))
+    channel_api_base: Optional[str] = "https://generativelanguage.googleapis.com/v1beta/openai/"
 
     def max_context_length(self) -> int:
         if super().max_context_length():

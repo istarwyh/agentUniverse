@@ -1,5 +1,5 @@
 channel_name: 'deepseek-r1-dashscope'
-channel_api_key: '${DASHSCOPE_CHANNEL_API_KEY}'
+channel_api_key: '${DASHSCOPE_API_KEY}'
 channel_api_base: 'https://dashscope.aliyuncs.com/compatible-mode/v1'
 channel_model_name: deepseek-r1
 model_support_stream: True

@@ -9,12 +9,10 @@ import json
 from typing import Optional, Union, Iterator, AsyncIterator
 
 from langchain_core.language_models import BaseLanguageModel
-from pydantic import Field
 from ollama import Options
 
 from agentuniverse.agent.memory.message import Message
 from agentuniverse.base.config.component_configer.component_configer import ComponentConfiger
-from agentuniverse.base.util.env_util import get_from_env
 from agentuniverse.llm.llm_channel.langchain_instance.ollama_channel_langchain_instance import \
     OllamaChannelLangchainInstance
 from agentuniverse.llm.llm_channel.llm_channel import LLMChannel
@@ -22,11 +20,7 @@ from agentuniverse.llm.llm_output import LLMOutput
 
 
 class OllamaLLMChannel(LLMChannel):
-    channel_api_key: Optional[str] = Field(default_factory=lambda: get_from_env("OLLAMA_CHANNEL_API_KEY"))
-    channel_organization: Optional[str] = Field(default_factory=lambda: get_from_env("OLLAMA_CHANNEL_ORGANIZATION"))
-    channel_api_base: Optional[str] = Field(default_factory=lambda: get_from_env("OLLAMA_BASE_URL") if get_from_env(
-        "OLLAMA_BASE_URL") else "http://localhost:11434")
-    channel_proxy: Optional[str] = Field(default_factory=lambda: get_from_env("OLLAMA_CHANNEL_PROXY"))
+    channel_api_base: Optional[str] = "http://localhost:11434"
 
     def _initialize_by_component_configer(self, component_configer: ComponentConfiger) -> 'OllamaLLMChannel':
         super()._initialize_by_component_configer(component_configer)
