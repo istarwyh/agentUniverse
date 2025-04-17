@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agentUniverse"
-version = "0.0.16.beta8"
+version = "0.0.16"
 description = "agentUniverse is a framework for developing applications powered by multi-agent base on large language model."
 
 authors = ["AntGroup <jerry.zzw@antgroup.com>"]
@@ -30,11 +30,11 @@ langchain = "0.1.20"
 langchain-core = "0.1.52"
 langchain-community = "0.0.38"
 openai = '1.13.3'
-tiktoken = '0.5.2'
+tiktoken = '<1.0.0'
 loguru = '0.7.2'
 flask_cors = '4.0.0'
 SQLAlchemy = '2.0.25'
-pydantic = "~2.6.4"
+pydantic = "^2.6.4"
 gunicorn = "^22.0.0"
 grpcio = "1.63.0"
 chromadb = "0.4.24"

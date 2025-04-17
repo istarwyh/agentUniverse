@@ -32,6 +32,7 @@ from agentuniverse.base.config.component_configer.configers.sqldb_wrapper_config
 from agentuniverse.base.config.config_type_enum import ConfigTypeEnum
 from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
 from agentuniverse.base.component.component_enum import ComponentEnum
+from agentuniverse.llm.llm_channel.llm_channel_manager import LLMChannelManager
 from agentuniverse.llm.llm_manager import LLMManager
 from agentuniverse.prompt.prompt_manager import PromptManager
 from agentuniverse.workflow.workflow_manager import WorkflowManager
@@ -69,7 +70,8 @@ class ComponentConfigerUtil(object):
         ComponentEnum.MEMORY_STORAGE: ComponentConfiger,
         ComponentEnum.WORK_PATTERN: WorkPatternConfiger,
         ComponentEnum.LOG_SINK: ComponentConfiger,
-        ComponentEnum.DEFAULT: ComponentConfiger
+        ComponentEnum.DEFAULT: ComponentConfiger,
+        ComponentEnum.LLM_CHANNEL: ComponentConfiger
     }
 
     __COMPONENT_MANAGER_CLZ_MAP = {
@@ -92,7 +94,8 @@ class ComponentConfigerUtil(object):
         ComponentEnum.MEMORY_COMPRESSOR: MemoryCompressorManager,
         ComponentEnum.MEMORY_STORAGE: MemoryStorageManager,
         ComponentEnum.WORK_PATTERN: WorkPatternManager,
-        ComponentEnum.LOG_SINK: LogSinkManager
+        ComponentEnum.LOG_SINK: LogSinkManager,
+        ComponentEnum.LLM_CHANNEL: LLMChannelManager,
     }
 
     @classmethod
@@ -117,9 +120,16 @@ class ComponentConfigerUtil(object):
         Returns:
             object: the component object
         """
-        module = importlib.import_module(component_configer.metadata_module)
-        clz = getattr(module, component_configer.metadata_class)
-        return clz
+        if component_configer.meta_class:
+            metadata_module = '.'.join(component_configer.meta_class.split('.')[:-1])
+            metadata_class = component_configer.meta_class.split('.')[-1]
+            module = importlib.import_module(metadata_module)
+            clz = getattr(module, metadata_class)
+            return clz
+        else:
+            module = importlib.import_module(component_configer.metadata_module)
+            clz = getattr(module, component_configer.metadata_class)
+            return clz
 
     @classmethod
     def get_component_manager_clz_by_type(cls, component_type_enum: ComponentEnum) -> Callable:

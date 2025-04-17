@@ -22,16 +22,15 @@ class TokenTextSplitter(DocProcessor):
     chunk_overlap: int = 20
     encoding_name: str = 'gpt2'
     model_name: Optional[str] = None
-    splitter: Optional[Splitter] = None
+    __splitter: Optional[Splitter] = None
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.splitter = Splitter(
-            encoding_name=self.encoding_name,
-            model_name=self.model_name,
-            chunk_size=self.chunk_size,
-            chunk_overlap=self.chunk_overlap
-        )
+    @property
+    def splitter(self) -> Splitter:
+        if not self.__splitter:
+            self.__splitter = Splitter(separator=self.separator,
+                                       chunk_size=self.chunk_size,
+                                       chunk_overlap=self.chunk_overlap)
+        return self.__splitter
 
     def _process_docs(self, origin_docs: List[Document], query: Query = None) -> \
             List[Document]:
@@ -68,10 +67,4 @@ class TokenTextSplitter(DocProcessor):
             self.encoding_name = doc_processor_configer.encoding_name
         if hasattr(doc_processor_configer, "model_name"):
             self.model_name = doc_processor_configer.model_name
-        self.splitter = Splitter(
-            encoding_name=self.encoding_name,
-            model_name=self.model_name,
-            chunk_size=self.chunk_size,
-            chunk_overlap=self.chunk_overlap
-        )
         return self
