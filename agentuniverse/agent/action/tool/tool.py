@@ -147,7 +147,7 @@ class Tool(ComponentBase):
         try:
             # First handle the main configuration values
             for key, value in component_configer.configer.value.items():
-                if key != 'metadata':  # Skip metadata field
+                if key != 'metadata' and key != 'meta_class':  # Skip metadata field
                     setattr(self, key, value)
         except Exception as e:
             print(f"Error during configuration initialization: {str(e)}")

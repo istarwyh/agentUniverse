@@ -45,6 +45,8 @@ memory_storage = ['${ROOT_PACKAGE}.intelligence.agentic.memory.memory_storage']
 # Scan and register log_sink components for all paths under this list, with priority over the default.
 log_sink = ['${ROOT_PACKAGE}.intelligence.utils.log_sink']
 
+llm_channel = ['${ROOT_PACKAGE}.intelligence.agentic.llm']
+
 [SUB_CONFIG_PATH]
 # Log config file path, an absolute path or a relative path based on the dir where the current config file is located.
 log_config_path = './log_config.toml'

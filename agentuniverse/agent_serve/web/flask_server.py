@@ -240,6 +240,7 @@ def openai_protocol_chat(model: str, messages: list):
     }
     span = opentracing.tracer.active_span
     if stream:
+        span = opentracing.tracer.active_span
         task = RequestTask(service_run_queue, False, **params)
         response = Response(timed_generator(task.user_stream_run(), g.start_time,span), mimetype="text/event-stream")
         response.headers['X-Request-ID'] = task.request_id

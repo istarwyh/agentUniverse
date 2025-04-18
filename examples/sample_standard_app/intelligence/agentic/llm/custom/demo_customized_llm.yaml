@@ -33,7 +33,4 @@ api_base: 'https://dashscope.aliyuncs.com/compatible-mode/v1'
 organization: '${DASHSCOPE_ORGANIZATION}'
 proxy: '${DASHSCOPE_PROXY}'
 streaming: True
-metadata:
-  type: 'LLM'
-  module: 'agentuniverse.llm.default.qwen_openai_style_llm'
-  class: 'QWenOpenAIStyleLLM'
+meta_class: 'agentuniverse.llm.default.qwen_openai_style_llm.QWenOpenAIStyleLLM'
