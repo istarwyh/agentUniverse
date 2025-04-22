@@ -220,6 +220,19 @@ class Agent(ComponentBase, ABC):
             result_dict[key] = output_object.get_data(key)
         return result_dict
 
+    async def async_langchain_run(self, input: str, callbacks=None, **kwargs):
+        """Run the agent model using LangChain."""
+        try:
+            parse_result = parse_json_markdown(input)
+        except Exception as e:
+            LOGGER.error(f"langchain run parse_json_markdown error,input(parse_result) error({str(e)})")
+            return "Error , Your Action Input is not a valid JSON string"
+        output_object = await self.async_run(**parse_result, callbacks=callbacks, **kwargs)
+        result_dict = {}
+        for key in self.output_keys():
+            result_dict[key] = output_object.get_data(key)
+        return result_dict
+
     def as_langchain_tool(self):
         """Convert to LangChain tool."""
         from langchain.agents.tools import Tool
@@ -236,6 +249,25 @@ class Agent(ComponentBase, ABC):
         return Tool(
             name=self.agent_model.info.get("name"),
             func=self.langchain_run,
+            description=self.agent_model.info.get("description") + args_description
+        )
+
+    async def async_as_langchain_tool(self):
+        """Convert to LangChain tool."""
+        from langchain.agents.tools import Tool
+        format_dict = {}
+        for key in self.input_keys():
+            format_dict.setdefault(key, "input val")
+        format_str = json.dumps(format_dict)
+
+        args_description = f"""
+        to use this tool,your input must be a json string,must contain all keys of {self.input_keys()},
+        and the value of the key must be a json string,the format of the json string is as follows:
+        ```{format_str}```
+        """
+        return Tool(
+            name=self.agent_model.info.get("name"),
+            func=self.async_langchain_run,
             description=self.agent_model.info.get("description") + args_description
         )
 
@@ -309,6 +341,8 @@ class Agent(ComponentBase, ABC):
         for _step in chain.steps:
             if hasattr(_step, "llm"):
                 return _step.kwargs.get('streaming', _step.llm.streaming)
+            if hasattr(_step, "llm_channel"):
+                return _step.kwargs.get('streaming', _step.llm_channel.streaming)
         return streaming
 
     def generate_result(self, data: list[dict | str]):
@@ -334,6 +368,19 @@ class Agent(ComponentBase, ABC):
                 continue
             tool_input = {key: input_object.get_data(key) for key in tool.input_keys}
             tool_results.append(str(tool.run(**tool_input)))
+        return "\n\n".join(tool_results)
+
+    async def async_invoke_tools(self, input_object: InputObject, **kwargs) -> str:
+        tool_names = kwargs.get('tool_names') or self.agent_model.action.get('tool', [])
+        if not tool_names:
+            return ''
+        tool_results: list = list()
+        for tool_name in tool_names:
+            tool: Tool = ToolManager().get_instance_obj(tool_name)
+            if tool is None:
+                continue
+            tool_input = {key: input_object.get_data(key) for key in tool.input_keys}
+            tool_results.append(await tool.async_run(**tool_input))
         return "\n\n".join(tool_results)
 
     def invoke_knowledge(self, query_str: str, input_object: InputObject, **kwargs) -> str:

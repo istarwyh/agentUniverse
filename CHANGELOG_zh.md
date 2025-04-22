@@ -24,6 +24,28 @@ Note - 对于版本的额外说明。
 ***************************************************
 
 # 版本更新记录
+## [0.0.16] - 2025-04-17
+### Added
+- 新增工具插件
+  - 新增基于opencv图像OCR能力的图片文字提取工具
+  - 新增shell命令状态查询与执行工具
+  - 新增通用文件读写工具
+  - 新增Tavily智能搜索工具
+- 新增知识Reader与加工组件
+  - 新增飞书云文档加载组件
+  - 新增通用代码加载组件
+  - 新增基于AST(Abstract Syntax Tree)代码处理组件
+- 新增llm模型通道配置能力，支持模型基于不同通道平台提供方进行切换,详情可见[文档](https://github.com/agentuniverse-ai/agentUniverse/blob/master/docs/guidebook/zh/In-Depth_Guides/%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/%E6%A8%A1%E5%9E%8B/%E6%A8%A1%E5%9E%8B%E9%80%9A%E9%81%93.md)
+- 新增Google gemini 2.5 pro模型配置
+- 支持aU智能体配置接入chatbox、CherryStudio客户端,详情可见[文档](https://github.com/agentuniverse-ai/agentUniverse/blob/master/docs/guidebook/zh/How-to/%E4%BD%BF%E7%94%A8chatbox%E7%AD%89%E5%B7%A5%E5%85%B7%E8%BF%9E%E6%8E%A5aU/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8chatbox%E7%AD%89%E5%B7%A5%E5%85%B7%E8%BF%9E%E6%8E%A5agentUniverse.md)
+
+### Note
+- 部分依赖第三方包版本限制放开
+  - tiktoken ('0.5.2' -> '<1.0.0')
+  - pydantic ('~2.6.4' -> '^2.6.4')
+- 基于Python3.10、3.11与3.12版本的主干回归通过
+- 其他代码优化与文档更新
+
 ## [0.0.15] - 2025-03-03
 ### Added
 - embedding组件新增  

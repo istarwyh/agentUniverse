@@ -122,6 +122,9 @@ class OpenAIStyleLLM(LLM):
 
     def as_langchain(self) -> BaseLanguageModel:
         """Convert the AgentUniverse(AU) openai llm class to the langchain openai llm class."""
+        self.init_channel()
+        if self._channel_instance:
+            return self._channel_instance.as_langchain()
         return LangchainOpenAIStyleInstance(self)
 
     def set_by_agent_model(self, **kwargs) -> None:
@@ -150,8 +153,6 @@ class OpenAIStyleLLM(LLM):
         text = message.get("content")
         if text is None:
             text = ""
-        # if not text:
-        #     return
         return LLMOutput(text=text, raw=chat_completion.model_dump())
 
     def generate_stream_result(self, stream: openai.Stream):
