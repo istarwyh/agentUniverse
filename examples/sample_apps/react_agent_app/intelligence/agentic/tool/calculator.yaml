@@ -1,0 +1,12 @@
+name: 'calculator'
+origin_tool_name: 'use_calculator'
+server_name: 'demo_mcp_tool'
+transport: 'stdio'
+command: 'python'
+args:
+  - '../../intelligence/agentic/tool/calculator.py'
+
+metadata:
+  type: 'TOOL'
+  module: 'agentuniverse.agent.action.tool.mcp_tool'
+  class: 'MCPTool'

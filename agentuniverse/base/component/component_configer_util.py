@@ -10,6 +10,7 @@ from typing import Type, Callable
 
 from agentuniverse.agent.action.knowledge.knowledge_manager import KnowledgeManager
 from agentuniverse.agent.action.tool.tool_manager import ToolManager
+from agentuniverse.agent.action.toolkit.toolkit_manager import ToolkitManager
 from agentuniverse.agent.agent_manager import AgentManager
 from agentuniverse.agent.memory.memory_compressor.memory_compressor_manager import MemoryCompressorManager
 from agentuniverse.agent.memory.memory_manager import MemoryManager
@@ -55,6 +56,7 @@ class ComponentConfigerUtil(object):
         ComponentEnum.LLM: LLMConfiger,
         ComponentEnum.PLANNER: PlannerConfiger,
         ComponentEnum.TOOL: ToolConfiger,
+        ComponentEnum.TOOLKIT: ComponentConfiger,
         ComponentEnum.MEMORY: MemoryConfiger,
         ComponentEnum.SERVICE: ServiceConfiger,
         ComponentEnum.PROMPT: PromptConfiger,
@@ -80,6 +82,7 @@ class ComponentConfigerUtil(object):
         ComponentEnum.LLM: LLMManager,
         ComponentEnum.PLANNER: PlannerManager,
         ComponentEnum.TOOL: ToolManager,
+        ComponentEnum.TOOLKIT: ToolkitManager,
         ComponentEnum.MEMORY: MemoryManager,
         ComponentEnum.SERVICE: ServiceManager,
         ComponentEnum.SQLDB_WRAPPER: SQLDBWrapperManager,
