@@ -92,7 +92,7 @@ class MCPTool(Tool):
         self.input_keys = tool_info.inputSchema['required']
         self.args_model_schema = tool_info.inputSchema
         if not self.description:
-            self.description = tool_info.description
+            self.description = f'{tool_info.description}\n{str(tool_info.inputSchema)}'
 
     def _initialize_by_component_configer(self, component_configer: ComponentConfiger) -> 'MCPTool':
         if not self.server_name:

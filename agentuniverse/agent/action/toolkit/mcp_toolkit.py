@@ -21,6 +21,7 @@ class MCPToolkit(Toolkit):
     url: str = ''
     command: str = ''
     args: List[str] = []
+    env: dict = None
     server_name: str = ''
     always_refresh: bool = False
 
@@ -35,7 +36,8 @@ class MCPToolkit(Toolkit):
             return {
                 'transport': self.transport,
                 "command": self.command,
-                "args": self.args
+                "args": self.args,
+                'env': self.env
             }
         else:
             raise Exception(
@@ -79,7 +81,7 @@ class MCPToolkit(Toolkit):
             tool_name = f'{self.name}@{tool.name}'
             tool_instance = MCPTool(
                 name=tool_name,
-                description=tool.description,
+                description=f'{tool.description}\n{str(tool.inputSchema)}',
                 server_name=self.server_name,
                 origin_tool_name=tool.name,
                 args_model_schema=tool.inputSchema,
