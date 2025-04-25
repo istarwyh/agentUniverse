@@ -13,6 +13,8 @@ transport: 'stdio'
 command: 'python'
 args:
   - 'stdio_server.py'
+env:
+  TIMEOUT: 100
 
 metadata:
   type: 'TOOLKIT'
@@ -34,4 +36,4 @@ metadata:
   class: 'MCPToolkit'
 ```
 
-- 关于`transport`、`url`、`command`、`args`参数的填写方式请参考[MCP工具](../工具/MCP工具.md)
+- 关于`transport`、`url`、`command`、`args`、`env`参数的填写方式请参考[MCP工具](../工具/MCP工具.md)

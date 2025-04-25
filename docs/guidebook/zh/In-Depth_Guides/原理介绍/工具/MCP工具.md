@@ -13,6 +13,8 @@ transport: 'stdio'
 command: 'python'
 args:
   - 'stdio_server.py'
+env:
+  TIMEOUT: 100
 
 metadata:
   type: 'TOOL'
@@ -36,4 +38,4 @@ metadata:
 - 在MCPTool中，name除了表示agentUniverse中工具的名称，也表示MCPServer中工具的名称。如果您希望使用一个不一样的名字，您可以使用`origin_tool_name`参数指定MCPServer中的真实工具名称
 - description和普通Tool不同,允许为空。如果不主动填写，会使用MCPServer中对于该工具的描述作为默认description
 - server_name用于标识一个唯一的MCPServer，统一server_name的MCPServer在请求过程中共享session
-- transport取值分为`stdio`和`sse`，分别表示通过标准输入输出流和SSE连接MCPServer。当transport取值为`stdio`时，需要配置`command`和`args`参数用于通过命令启动一个本地的MCPServer。当transport取值为`sse`时，您需要配置`url`参数用于连接一个远程的MCPServer
+- transport取值分为`stdio`和`sse`，分别表示通过标准输入输出流和SSE连接MCPServer。当transport取值为`stdio`时，需要配置`command`和`args`参数用于通过命令启动一个本地的MCPServer。`env`为可选参数，类型是dict，表示运行时的环境变量。当transport取值为`sse`时，您需要配置`url`参数用于连接一个远程的MCPServer

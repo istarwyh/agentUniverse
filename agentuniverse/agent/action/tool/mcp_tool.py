@@ -28,6 +28,7 @@ class MCPTool(Tool):
     url: str = ''
     command: str = ''
     args: List[str] = []
+    env: dict = None
     # You can use origin_tool_name while you want another name for this aU tool
     origin_tool_name: str = ''
 
@@ -62,7 +63,8 @@ class MCPTool(Tool):
             return {
                 'transport': self.transport,
                 "command": self.command,
-                "args": self.args
+                "args": self.args,
+                'env': self.env
             }
         else:
             raise Exception(
