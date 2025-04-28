@@ -49,6 +49,14 @@ def trace_llm(func):
 
         start_time = time.time()
         Monitor().trace_llm_input(source=source, llm_input=llm_input)
+        if ApplicationConfigManager().app_configer.use_billing_center:
+            agent_id = get_caller_agent()
+            if "billing_center_params" not in kwargs:
+                kwargs["billing_center_params"] = {
+                    'agent_id': agent_id
+                }
+            elif 'agent_id' not in kwargs['billing_center_params']:
+                kwargs['billing_center_params']['agent_id'] = agent_id
 
         # invoke function
         result = await func(*args, **kwargs)
