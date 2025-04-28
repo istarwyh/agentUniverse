@@ -96,7 +96,8 @@ class MCPTool(Tool):
 
     def _initialize_by_component_configer(self, component_configer: ComponentConfiger) -> 'MCPTool':
         if not self.server_name:
-            raise Exception('MCP tool need an unique server name')
+            # use an unique name to manage session
+            self.server_name = self.name
         coro = self.get_tool_info()
         run_async_from_sync(coro, timeout=10)
         return self
