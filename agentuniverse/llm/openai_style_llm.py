@@ -14,9 +14,11 @@ import tiktoken
 from langchain_core.language_models.base import BaseLanguageModel
 from openai import OpenAI, AsyncOpenAI
 
+from agentuniverse.base.config.application_configer.application_config_manager import ApplicationConfigManager
 from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
 from agentuniverse.base.util.env_util import get_from_env
 from agentuniverse.base.util.system_util import process_yaml_func
+from agentuniverse.base.util.tracing.au_trace_manager import AuTraceManager
 from agentuniverse.llm.llm import LLM, LLMOutput
 from agentuniverse.llm.openai_style_langchain_instance import LangchainOpenAIStyleInstance
 
@@ -41,6 +43,8 @@ class OpenAIStyleLLM(LLM):
     api_base: Optional[str] = None
     proxy: Optional[str] = None
     client_args: Optional[dict] = None
+    ext_params: Optional[dict] = {}
+    ext_headers: Optional[dict] = {}
 
     def _new_client(self):
         """Initialize the openai client."""
@@ -49,10 +53,11 @@ class OpenAIStyleLLM(LLM):
         return OpenAI(
             api_key=self.api_key,
             organization=self.organization,
-            base_url=self.api_base,
+            base_url=self.get_base_url(),
             timeout=self.request_timeout,
             max_retries=self.max_retries,
             http_client=httpx.Client(proxy=self.proxy) if self.proxy else None,
+
             **(self.client_args or {}),
         )
 
@@ -63,12 +68,45 @@ class OpenAIStyleLLM(LLM):
         return AsyncOpenAI(
             api_key=self.api_key,
             organization=self.organization,
-            base_url=self.api_base,
+            base_url=self.get_base_url(),
             timeout=self.request_timeout,
             max_retries=self.max_retries,
             http_client=httpx.AsyncClient(proxy=self.proxy) if self.proxy else None,
             **(self.client_args or {}),
         )
+
+    def load_billing_center_params(self, params_map: dict[str, str]) -> [dict, dict]:
+        if not ApplicationConfigManager().app_configer.use_billing_center:
+            return params_map.pop("billing_center_params", {}), params_map
+        billing_center_params = params_map.pop("billing_center_params",{})
+        keys = [
+            "scene_code",
+            "agent_id",
+            "session_id",
+            "trace_id",
+            "app_id"
+        ]
+        extra_headers = {}
+        for key in keys:
+            if key in billing_center_params:
+                extra_headers[key] = billing_center_params.pop(key, "")
+        extra_headers["base_url"] = self.api_base
+        extra_headers["proxy"] = self.proxy
+        if "session_id" not in extra_headers:
+            extra_headers["session_id"] = AuTraceManager().get_session_id()
+        if "trace_id" not in extra_headers:
+            extra_headers["trace_id"] = AuTraceManager().get_session_id()
+        if "scene_code" not in extra_headers:
+            extra_headers["scene_code"] = AuTraceManager().get_scene_code()
+        if not extra_headers.get("app_id"):
+            extra_headers["app_id"] = ApplicationConfigManager().app_configer.base_info_appname
+        return {**self.ext_headers, **extra_headers}, params_map
+
+    def get_base_url(self):
+        if ApplicationConfigManager().app_configer.use_billing_center:
+            return ApplicationConfigManager().app_configer.billing_center_url
+        else:
+            return self.api_base
 
     def _call(self, messages: list, **kwargs: Any) -> Union[LLMOutput, Iterator[LLMOutput]]:
         """Run the OpenAI LLM.
@@ -82,12 +120,15 @@ class OpenAIStyleLLM(LLM):
             streaming = kwargs.pop('stream')
         self.client = self._new_client()
         client = self.client
+        extra_headers, kwargs = self.load_billing_center_params(kwargs)
         chat_completion = client.chat.completions.create(
             messages=messages,
             model=kwargs.pop('model', self.model_name),
             temperature=kwargs.pop('temperature', self.temperature),
             stream=kwargs.pop('stream', streaming),
             max_tokens=kwargs.pop('max_tokens', self.max_tokens),
+            extra_headers=extra_headers,
+            extra_body=self.ext_params,
             **kwargs,
         )
         if not streaming:
@@ -107,12 +148,15 @@ class OpenAIStyleLLM(LLM):
             streaming = kwargs.pop('stream')
         self.async_client = self._new_async_client()
         async_client = self.async_client
+        extra_headers, kwargs = self.load_billing_center_params(kwargs)
         chat_completion = await async_client.chat.completions.create(
             messages=messages,
             model=kwargs.pop('model', self.model_name),
             temperature=kwargs.pop('temperature', self.temperature),
             stream=kwargs.pop('stream', streaming),
             max_tokens=kwargs.pop('max_tokens', self.max_tokens),
+            extra_headers=extra_headers,
+            extra_body=self.ext_params,
             **kwargs,
         )
         if not streaming:
@@ -186,6 +230,11 @@ class OpenAIStyleLLM(LLM):
         if 'proxy' in component_configer.configer.value:
             proxy = component_configer.configer.value.get('proxy')
             self.proxy = process_yaml_func(proxy, component_configer.yaml_func_instance)
+        if component_configer.configer.value.get("extra_headers"):
+            self.ext_headers = component_configer.configer.value.get("extra_headers")
+        if component_configer.configer.value.get("extra_params"):
+            self.ext_params = component_configer.configer.value.get("extra_params")
+
         return super().initialize_by_component_configer(component_configer)
 
     def get_num_tokens(self, text: str) -> int:

@@ -14,6 +14,7 @@ import uuid
 from functools import wraps
 
 from agentuniverse.agent.memory.conversation_memory.conversation_memory_module import ConversationMemoryModule
+from agentuniverse.base.config.application_configer.application_config_manager import ApplicationConfigManager
 from agentuniverse.base.util.monitor.monitor import Monitor
 from agentuniverse.llm.llm_output import LLMOutput
 
@@ -103,6 +104,15 @@ def trace_llm(func):
         start_time = time.time()
         Monitor().trace_llm_input(source=source, llm_input=llm_input)
 
+        if ApplicationConfigManager().app_configer.use_billing_center:
+            agent_id = get_caller_agent()
+            if "billing_center_params" not in kwargs:
+                kwargs["billing_center_params"] = {
+                    'agent_id': agent_id
+                }
+            elif 'agent_id' not in kwargs['billing_center_params']:
+                kwargs['billing_center_params']['agent_id'] = agent_id
+
         # invoke function
         result = func(*args, **kwargs)
         # not streaming
@@ -139,6 +149,16 @@ def trace_llm(func):
     else:
         # sync function
         return wrapper_sync
+
+
+def get_caller_agent(instance: object = None):
+    source_list = Monitor.get_invocation_chain()
+    if len(source_list) > 0:
+        # 逆序遍历
+        for item in reversed(source_list):
+            if item.get("type") == "agent":
+                return item.get("source", None)
+    return "unknown"
 
 
 def get_caller_info(instance: object = None):

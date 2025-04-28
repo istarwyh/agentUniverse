@@ -19,6 +19,7 @@ from agentuniverse.base.component.component_base import ComponentBase
 from agentuniverse.base.component.component_enum import ComponentEnum
 from agentuniverse.base.config.application_configer.application_config_manager import ApplicationConfigManager
 from agentuniverse.base.config.component_configer.component_configer import ComponentConfiger
+from agentuniverse.base.util.tracing.au_trace_manager import AuTraceManager
 from agentuniverse.llm.llm_channel.langchain_instance.default_channel_langchain_instance import \
     DefaultChannelLangchainInstance
 from agentuniverse.llm.llm_output import LLMOutput
@@ -32,6 +33,8 @@ class LLMChannel(ComponentBase):
     channel_proxy: Optional[str] = None
     channel_model_name: Optional[str] = None
     channel_ext_info: Optional[dict] = None
+    channel_ext_headers: Optional[dict] = {}
+    channel_ext_params: Optional[dict] = {}
 
     model_support_stream: Optional[bool] = None
     model_support_max_context_length: Optional[int] = None
@@ -68,6 +71,10 @@ class LLMChannel(ComponentBase):
             self.model_support_max_tokens = component_configer.model_support_max_tokens
         if hasattr(component_configer, "model_is_openai_protocol_compatible"):
             self.model_is_openai_protocol_compatible = component_configer.model_is_openai_protocol_compatible
+        if component_configer.configer.value.get("extra_headers"):
+            self.channel_ext_headers = component_configer.configer.value.get("extra_headers", {})
+        if component_configer.configer.value.get("extra_params"):
+            self.channel_ext_params = component_configer.configer.value.get("extra_params", {})
         return self
 
     def create_copy(self):
@@ -107,15 +114,50 @@ class LLMChannel(ComponentBase):
         """Asynchronously run the LLM."""
         return self._acall(*args, **kwargs)
 
+    def load_billing_center_params(self, params_map: dict[str, str]) -> [dict, dict]:
+        if not ApplicationConfigManager().app_configer.use_billing_center:
+            return params_map.pop("billing_center_params", {}), params_map
+        billing_center_params: dict = params_map.pop("billing_center_params", {})
+        keys = [
+            "scene_code",
+            "agent_id",
+            "session_id",
+            "trace_id",
+            "app_id"
+        ]
+        extra_headers = {}
+        for key in keys:
+            if key in billing_center_params:
+                extra_headers[key] = billing_center_params.pop(key, "")
+        extra_headers["base_url"] = self.channel_api_base
+        if not extra_headers.get("session_id"):
+            extra_headers["session_id"] = AuTraceManager().get_session_id()
+        if not extra_headers.get("trace_id"):
+            extra_headers["trace_id"] = AuTraceManager().get_session_id()
+        if not extra_headers.get("scene_code"):
+            extra_headers["scene_code"] = AuTraceManager().get_scene_code()
+        if not extra_headers.get("app_id"):
+            extra_headers["app_id"] = ApplicationConfigManager().app_configer.base_info_appname
+        extra_headers["proxy"] = self.channel_proxy
+        return extra_headers, params_map
+
+    def get_base_url(self):
+        if ApplicationConfigManager().app_configer.use_billing_center:
+            return ApplicationConfigManager().app_configer.billing_center_url
+        else:
+            return self.channel_api_base
+
     def _call(self, messages: list, **kwargs: Any) -> Union[LLMOutput, Iterator[LLMOutput]]:
         streaming = kwargs.pop("streaming") if "streaming" in kwargs else self.channel_model_config.get('streaming')
         if 'stream' in kwargs:
             streaming = kwargs.pop('stream')
         if self.model_support_stream is False and streaming is True:
             streaming = False
-
+        extra_headers, kwargs = self.load_billing_center_params(kwargs)
+        extra_headers = {**self.channel_ext_headers, **extra_headers}
         support_max_tokens = self.model_support_max_tokens
-        max_tokens = kwargs.pop('max_tokens', None) or self.channel_model_config.get('max_tokens', None) or support_max_tokens
+        max_tokens = kwargs.pop('max_tokens', None) or self.channel_model_config.get('max_tokens',
+                                                                                     None) or support_max_tokens
         if support_max_tokens:
             max_tokens = min(support_max_tokens, max_tokens)
 
@@ -126,6 +168,8 @@ class LLMChannel(ComponentBase):
             temperature=kwargs.pop('temperature', self.channel_model_config.get('temperature')),
             stream=kwargs.pop('stream', streaming),
             max_tokens=max_tokens,
+            extra_headers=extra_headers,
+            extra_body=self.channel_ext_params,
             **kwargs,
         )
         if not streaming:
@@ -143,10 +187,15 @@ class LLMChannel(ComponentBase):
             streaming = False
 
         support_max_tokens = self.model_support_max_tokens
-        max_tokens = kwargs.pop('max_tokens', None) or self.channel_model_config.get('max_tokens', None) or support_max_tokens
+        max_tokens = kwargs.pop('max_tokens', None) or self.channel_model_config.get('max_tokens',
+                                                                                     None) or support_max_tokens
         if support_max_tokens:
             max_tokens = min(support_max_tokens, max_tokens)
 
+        extra_headers, kwargs = self.load_billing_center_params(kwargs)
+        extra_headers = {**self.channel_ext_headers, **extra_headers}
+
+        call_info, kwargs = self.load_call_info(kwargs)
         self.async_client = self._new_async_client()
         chat_completion = await self.async_client.chat.completions.create(
             messages=messages,
@@ -154,6 +203,8 @@ class LLMChannel(ComponentBase):
             temperature=kwargs.pop('temperature', self.channel_model_config.get('temperature')),
             stream=kwargs.pop('stream', streaming),
             max_tokens=max_tokens,
+            extra_headers=extra_headers,
+            extra_body=self.channel_ext_params,
             **kwargs,
         )
         if not streaming:
@@ -192,7 +243,7 @@ class LLMChannel(ComponentBase):
         return OpenAI(
             api_key=self.channel_api_key,
             organization=self.channel_organization,
-            base_url=self.channel_api_base,
+            base_url=self.get_base_url(),
             timeout=self.channel_model_config.get('request_timeout'),
             max_retries=self.channel_model_config.get('max_retries'),
             http_client=httpx.Client(proxy=self.channel_proxy) if self.channel_proxy else None,
@@ -206,7 +257,7 @@ class LLMChannel(ComponentBase):
         return AsyncOpenAI(
             api_key=self.channel_api_key,
             organization=self.channel_organization,
-            base_url=self.channel_api_base,
+            base_url=self.get_base_url(),
             timeout=self.channel_model_config.get('request_timeout'),
             max_retries=self.channel_model_config.get('max_retries'),
             http_client=httpx.AsyncClient(proxy=self.channel_proxy) if self.channel_proxy else None,

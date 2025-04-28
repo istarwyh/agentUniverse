@@ -8,6 +8,9 @@
 from typing import Optional
 from pydantic import BaseModel
 
+from agentuniverse.base.config.application_configer.application_config_manager import ApplicationConfigManager
+from agentuniverse.base.util.tracing.au_trace_manager import AuTraceManager
+
 
 class AgentModel(BaseModel):
     """The parent class of all agent models, containing only attributes."""
@@ -18,6 +21,20 @@ class AgentModel(BaseModel):
     memory: Optional[dict] = dict()
     action: Optional[dict] = dict()
     work_pattern: Optional[dict] = dict()
+
+    def billing_center_params(self):
+        app_id = ApplicationConfigManager().app_configer.base_info_appname
+        trace_id = AuTraceManager().get_trace_id()
+        session_id = AuTraceManager().get_trace_id()
+        scene_code = AuTraceManager().get_scene_code()
+        billing_center_info = {
+            "app_id": app_id,
+            "trace_id": trace_id,
+            "session_id": session_id,
+            "scene_code": scene_code,
+            "agent_id": self.info.get("name")
+        }
+        return billing_center_info
 
     def llm_params(self) -> dict:
         """
@@ -32,4 +49,6 @@ class AgentModel(BaseModel):
                 params['model'] = value
             else:
                 params[key] = value
+        # if ApplicationConfigManager().app_configer.billing_center.get("use_billing_center"):
+        #     params["billing_center_params"] = self.billing_center_params()
         return params
