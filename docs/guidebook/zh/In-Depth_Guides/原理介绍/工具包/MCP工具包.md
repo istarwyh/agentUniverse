@@ -35,5 +35,8 @@ metadata:
   module: 'agentuniverse.agent.action.toolkit.mcp_toolkit'
   class: 'MCPToolkit'
 ```
-
 - 关于`transport`、`url`、`command`、`args`、`env`参数的填写方式请参考[MCP工具](../工具/MCP工具.md)
+
+完整工具包定义示例可参考：[duckduckgo_search_mcp_tool](../../../../../../examples/sample_apps/toolkit_demo_app/intelligence/agentic/toolkit/docx_toolkit.yaml)
+
+工具包调用可参考示例：[demo_react_agent_with_single_mcp_tool](../../../../../../examples/sample_apps/toolkit_demo_app/intelligence/agentic/agent/agent_instance/react_agent_case/demo_react_agent_with_mcp_toolkit.yaml)

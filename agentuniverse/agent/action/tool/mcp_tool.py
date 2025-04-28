@@ -28,7 +28,7 @@ class MCPTool(Tool):
     url: str = ''
     command: str = ''
     args: List[str] = []
-    env: dict = None
+    env: Optional[dict] = None
     # You can use origin_tool_name while you want another name for this aU tool
     origin_tool_name: str = ''
 

@@ -39,3 +39,7 @@ metadata:
 - description和普通Tool不同,允许为空。如果不主动填写，会使用MCPServer中对于该工具的描述作为默认description
 - server_name用于标识一个唯一的MCPServer，统一server_name的MCPServer在请求过程中共享session
 - transport取值分为`stdio`和`sse`，分别表示通过标准输入输出流和SSE连接MCPServer。当transport取值为`stdio`时，需要配置`command`和`args`参数用于通过命令启动一个本地的MCPServer。`env`为可选参数，类型是dict，表示运行时的环境变量。当transport取值为`sse`时，您需要配置`url`参数用于连接一个远程的MCPServer
+
+工具定义示例可参考：[duckduckgo_search_mcp_tool](../../../../../../examples/sample_apps/toolkit_demo_app/intelligence/agentic/tool/duckduckgo_search_mcp_tool.yaml)
+
+工具调用可参考示例：[demo_react_agent_with_single_mcp_tool](../../../../../../examples/sample_apps/toolkit_demo_app/intelligence/agentic/agent/agent_instance/react_agent_case/demo_react_agent_with_single_mcp_tool.yaml)
