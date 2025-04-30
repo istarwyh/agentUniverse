@@ -8,5 +8,5 @@ tool_type: 'api'
 input_keys: ['input']
 metadata:
   type: 'TOOL'
-  module: 'sample_standard_app.intelligence.agentic.tool.custom.python_runner'
+  module: '${ROOT_PACKAGE}.intelligence.agentic.tool.python_runner'
   class: 'PythonRunner'

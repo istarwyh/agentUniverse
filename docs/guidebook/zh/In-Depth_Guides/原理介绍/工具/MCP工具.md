@@ -42,4 +42,4 @@ metadata:
 
 工具定义示例可参考：[duckduckgo_search_mcp_tool](../../../../../../examples/sample_apps/toolkit_demo_app/intelligence/agentic/tool/duckduckgo_search_mcp_tool.yaml)
 
-工具调用可参考示例：[demo_react_agent_with_single_mcp_tool](../../../../../../examples/sample_apps/toolkit_demo_app/intelligence/agentic/agent/agent_instance/react_agent_case/demo_react_agent_with_single_mcp_tool.yaml)
+工具调用可参考示例：[demo_react_agent_with_single_mcp_tool](../../../../../../examples/sample_apps/toolkit_demo_app/intelligence/agentic/agent/agent_instance/demo_react_agent_with_single_mcp_tool.yaml)

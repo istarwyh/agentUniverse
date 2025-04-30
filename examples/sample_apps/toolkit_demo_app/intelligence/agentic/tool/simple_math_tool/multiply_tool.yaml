@@ -17,5 +17,5 @@ tool_type: 'api'
 input_keys: ['a', 'b']
 metadata:
   type: 'TOOL'
-  module: 'toolkit_demo_app.intelligence.agentic.tool.simple_math_tool.simple_math_tool'
+  module: '${ROOT_PACKAGE}.intelligence.agentic.tool.simple_math_tool.simple_math_tool'
   class: 'MultiplyTool'
