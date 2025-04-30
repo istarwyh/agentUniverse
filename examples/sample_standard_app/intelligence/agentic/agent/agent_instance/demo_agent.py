@@ -9,6 +9,7 @@
 from agentuniverse.agent.agent import Agent
 from agentuniverse.agent.input_object import InputObject
 from agentuniverse.agent.memory.memory import Memory
+from agentuniverse.agent.template.agent_template import AgentTemplate
 from agentuniverse.base.util.agent_util import assemble_memory_input, assemble_memory_output
 from agentuniverse.base.util.prompt_util import process_llm_token
 
@@ -19,7 +20,7 @@ from agentuniverse.prompt.prompt import Prompt
 from langchain_core.output_parsers import StrOutputParser
 
 
-class DemoAgent(Agent):
+class DemoAgent(AgentTemplate):
 
     def input_keys(self) -> list[str]:
         return ['input']

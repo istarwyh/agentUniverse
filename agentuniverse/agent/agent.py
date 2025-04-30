@@ -133,6 +133,7 @@ class Agent(ComponentBase, ABC):
     async def async_run(self, **kwargs) -> OutputObject:
         self.input_check(kwargs)
         input_object = InputObject(kwargs)
+        self.update_trace_context(input_object)
 
         agent_input = self.pre_parse_input(input_object)
 

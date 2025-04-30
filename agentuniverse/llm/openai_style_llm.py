@@ -14,11 +14,10 @@ import tiktoken
 from langchain_core.language_models.base import BaseLanguageModel
 from openai import OpenAI, AsyncOpenAI
 
-from agentuniverse.base.config.application_configer.application_config_manager import ApplicationConfigManager
 from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
+from agentuniverse.base.util.billing_center import BillingCenter, BillingCenterInfo
 from agentuniverse.base.util.env_util import get_from_env
 from agentuniverse.base.util.system_util import process_yaml_func
-from agentuniverse.base.util.tracing.au_trace_manager import AuTraceManager
 from agentuniverse.llm.llm import LLM, LLMOutput
 from agentuniverse.llm.openai_style_langchain_instance import LangchainOpenAIStyleInstance
 
@@ -53,7 +52,7 @@ class OpenAIStyleLLM(LLM):
         return OpenAI(
             api_key=self.api_key,
             organization=self.organization,
-            base_url=self.get_base_url(),
+            base_url=BillingCenter.get_base_url(self.api_base),
             timeout=self.request_timeout,
             max_retries=self.max_retries,
             http_client=httpx.Client(proxy=self.proxy) if self.proxy else None,
@@ -68,45 +67,12 @@ class OpenAIStyleLLM(LLM):
         return AsyncOpenAI(
             api_key=self.api_key,
             organization=self.organization,
-            base_url=self.get_base_url(),
+            base_url=BillingCenter.get_base_url(self.api_base),
             timeout=self.request_timeout,
             max_retries=self.max_retries,
             http_client=httpx.AsyncClient(proxy=self.proxy) if self.proxy else None,
             **(self.client_args or {}),
         )
-
-    def load_billing_center_params(self, params_map: dict[str, str]) -> [dict, dict]:
-        if not ApplicationConfigManager().app_configer.use_billing_center:
-            return params_map.pop("billing_center_params", {}), params_map
-        billing_center_params = params_map.pop("billing_center_params",{})
-        keys = [
-            "scene_code",
-            "agent_id",
-            "session_id",
-            "trace_id",
-            "app_id"
-        ]
-        extra_headers = {}
-        for key in keys:
-            if key in billing_center_params:
-                extra_headers[key] = billing_center_params.pop(key, "")
-        extra_headers["base_url"] = self.api_base
-        extra_headers["proxy"] = self.proxy
-        if "session_id" not in extra_headers:
-            extra_headers["session_id"] = AuTraceManager().get_session_id()
-        if "trace_id" not in extra_headers:
-            extra_headers["trace_id"] = AuTraceManager().get_session_id()
-        if "scene_code" not in extra_headers:
-            extra_headers["scene_code"] = AuTraceManager().get_scene_code()
-        if not extra_headers.get("app_id"):
-            extra_headers["app_id"] = ApplicationConfigManager().app_configer.base_info_appname
-        return {**self.ext_headers, **extra_headers}, params_map
-
-    def get_base_url(self):
-        if ApplicationConfigManager().app_configer.use_billing_center:
-            return ApplicationConfigManager().app_configer.billing_center_url
-        else:
-            return self.api_base
 
     def _call(self, messages: list, **kwargs: Any) -> Union[LLMOutput, Iterator[LLMOutput]]:
         """Run the OpenAI LLM.
@@ -120,7 +86,7 @@ class OpenAIStyleLLM(LLM):
             streaming = kwargs.pop('stream')
         self.client = self._new_client()
         client = self.client
-        extra_headers, kwargs = self.load_billing_center_params(kwargs)
+        extra_headers, kwargs = BillingCenter.billing_center_openai_headers(self, kwargs)
         chat_completion = client.chat.completions.create(
             messages=messages,
             model=kwargs.pop('model', self.model_name),
@@ -148,7 +114,7 @@ class OpenAIStyleLLM(LLM):
             streaming = kwargs.pop('stream')
         self.async_client = self._new_async_client()
         async_client = self.async_client
-        extra_headers, kwargs = self.load_billing_center_params(kwargs)
+        extra_headers, kwargs = BillingCenter.billing_center_openai_headers(self, kwargs)
         chat_completion = await async_client.chat.completions.create(
             messages=messages,
             model=kwargs.pop('model', self.model_name),
@@ -191,7 +157,7 @@ class OpenAIStyleLLM(LLM):
         if not isinstance(chunk, dict):
             chunk = chunk.dict()
         if len(chunk["choices"]) == 0:
-            return
+            return LLMOutput(text="",raw=chat_completion.model_dump())
         choice = chunk["choices"][0]
         message = choice.get("delta")
         text = message.get("content")
@@ -237,7 +203,7 @@ class OpenAIStyleLLM(LLM):
 
         return super().initialize_by_component_configer(component_configer)
 
-    def get_num_tokens(self, text: str) -> int:
+    def get_num_tokens(self, text: str, model=None) -> int:
         """Get the number of tokens present in the text.
 
         Useful for checking if an input will fit in an openai model's context window.
@@ -248,8 +214,10 @@ class OpenAIStyleLLM(LLM):
         Returns:
             The integer number of tokens in the text.
         """
+        if not model:
+            model = self.model_name
         try:
-            encoding = tiktoken.encoding_for_model(self.model_name)
+            encoding = tiktoken.encoding_for_model(model)
         except KeyError:
             encoding = tiktoken.get_encoding("cl100k_base")
         return len(encoding.encode(text))
@@ -258,3 +226,71 @@ class OpenAIStyleLLM(LLM):
         """Return the maximum length of the context."""
         if super().max_context_length():
             return super().max_context_length()
+
+    def get_billing_tokens(self, input: dict, output: LLMOutput):
+        output_json = output.raw
+        if "usage" in output_json and output_json['usage'].get("prompt_tokens", 0) > 0:
+            return output_json['usage']
+        messages = input.get("messages")
+        text = ""
+        for message in messages:
+            content = message.get("content")
+            if isinstance(content, str):
+                text += content
+            elif isinstance(content, list):
+                for item in content:
+                    if item.get("type") == "text":
+                        content += item.get("content")
+        prompt_tokens = self.get_num_tokens(text)
+        output = output.text
+        completion_tokens = self.get_num_tokens(output)
+        total_tokens = prompt_tokens + completion_tokens
+        return {
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens
+        }
+
+    def billing_tokens_from_stream(self, generator: Iterator[LLMOutput],
+                                   billing_center_params: BillingCenterInfo):
+        content = ""
+        usage = None
+        for llm_output in generator:
+            content += llm_output.text
+            if "usage" in llm_output.raw and llm_output.raw.get("usage"):
+                usage = llm_output.raw.get("usage")
+            yield llm_output
+        if usage:
+            billing_center_params.usage = usage
+            return
+        llm_output = LLMOutput(
+            text=content,
+            raw={}
+        )
+        billing_center_params.output = llm_output.model_dump()
+        billing_center_params.usage = self.get_billing_tokens(billing_center_params.input,
+                                                              llm_output)
+
+    async def async_billing_tokens_from_stream(self, generator: AsyncIterator[LLMOutput],
+                                               billing_center_params: BillingCenterInfo):
+        content = ""
+        usage = None
+        async for llm_output in generator:
+            content += llm_output.text
+            if "usage" in llm_output.raw and llm_output.raw.get("usage"):
+                usage = llm_output.raw.get("usage")
+            yield llm_output
+        if usage:
+            billing_center_params.usage = usage
+            return
+        llm_output = LLMOutput(
+            text=content,
+            raw={}
+        )
+        billing_center_params.output = llm_output.model_dump()
+        billing_center_params.usage = self.get_billing_tokens(billing_center_params.input,
+                                                              llm_output)
+
+    def update_billing_center_params(self, params: BillingCenterInfo, input: dict):
+        params.base_url = self.api_base
+        return super().update_billing_center_params(params, input)

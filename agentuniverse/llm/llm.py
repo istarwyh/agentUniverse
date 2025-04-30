@@ -16,6 +16,7 @@ from agentuniverse.base.component.component_base import ComponentBase
 from agentuniverse.base.component.component_enum import ComponentEnum
 from agentuniverse.base.config.application_configer.application_config_manager import ApplicationConfigManager
 from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
+from agentuniverse.base.util.billing_center import BillingCenterInfo
 from agentuniverse.base.util.logging.logging_util import LOGGER
 from agentuniverse.llm.llm_channel.llm_channel import LLMChannel
 from agentuniverse.llm.llm_channel.llm_channel_manager import LLMChannelManager
@@ -170,13 +171,15 @@ class LLM(ComponentBase):
         return self._max_context_length
 
     @abstractmethod
-    def get_num_tokens(self, text: str) -> int:
+    def get_num_tokens(self, text: str, model=None) -> int:
         """Get the number of tokens present in the text.
 
         Useful for checking if an input will fit in a model's context window.
 
         Args:
             text: The string input to tokenize.
+            model: The model you want to calculate
+
 
         Returns:
             The integer number of tokens in the text.
@@ -194,7 +197,7 @@ class LLM(ComponentBase):
         try:
             self.init_channel()
             if self._channel_instance:
-                return self._channel_instance.call(*args, **kwargs)
+                return self._channel_instance._call(*args, **kwargs)
             return self._call(*args, **kwargs)
         except Exception as e:
             LOGGER.error(f'Error in LLM call: {e}')
@@ -206,7 +209,7 @@ class LLM(ComponentBase):
         try:
             self.init_channel()
             if self._channel_instance:
-                return await self._channel_instance.acall(*args, **kwargs)
+                return await self._channel_instance._acall(*args, **kwargs)
             return await self._acall(*args, **kwargs)
         except Exception as e:
             LOGGER.error(f'Error in LLM acall: {e}')
@@ -221,3 +224,63 @@ class LLM(ComponentBase):
         copied.async_client = self.async_client
         copied.langchain_instance = self.langchain_instance
         return copied
+
+    def get_billing_tokens(self, input: dict, output: LLMOutput) -> dict:
+        text = ""
+        if "messages" in input:
+            messages = input.get("messages")
+            for message in messages:
+                content = message.get("content")
+                if isinstance(content, str):
+                    text += content
+                elif isinstance(content, list):
+                    for item in content:
+                        if item.get("type") == "text":
+                            content += item.get("content")
+        elif "prompt" in input:
+            text = str(input.get("prompt"))
+        prompt_tokens = self.get_num_tokens(text, input.get("model"))
+        output = output.text
+        completion_tokens = self.get_num_tokens(output)
+        total_tokens = prompt_tokens + completion_tokens
+        return {
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens
+        }
+
+    def update_billing_center_params(self, params: BillingCenterInfo, input: dict) -> BillingCenterInfo:
+        if "model" in input:
+            params.model = input.get("model")
+        else:
+            params.model = self.model_name
+        params.input = input
+        return params
+
+    def billing_tokens_from_stream(self, generator: Iterator[LLMOutput],
+                                   billing_center_params: BillingCenterInfo):
+        content = ""
+        for llm_output in generator:
+            content += llm_output.text
+            yield llm_output
+        llm_output = LLMOutput(
+            text="content",
+            raw={}
+        )
+        billing_center_params.output = llm_output.model_dump()
+        billing_center_params.usage = self.get_billing_tokens(billing_center_params.input,
+                                                              llm_output)
+
+    async def async_billing_tokens_from_stream(self, generator: AsyncIterator[LLMOutput],
+                                               billing_center_params: BillingCenterInfo):
+        content = ""
+        async for llm_output in generator:
+            content += llm_output.text
+            yield llm_output
+        llm_output = LLMOutput(
+            text="content",
+            raw={}
+        )
+        billing_center_params.output = llm_output.model_dump()
+        billing_center_params.usage = self.get_billing_tokens(billing_center_params.input,
+                                                              llm_output)
