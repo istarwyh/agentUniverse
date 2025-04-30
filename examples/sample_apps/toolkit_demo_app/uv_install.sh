@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-TOOLS=("duckduckgo-mcp-server" "excel-mcp-server")
+TOOLS=("duckduckgo-mcp-server" "mcp-server-office")
 UV_INSTALL_URL_UNIX="https://astral.sh/uv/install.sh"
 UV_INSTALL_URL_WIN="https://astral.sh/uv/install.ps1"
 
