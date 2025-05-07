@@ -38,7 +38,7 @@ from agentuniverse.llm.llm_manager import LLMManager
 from agentuniverse.prompt.prompt_manager import PromptManager
 from agentuniverse.workflow.workflow_manager import WorkflowManager
 from agentuniverse.base.util.logging.log_sink.log_sink_manager import LogSinkManager
-
+from agentuniverse.base.util.logging.logging_util import LOGGER
 from agentuniverse.agent.action.knowledge.embedding.embedding_manager import EmbeddingManager
 from agentuniverse.agent.action.knowledge.doc_processor.doc_processor_manager import DocProcessorManager
 from agentuniverse.agent.action.knowledge.reader.reader_manager import ReaderManager
@@ -124,15 +124,23 @@ class ComponentConfigerUtil(object):
             object: the component object
         """
         if component_configer.meta_class:
-            metadata_module = '.'.join(component_configer.meta_class.split('.')[:-1])
-            metadata_class = component_configer.meta_class.split('.')[-1]
-            module = importlib.import_module(metadata_module)
-            clz = getattr(module, metadata_class)
-            return clz
+            try:
+                metadata_module = '.'.join(component_configer.meta_class.split('.')[:-1])
+                metadata_class = component_configer.meta_class.split('.')[-1]
+                module = importlib.import_module(metadata_module)
+                clz = getattr(module, metadata_class)
+                return clz
+            except Exception as ex:
+                LOGGER.error(f"Please check your config file, load configer module error! module name: {metadata_class},error info: {ex} ")
+                raise ex
         else:
-            module = importlib.import_module(component_configer.metadata_module)
-            clz = getattr(module, component_configer.metadata_class)
-            return clz
+            try:
+                module = importlib.import_module(component_configer.metadata_module)
+                clz = getattr(module, component_configer.metadata_class)
+                return clz
+            except Exception as ex:
+                LOGGER.error(f"Please check your config file, load configer module error! module name: {component_configer.metadata_module},error info: {ex} ")
+                raise ex
 
     @classmethod
     def get_component_manager_clz_by_type(cls, component_type_enum: ComponentEnum) -> Callable:

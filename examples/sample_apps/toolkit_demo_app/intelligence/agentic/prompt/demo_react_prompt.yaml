@@ -26,6 +26,8 @@ instruction: |
   背景信息是:
   {background}
   
+  当前时间是: {current_time}
+  
   开始！
     注意：
       1.你的回答必须是（Thought/Action/Observation）与（Thought/Final Answer）两种格式之一
