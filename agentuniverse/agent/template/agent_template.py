@@ -99,6 +99,9 @@ class AgentTemplate(Agent, ABC):
     def invoke_tools(self, input_object: InputObject, **kwargs) -> str:
         return super().invoke_tools(input_object=input_object, tool_names=self.tool_names)
 
+    async def async_invoke_tools(self, input_object: InputObject, **kwargs) -> str:
+        return await super().async_invoke_tools(input_object=input_object, tool_names=self.tool_names)
+
     def invoke_knowledge(self, query_str: str, input_object: InputObject, **kwargs) -> str:
         return super().invoke_knowledge(query_str=query_str, input_object=input_object,
                                         knowledge_names=self.knowledge_names)

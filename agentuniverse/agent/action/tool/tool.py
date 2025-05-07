@@ -1,6 +1,6 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
-
+import asyncio
 # @Time    : 2024/3/13 14:29
 # @Author  : wangchongshi
 # @Email   : wangchongshi.wcs@antgroup.com
@@ -70,6 +70,13 @@ class Tool(ComponentBase):
         tool_input = ToolInput(kwargs)
         return self.execute(tool_input)
 
+    @trace_tool
+    async def async_run(self, **kwargs):
+        """The callable method that runs the tool."""
+        self.input_check(kwargs)
+        tool_input = ToolInput(kwargs)
+        return await self.async_execute(tool_input)
+
     def input_check(self, kwargs: dict) -> None:
         """Check whether the input parameters of the tool contain input keys of the tool"""
         if self.input_keys:
@@ -87,6 +94,15 @@ class Tool(ComponentBase):
             tool_input.add_data(key, parse_result[key])
         return self.execute(tool_input)
 
+    @trace_tool
+    async def async_langchain_run(self, *args, callbacks=None, **kwargs):
+        kwargs["callbacks"] = callbacks
+        tool_input = ToolInput(kwargs)
+        parse_result = self.parse_react_input(args[0])
+        for key in self.input_keys:
+            tool_input.add_data(key, parse_result[key])
+        return await self.async_execute(tool_input)
+
     def parse_react_input(self, input_str: str):
         """
             parse react string to you input
@@ -100,10 +116,20 @@ class Tool(ComponentBase):
     def execute(self, tool_input: ToolInput):
         raise NotImplementedError
 
+    async def async_execute(self, tool_input: ToolInput):
+        """The callable method that runs the tool."""
+        return await asyncio.to_thread(self.execute, tool_input)
+
     def as_langchain(self) -> LangchainTool:
         """Convert the agentUniverse(aU) tool class to the langchain tool class."""
         return LangchainTool(name=self.name,
                              func=self.langchain_run,
+                             description=self.description)
+
+    async def async_as_langchain(self) -> LangchainTool:
+        return LangchainTool(name=self.name,
+                             func=self.run,
+                             coroutine=self.async_langchain_run,
                              description=self.description)
 
     def get_instance_code(self) -> str:

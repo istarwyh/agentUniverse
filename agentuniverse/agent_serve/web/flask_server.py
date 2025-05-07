@@ -238,6 +238,7 @@ def openai_protocol_chat(model: str, messages: list):
         "messages": messages,
         "stream": stream
     }
+    span = opentracing.tracer.active_span
     if stream:
         span = opentracing.tracer.active_span
         task = RequestTask(service_run_queue, False, **params)
