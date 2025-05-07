@@ -156,7 +156,6 @@ def service_run_stream(service_id: str, params: dict, saved: bool = False):
     context_prefix = get_context_prefix()
     response = Response(timed_generator(task.stream_run(), g.start_time, context_prefix), mimetype="text/event-stream")
     response.headers['X-Request-ID'] = task.request_id
-    LOGGER.info("au_test")
     return response
 
 
