@@ -152,7 +152,7 @@ class BillingCenter(BaseModel):
     @classmethod
     def billing_center_openai_channel_headers(cls, llm, params_map: dict[str, Any]):
         billing_type = ApplicationConfigManager().app_configer.billing_center.get("billing_type")
-        if not ApplicationConfigManager().app_configer.use_billing_centeror:
+        if not ApplicationConfigManager().app_configer.use_billing_center:
             return llm.channel_ext_headers, params_map
         if billing_type == "push":
             params_map.pop("billing_center_params")

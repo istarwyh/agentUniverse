@@ -264,7 +264,7 @@ class LLM(ComponentBase):
             content += llm_output.text
             yield llm_output
         llm_output = LLMOutput(
-            text="content",
+            text=content,
             raw={}
         )
         billing_center_params.output = llm_output.model_dump()
@@ -278,7 +278,7 @@ class LLM(ComponentBase):
             content += llm_output.text
             yield llm_output
         llm_output = LLMOutput(
-            text="content",
+            text=content,
             raw={}
         )
         billing_center_params.output = llm_output.model_dump()
