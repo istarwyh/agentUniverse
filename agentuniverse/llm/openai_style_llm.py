@@ -157,7 +157,7 @@ class OpenAIStyleLLM(LLM):
         if not isinstance(chunk, dict):
             chunk = chunk.dict()
         if len(chunk["choices"]) == 0:
-            return LLMOutput(text="",raw=chat_completion.model_dump())
+            return LLMOutput(text="", raw=chat_completion.model_dump())
         choice = chunk["choices"][0]
         message = choice.get("delta")
         text = message.get("content")
@@ -203,7 +203,7 @@ class OpenAIStyleLLM(LLM):
 
         return super().initialize_by_component_configer(component_configer)
 
-    def get_num_tokens(self, text: str, model=None) -> int:
+    def get_num_tokens(self, text: str) -> int:
         """Get the number of tokens present in the text.
 
         Useful for checking if an input will fit in an openai model's context window.
@@ -214,10 +214,8 @@ class OpenAIStyleLLM(LLM):
         Returns:
             The integer number of tokens in the text.
         """
-        if not model:
-            model = self.model_name
         try:
-            encoding = tiktoken.encoding_for_model(model)
+            encoding = tiktoken.encoding_for_model(self.model_name)
         except KeyError:
             encoding = tiktoken.get_encoding("cl100k_base")
         return len(encoding.encode(text))
@@ -241,9 +239,9 @@ class OpenAIStyleLLM(LLM):
                 for item in content:
                     if item.get("type") == "text":
                         content += item.get("content")
-        prompt_tokens = self.get_num_tokens(text)
+        prompt_tokens = self.get_num_tokens_from_model(text, model=input.get("model"))
         output = output.text
-        completion_tokens = self.get_num_tokens(output)
+        completion_tokens = self.get_num_tokens_from_model(output, model=input.get("model"))
         total_tokens = prompt_tokens + completion_tokens
         return {
             "prompt_tokens": prompt_tokens,

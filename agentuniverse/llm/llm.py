@@ -8,6 +8,8 @@
 from abc import abstractmethod
 from copy import deepcopy
 from typing import Optional, Any, AsyncIterator, Iterator, Union
+
+import tiktoken
 from langchain_core.language_models.base import BaseLanguageModel
 from langchain_core.runnables import Runnable
 
@@ -171,7 +173,7 @@ class LLM(ComponentBase):
         return self._max_context_length
 
     @abstractmethod
-    def get_num_tokens(self, text: str, model=None) -> int:
+    def get_num_tokens(self, text: str) -> int:
         """Get the number of tokens present in the text.
 
         Useful for checking if an input will fit in a model's context window.
@@ -184,6 +186,16 @@ class LLM(ComponentBase):
         Returns:
             The integer number of tokens in the text.
         """
+
+    def get_num_tokens_from_model(self, text: str, model=None):
+        if model:
+            return self.get_num_tokens(text)
+        encoding = tiktoken.get_encoding("cl100k_base")
+        try:
+            encoding = tiktoken.encoding_for_model(self.model_name)
+        except KeyError:
+            LOGGER.error("get_num_tokens_from_model error")
+        return len(encoding.encode(text))
 
     def as_langchain_runnable(self, params=None) -> Runnable:
         """Get the langchain llm class."""
@@ -239,9 +251,9 @@ class LLM(ComponentBase):
                             content += item.get("content")
         elif "prompt" in input:
             text = str(input.get("prompt"))
-        prompt_tokens = self.get_num_tokens(text, input.get("model"))
+        prompt_tokens = self.get_num_tokens_from_model(text, input.get("model"))
         output = output.text
-        completion_tokens = self.get_num_tokens(output)
+        completion_tokens = self.get_num_tokens_from_model(output, input.get("model"))
         total_tokens = prompt_tokens + completion_tokens
         return {
             "prompt_tokens": prompt_tokens,

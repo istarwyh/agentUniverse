@@ -161,7 +161,7 @@ class BillingCenter(BaseModel):
         extra_headers = billing_center_params.model_dump(
             include={'agent_id', 'app_id', 'scene_code', 'session_id', 'trace_id'}
         )
-        extra_headers["base_url"] = llm.channel_api_base
+        extra_headers["OriginalUrl"] = llm.channel_api_base
         if llm.channel_proxy:
             extra_headers["proxy"] = llm.channel_proxy if llm.channel_proxy else ""
         return {**llm.channel_ext_headers, **extra_headers}, params_map
@@ -178,7 +178,7 @@ class BillingCenter(BaseModel):
         extra_headers = billing_center_params.model_dump(
             include={'agent_id', 'app_id', 'scene_code', 'session_id', 'trace_id'}
         )
-        extra_headers["base_url"] = llm.api_base
+        extra_headers["OriginalUrl"] = llm.api_base
         if llm.proxy:
             extra_headers["proxy"] = llm.proxy
         return {**llm.ext_headers, **extra_headers}, params_map
