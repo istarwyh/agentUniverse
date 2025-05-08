@@ -224,7 +224,7 @@ class LLMChannel(ComponentBase):
             base_url=BillingCenter.get_base_url(self.channel_api_base),
             timeout=self.channel_model_config.get('request_timeout'),
             max_retries=self.channel_model_config.get('max_retries'),
-            http_client=httpx.Client(proxy=self.channel_proxy) if self.channel_proxy else None,
+            http_client=httpx.Client(proxy=self.channel_proxy,http2=True) if self.channel_proxy else httpx.Client(http2=True),
             **(self.channel_model_config.get('client_args') or {}),
         )
 
@@ -238,7 +238,7 @@ class LLMChannel(ComponentBase):
             base_url=BillingCenter.get_base_url(self.channel_api_base),
             timeout=self.channel_model_config.get('request_timeout'),
             max_retries=self.channel_model_config.get('max_retries'),
-            http_client=httpx.AsyncClient(proxy=self.channel_proxy) if self.channel_proxy else None,
+            http_client=httpx.AsyncClient(proxy=self.channel_proxy,http2=True) if self.channel_proxy else httpx.Client(http2=True),
             **(self.channel_model_config.get('client_args') or {}),
         )
 
@@ -341,7 +341,7 @@ class LLMChannel(ComponentBase):
                 for item in content:
                     if item.get("type") == "text":
                         content += item.get("content")
-        prompt_tokens = self.get_num_tokens(text, input.get("model"))
+        prompt_tokens = self.get_num_tokens(text)
         output = output.text
         completion_tokens = self.get_num_tokens(output)
         total_tokens = prompt_tokens + completion_tokens
