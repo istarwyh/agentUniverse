@@ -103,10 +103,6 @@ class Agent(ComponentBase, ABC):
         if trace_id:
             AuTraceManager().trace_context.set_trace_id(trace_id)
 
-        scene_code = input_object.get_data("scene_code")
-        if scene_code:
-            FrameworkContextManager().set_context("scene_code", scene_code)
-
     @trace_agent
     def run(self, **kwargs) -> OutputObject:
         """Agent instance running entry.
