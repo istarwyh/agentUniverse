@@ -167,7 +167,7 @@ class LLMChannel(ComponentBase):
                                                                                      None) or support_max_tokens
         if support_max_tokens:
             max_tokens = min(support_max_tokens, max_tokens)
-        ext_params = self.channel_ext_params.copy()
+        ext_params = self.ext_params.copy()
         if not streaming:
             ext_params.pop("stream_options")
         self.async_client = self._new_async_client(kwargs.pop("api_base", None))
