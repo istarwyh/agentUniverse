@@ -19,7 +19,6 @@ from agentuniverse.base.component.component_base import ComponentBase
 from agentuniverse.base.component.component_enum import ComponentEnum
 from agentuniverse.base.config.application_configer.application_config_manager import ApplicationConfigManager
 from agentuniverse.base.config.component_configer.component_configer import ComponentConfiger
-from agentuniverse.base.util.billing_center import BillingCenter, BillingCenterInfo
 from agentuniverse.llm.llm_channel.langchain_instance.default_channel_langchain_instance import \
     DefaultChannelLangchainInstance
 from agentuniverse.llm.llm_output import LLMOutput
@@ -33,8 +32,8 @@ class LLMChannel(ComponentBase):
     channel_proxy: Optional[str] = None
     channel_model_name: Optional[str] = None
     channel_ext_info: Optional[dict] = None
-    channel_ext_headers: Optional[dict] = {}
-    channel_ext_params: Optional[dict] = {}
+    ext_headers: Optional[dict] = {}
+    ext_params: Optional[dict] = {}
 
     model_support_stream: Optional[bool] = None
     model_support_max_context_length: Optional[int] = None
@@ -71,15 +70,15 @@ class LLMChannel(ComponentBase):
             self.model_support_max_tokens = component_configer.model_support_max_tokens
         if hasattr(component_configer, "model_is_openai_protocol_compatible"):
             self.model_is_openai_protocol_compatible = component_configer.model_is_openai_protocol_compatible
-        if component_configer.configer.value.get("extra_headers"):
-            self.channel_ext_headers = component_configer.configer.value.get("extra_headers", {})
-        if component_configer.configer.value.get("extra_params"):
-            self.channel_ext_params = component_configer.configer.value.get("extra_params", {})
-            self.channel_ext_params["stream_options"] = {
+        if component_configer.configer.value.get("ext_headers"):
+            self.ext_headers = component_configer.configer.value.get("extra_headers", {})
+        if component_configer.configer.value.get("ext_params"):
+            self.ext_params = component_configer.configer.value.get("extra_params", {})
+            self.ext_params["stream_options"] = {
                 "include_usage": True
             }
         else:
-            self.channel_ext_params = {
+            self.ext_params = {
                 "stream_options": {
                     "include_usage": True
                 }
@@ -129,25 +128,24 @@ class LLMChannel(ComponentBase):
             streaming = kwargs.pop('stream')
         if self.model_support_stream is False and streaming is True:
             streaming = False
-        extra_headers, kwargs = BillingCenter.billing_center_openai_channel_headers(self, kwargs)
         support_max_tokens = self.model_support_max_tokens
         max_tokens = kwargs.pop('max_tokens', None) or self.channel_model_config.get('max_tokens',
                                                                                      None) or support_max_tokens
         if support_max_tokens:
             max_tokens = min(support_max_tokens, max_tokens)
 
-        ext_params = self.channel_ext_params.copy()
+        ext_params = self.ext_params.copy()
         if not streaming:
-            ext_params.pop("stream_options")
-        self.client = self._new_client()
+            ext_params.pop("stream_options", "")
+        self.client = self._new_client(kwargs.pop("api_base", None))
         chat_completion = self.client.chat.completions.create(
             messages=messages,
             model=kwargs.pop('model', self.channel_model_name),
             temperature=kwargs.pop('temperature', self.channel_model_config.get('temperature')),
             stream=kwargs.pop('stream', streaming),
             max_tokens=max_tokens,
-            extra_headers=extra_headers,
             extra_body=ext_params,
+            extra_headers=kwargs.pop("extra_headers", self.ext_headers),
             **kwargs,
         )
         if not streaming:
@@ -172,16 +170,14 @@ class LLMChannel(ComponentBase):
         ext_params = self.channel_ext_params.copy()
         if not streaming:
             ext_params.pop("stream_options")
-
-        extra_headers, kwargs = BillingCenter.billing_center_openai_channel_headers(self, kwargs)
-        self.async_client = self._new_async_client()
+        self.async_client = self._new_async_client(kwargs.pop("api_base", None))
         chat_completion = await self.async_client.chat.completions.create(
             messages=messages,
             model=kwargs.pop('model', self.channel_model_name),
             temperature=kwargs.pop('temperature', self.channel_model_config.get('temperature')),
             stream=kwargs.pop('stream', streaming),
             max_tokens=max_tokens,
-            extra_headers=extra_headers,
+            extra_headers=kwargs.pop("extra_headers", self.ext_headers),
             extra_body=ext_params,
             **kwargs,
         )
@@ -214,28 +210,28 @@ class LLMChannel(ComponentBase):
     def max_context_length(self) -> int:
         return self.channel_model_config.get('max_context_length')
 
-    def _new_client(self):
+    def _new_client(self, api_base: str = None):
         """Initialize the openai client."""
         if self.client is not None:
             return self.client
         return OpenAI(
             api_key=self.channel_api_key,
             organization=self.channel_organization,
-            base_url=BillingCenter.get_base_url(self.channel_api_base),
+            base_url=api_base if api_base else self.channel_api_base,
             timeout=self.channel_model_config.get('request_timeout'),
             max_retries=self.channel_model_config.get('max_retries'),
             http_client=httpx.Client(proxy=self.channel_proxy) if self.channel_proxy else None,
             **(self.channel_model_config.get('client_args') or {}),
         )
 
-    def _new_async_client(self):
+    def _new_async_client(self, api_base=None):
         """Initialize the openai async client."""
         if self.async_client is not None:
             return self.async_client
         return AsyncOpenAI(
             api_key=self.channel_api_key,
             organization=self.channel_organization,
-            base_url=BillingCenter.get_base_url(self.channel_api_base),
+            base_url=api_base if api_base else self.channel_api_base,
             timeout=self.channel_model_config.get('request_timeout'),
             max_retries=self.channel_model_config.get('max_retries'),
             http_client=httpx.AsyncClient(proxy=self.channel_proxy) if self.channel_proxy else None,
@@ -276,77 +272,3 @@ class LLMChannel(ComponentBase):
         """Return the full name of the component."""
         appname = ApplicationConfigManager().app_configer.base_info_appname
         return f'{appname}.{self.component_type.value.lower()}.{self.channel_name}'
-
-    def billing_tokens_from_stream(self, generator: Iterator[LLMOutput],
-                                   billing_center_params: BillingCenterInfo):
-        content = ""
-        usage = None
-        for llm_output in generator:
-            content += llm_output.text
-            if "usage" in llm_output.raw and llm_output.raw.get("usage"):
-                usage = llm_output.raw.get("usage")
-            yield llm_output
-        llm_output = LLMOutput(
-            text=content,
-            raw={}
-        )
-        billing_center_params.output = llm_output.model_dump()
-        if usage:
-            billing_center_params.usage = usage
-            return
-
-        billing_center_params.usage = self.get_billing_tokens(billing_center_params.input,
-                                                              llm_output)
-
-    async def async_billing_tokens_from_stream(self, generator: AsyncIterator[LLMOutput],
-                                               billing_center_params: BillingCenterInfo):
-        content = ""
-        usage = None
-        async for llm_output in generator:
-            content += llm_output.text
-            if "usage" in llm_output.raw and llm_output.raw.get("usage"):
-                usage = llm_output.raw.get("usage")
-            yield llm_output
-        llm_output = LLMOutput(
-            text=content,
-            raw={}
-        )
-        billing_center_params.output = llm_output.model_dump()
-        if usage:
-            billing_center_params.usage = usage
-            return
-        billing_center_params.usage = self.get_billing_tokens(billing_center_params.input,
-                                                              llm_output)
-
-    def update_billing_center_params(self, params: BillingCenterInfo, input: dict) -> BillingCenterInfo:
-        if "model" in input:
-            params.model = input.get("model")
-        else:
-            params.model = self.model_name
-        params.base_url = self.channel_api_base
-        params.input = input
-        return params
-
-    def get_billing_tokens(self, input: dict, output: LLMOutput):
-        output_json = output.raw
-        if "usage" in output_json and output_json['usage'].get("prompt_tokens", 0) > 0:
-            return output_json['usage']
-        messages = input.get("messages")
-        text = ""
-        for message in messages:
-            content = message.get("content")
-            if isinstance(content, str):
-                text += content
-            elif isinstance(content, list):
-                for item in content:
-                    if item.get("type") == "text":
-                        content += item.get("content")
-        prompt_tokens = self.get_num_tokens(text)
-        output = output.text
-        completion_tokens = self.get_num_tokens(output)
-        total_tokens = prompt_tokens + completion_tokens
-        return {
-            "prompt_tokens": prompt_tokens,
-            "completion_tokens": completion_tokens,
-            "total_tokens": total_tokens
-        }

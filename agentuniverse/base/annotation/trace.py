@@ -14,18 +14,24 @@ import uuid
 from functools import wraps
 
 from agentuniverse.agent.memory.conversation_memory.conversation_memory_module import ConversationMemoryModule
-from agentuniverse.base.util.billing_center import trace_billing
+from agentuniverse.base.config.application_configer.application_config_manager import ApplicationConfigManager
 from agentuniverse.base.util.monitor.monitor import Monitor
 from agentuniverse.llm.llm_output import LLMOutput
+
 
 def trace_llm(func):
     """Annotation: @trace_llm
 
     Decorator to trace the LLM invocation, add llm input and output to the monitor.
     """
+    def plugins(func):
+        llm_plugins = ApplicationConfigManager().app_configer.llm_plugins
+        warp_func = func
+        for item in llm_plugins:
+            warp_func = item(func)
+        return warp_func
 
     @wraps(func)
-    @trace_billing
     async def wrapper_async(*args, **kwargs):
         # get llm input from arguments
         llm_input = _get_input(func, *args, **kwargs)
@@ -42,7 +48,7 @@ def trace_llm(func):
 
         if self and hasattr(self, 'tracing'):
             if self.tracing is False:
-                return await func(*args, **kwargs)
+                return await plugins(func)(*args, **kwargs)
 
         # add invocation chain to the monitor module.
         Monitor.add_invocation_chain({'source': source, 'type': 'llm'})
@@ -51,7 +57,7 @@ def trace_llm(func):
         Monitor().trace_llm_input(source=source, llm_input=llm_input)
 
         # invoke function
-        result = await func(*args, **kwargs)
+        result = await plugins(func)(*args, **kwargs)
         # not streaming
         if isinstance(result, LLMOutput):
             # add llm invocation info to monitor
@@ -80,7 +86,6 @@ def trace_llm(func):
             return gen_iterator()
 
     @functools.wraps(func)
-    @trace_billing
     def wrapper_sync(*args, **kwargs):
         # get llm input from arguments
         llm_input = _get_input(func, *args, **kwargs)
@@ -97,7 +102,7 @@ def trace_llm(func):
 
         if self and hasattr(self, 'tracing'):
             if self.tracing is False:
-                return func(*args, **kwargs)
+                return plugins(func)(*args, **kwargs)
 
         # add invocation chain to the monitor module.
         Monitor.add_invocation_chain({'source': source, 'type': 'llm'})
@@ -105,7 +110,7 @@ def trace_llm(func):
         start_time = time.time()
         Monitor().trace_llm_input(source=source, llm_input=llm_input)
         # invoke function
-        result = func(*args, **kwargs)
+        result = plugins(func)(*args, **kwargs)
         # not streaming
         if isinstance(result, LLMOutput):
             # add llm invocation info to monitor
@@ -135,11 +140,11 @@ def trace_llm(func):
             return gen_iterator()
 
     if asyncio.iscoroutinefunction(func):
-        # async function
+
         return wrapper_async
     else:
-        # sync function
         return wrapper_sync
+
 
 def get_caller_info(instance: object = None):
     source_list = Monitor.get_invocation_chain()

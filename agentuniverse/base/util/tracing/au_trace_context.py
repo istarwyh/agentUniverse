@@ -65,6 +65,7 @@ class AuTraceContext:
             self._span_id_counter += 1
             return child_span_id
 
+
     def to_dict(self) -> dict:
         return {
             "session_id": self.session_id,

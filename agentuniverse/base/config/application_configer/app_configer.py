@@ -1,11 +1,11 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
-
+import importlib
 # @Time    : 2024/3/12 16:17
 # @Author  : jerry.zzw 
 # @Email   : jerry.zzw@antgroup.com
 # @FileName: app_configer.py
-from typing import Optional, Dict
+from typing import Optional, Dict, Any
 
 from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
 from agentuniverse.base.config.component_configer.configers.tool_configer import ToolConfiger
@@ -51,9 +51,7 @@ class AppConfiger(object):
         self.__llm_configer_map: Dict[str, LLMConfiger] = {}
         self.__agent_llm_set: Optional[set[str]] = set()
         self.__agent_tool_set: Optional[set[str]] = set()
-        self.__billing_center: Optional[dict] = {}
-        self.__use_billing_center: Optional[bool] = False
-        self.__billing_center_url: Optional[bool] = None
+        self.__llm_plugins: Optional[Any] = set()
 
     @property
     def base_info_appname(self) -> Optional[str]:
@@ -229,16 +227,17 @@ class AppConfiger(object):
         self.__agent_tool_set = value
 
     @property
-    def billing_center(self):
-        return self.__billing_center
+    def llm_plugins(self):
+        return self.__llm_plugins
 
-    @property
-    def billing_center_url(self):
-        return self.__billing_center_url
-
-    @property
-    def use_billing_center(self):
-        return self.__use_billing_center
+    @classmethod
+    def load_llm_plugins(cls, plugin_modules):
+        funcs = []
+        for item in plugin_modules:
+            module_name, func_name = item.rsplit('.', 1)
+            module = importlib.import_module(module_name)
+            funcs.append(getattr(module, func_name))
+        return funcs
 
     def load_by_configer(self, configer: Configer) -> 'AppConfiger':
         """Load the AppConfiger by the given Configer.
@@ -275,7 +274,5 @@ class AppConfiger(object):
         self.__core_log_sink_package_list = configer.value.get('CORE_PACKAGE', {}).get('log_sink')
         self.__core_llm_channel_package_list = configer.value.get('CORE_PACKAGE', {}).get('llm_channel')
         self.__conversation_memory_configer = configer.value.get('CONVERSATION_MEMORY', {})
-        self.__billing_center = configer.value.get('BILLING_CENTER', {})
-        self.__use_billing_center = self.billing_center.get("use_billing_center")
-        self.__billing_center_url = self.billing_center.get("billing_center_url")
+        self.__llm_plugins = self.load_llm_plugins(configer.value.get("PLUGINS", {}).get("llm_plugins", []))
         return self

@@ -105,7 +105,7 @@ class Agent(ComponentBase, ABC):
 
         scene_code = input_object.get_data("scene_code")
         if scene_code:
-            AuTraceManager().trace_context.set_scene_code(scene_code)
+            FrameworkContextManager().set_context("scene_code", scene_code)
 
     @trace_agent
     def run(self, **kwargs) -> OutputObject:

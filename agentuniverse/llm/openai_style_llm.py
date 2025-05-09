@@ -15,7 +15,6 @@ from langchain_core.language_models.base import BaseLanguageModel
 from openai import OpenAI, AsyncOpenAI
 
 from agentuniverse.base.config.component_configer.configers.llm_configer import LLMConfiger
-from agentuniverse.base.util.billing_center import BillingCenter, BillingCenterInfo
 from agentuniverse.base.util.env_util import get_from_env
 from agentuniverse.base.util.system_util import process_yaml_func
 from agentuniverse.llm.llm import LLM, LLMOutput
@@ -45,14 +44,14 @@ class OpenAIStyleLLM(LLM):
     ext_params: Optional[dict] = {}
     ext_headers: Optional[dict] = {}
 
-    def _new_client(self):
+    def _new_client(self, api_base=None):
         """Initialize the openai client."""
         if self.client is not None:
             return self.client
         return OpenAI(
             api_key=self.api_key,
             organization=self.organization,
-            base_url=BillingCenter.get_base_url(self.api_base),
+            base_url=api_base if api_base else self.api_base,
             timeout=self.request_timeout,
             max_retries=self.max_retries,
             http_client=httpx.Client(proxy=self.proxy) if self.proxy else None,
@@ -60,14 +59,14 @@ class OpenAIStyleLLM(LLM):
             **(self.client_args or {}),
         )
 
-    def _new_async_client(self):
+    def _new_async_client(self, api_base: str = None):
         """Initialize the openai async client."""
         if self.async_client is not None:
             return self.async_client
         return AsyncOpenAI(
             api_key=self.api_key,
             organization=self.organization,
-            base_url=BillingCenter.get_base_url(self.api_base),
+            base_url=api_base if api_base else self.api_base,
             timeout=self.request_timeout,
             max_retries=self.max_retries,
             http_client=httpx.AsyncClient(proxy=self.proxy) if self.proxy else None,
@@ -84,17 +83,21 @@ class OpenAIStyleLLM(LLM):
         streaming = kwargs.pop("streaming") if "streaming" in kwargs else self.streaming
         if 'stream' in kwargs:
             streaming = kwargs.pop('stream')
-        self.client = self._new_client()
+        self.client = self._new_client(kwargs.pop("api_base", None))
+        ext_params = self.ext_params.copy()
+        if streaming and "stream_options" not in ext_params:
+            ext_params["stream_options"] = {
+                "include_usage": True
+            }
         client = self.client
-        extra_headers, kwargs = BillingCenter.billing_center_openai_headers(self, kwargs)
         chat_completion = client.chat.completions.create(
             messages=messages,
             model=kwargs.pop('model', self.model_name),
             temperature=kwargs.pop('temperature', self.temperature),
             stream=kwargs.pop('stream', streaming),
             max_tokens=kwargs.pop('max_tokens', self.max_tokens),
-            extra_headers=extra_headers,
-            extra_body=self.ext_params,
+            extra_headers=kwargs.pop("extra_headers", self.ext_headers),
+            extra_body=ext_params,
             **kwargs,
         )
         if not streaming:
@@ -112,17 +115,21 @@ class OpenAIStyleLLM(LLM):
         streaming = kwargs.pop("streaming") if "streaming" in kwargs else self.streaming
         if 'stream' in kwargs:
             streaming = kwargs.pop('stream')
-        self.async_client = self._new_async_client()
+        self.async_client = self._new_async_client(kwargs.pop("api_base", None))
         async_client = self.async_client
-        extra_headers, kwargs = BillingCenter.billing_center_openai_headers(self, kwargs)
+        ext_params = self.ext_params.copy()
+        if streaming and "stream_options" not in ext_params:
+            ext_params["stream_options"] = {
+                "include_usage": True
+            }
         chat_completion = await async_client.chat.completions.create(
             messages=messages,
             model=kwargs.pop('model', self.model_name),
             temperature=kwargs.pop('temperature', self.temperature),
             stream=kwargs.pop('stream', streaming),
             max_tokens=kwargs.pop('max_tokens', self.max_tokens),
-            extra_headers=extra_headers,
-            extra_body=self.ext_params,
+            extra_headers=kwargs.pop("extra_headers", self.ext_headers),
+            extra_body=ext_params,
             **kwargs,
         )
         if not streaming:
@@ -196,10 +203,10 @@ class OpenAIStyleLLM(LLM):
         if 'proxy' in component_configer.configer.value:
             proxy = component_configer.configer.value.get('proxy')
             self.proxy = process_yaml_func(proxy, component_configer.yaml_func_instance)
-        if component_configer.configer.value.get("extra_headers"):
-            self.ext_headers = component_configer.configer.value.get("extra_headers")
-        if component_configer.configer.value.get("extra_params"):
-            self.ext_params = component_configer.configer.value.get("extra_params")
+        if component_configer.configer.value.get("ext_headers"):
+            self.ext_headers = component_configer.configer.value.get("ext_headers")
+        if component_configer.configer.value.get("ext_params"):
+            self.ext_params = component_configer.configer.value.get("ext_params")
 
         return super().initialize_by_component_configer(component_configer)
 
@@ -224,71 +231,3 @@ class OpenAIStyleLLM(LLM):
         """Return the maximum length of the context."""
         if super().max_context_length():
             return super().max_context_length()
-
-    def get_billing_tokens(self, input: dict, output: LLMOutput):
-        output_json = output.raw
-        if "usage" in output_json and output_json['usage'].get("prompt_tokens", 0) > 0:
-            return output_json['usage']
-        messages = input.get("messages")
-        text = ""
-        for message in messages:
-            content = message.get("content")
-            if isinstance(content, str):
-                text += content
-            elif isinstance(content, list):
-                for item in content:
-                    if item.get("type") == "text":
-                        content += item.get("content")
-        prompt_tokens = self.get_num_tokens_from_model(text, model=input.get("model"))
-        output = output.text
-        completion_tokens = self.get_num_tokens_from_model(output, model=input.get("model"))
-        total_tokens = prompt_tokens + completion_tokens
-        return {
-            "prompt_tokens": prompt_tokens,
-            "completion_tokens": completion_tokens,
-            "total_tokens": total_tokens
-        }
-
-    def billing_tokens_from_stream(self, generator: Iterator[LLMOutput],
-                                   billing_center_params: BillingCenterInfo):
-        content = ""
-        usage = None
-        for llm_output in generator:
-            content += llm_output.text
-            if "usage" in llm_output.raw and llm_output.raw.get("usage"):
-                usage = llm_output.raw.get("usage")
-            yield llm_output
-        if usage:
-            billing_center_params.usage = usage
-            return
-        llm_output = LLMOutput(
-            text=content,
-            raw={}
-        )
-        billing_center_params.output = llm_output.model_dump()
-        billing_center_params.usage = self.get_billing_tokens(billing_center_params.input,
-                                                              llm_output)
-
-    async def async_billing_tokens_from_stream(self, generator: AsyncIterator[LLMOutput],
-                                               billing_center_params: BillingCenterInfo):
-        content = ""
-        usage = None
-        async for llm_output in generator:
-            content += llm_output.text
-            if "usage" in llm_output.raw and llm_output.raw.get("usage"):
-                usage = llm_output.raw.get("usage")
-            yield llm_output
-        if usage:
-            billing_center_params.usage = usage
-            return
-        llm_output = LLMOutput(
-            text=content,
-            raw={}
-        )
-        billing_center_params.output = llm_output.model_dump()
-        billing_center_params.usage = self.get_billing_tokens(billing_center_params.input,
-                                                              llm_output)
-
-    def update_billing_center_params(self, params: BillingCenterInfo, input: dict):
-        params.base_url = self.api_base
-        return super().update_billing_center_params(params, input)

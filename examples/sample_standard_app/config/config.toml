@@ -76,5 +76,16 @@ dir = './monitor'
 [EXTENSION_MODULES]
 class_list = [
     '${ROOT_PACKAGE}.config.config_extension.ConfigExtension',
-    '${ROOT_PACKAGE}.config.yaml_func_extension.YamlFuncExtension'
+    '${ROOT_PACKAGE}.config.yaml_func_extension.YamlFuncExtension',
+    'agentuniverse_ant_ext.manager.billing_center.billing_center_manager.BillingCenterManager'
+]
+
+[BILLING_CENTER]
+use_billing_center = true
+billing_center_url = "http://localhost:8888/v1"
+billing_type = "proxy"
+
+[PLUGINS]
+llm_plugins = [
+    "agentuniverse_ant_ext.manager.billing_center.billing_center.trace_billing"
 ]
