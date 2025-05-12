@@ -35,7 +35,7 @@ class ServerApplication:
 
     @classmethod
     def start(cls):
-        AgentUniverse().start()
+        AgentUniverse().start(core_mode=True)
         MCPServerManager().start_server()
         
 if __name__ == "__main__":
