@@ -9,9 +9,11 @@
 from agentuniverse.agent.input_object import InputObject
 from agentuniverse.agent.memory.memory import Memory
 from agentuniverse.agent.template.agent_template import AgentTemplate
-from agentuniverse.agent.template.rag_agent_template import RagAgentTemplate
+
+from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
 from agentuniverse.base.util.agent_util import assemble_memory_input, assemble_memory_output
 from agentuniverse.base.util.prompt_util import process_llm_token
+from agentuniverse.base.util.reasoning_output_parse import ReasoningOutputParser
 
 from agentuniverse.llm.llm import LLM
 from agentuniverse.prompt.prompt import Prompt
@@ -29,6 +31,8 @@ class DemoAgent(AgentTemplate):
 
     def parse_input(self, input_object: InputObject, agent_input: dict) -> dict:
         agent_input['input'] = input_object.get_data('input')
+        data = FrameworkContextManager().get_context("scene_code")
+        print(data)
         return agent_input
 
     def parse_result(self, agent_result: dict) -> dict:
@@ -49,7 +53,7 @@ class DemoAgent(AgentTemplate):
         assemble_memory_input(memory, agent_input)
         process_llm_token(llm, prompt.as_langchain(), self.agent_model.profile, agent_input)
         chain = prompt.as_langchain() | llm.as_langchain_runnable(
-            self.agent_model.llm_params()) | StrOutputParser()
+            self.agent_model.llm_params()) | ReasoningOutputParser()
         res = self.invoke_chain(chain, agent_input, input_object, **kwargs)
         assemble_memory_output(memory=memory,
                                agent_input=agent_input,
