@@ -10,6 +10,8 @@ import sys
 from pathlib import Path
 from typing import List
 
+from agentuniverse.agent_serve.web.mcp.mcp_server_manager import \
+    MCPServerManager
 from agentuniverse.base.annotation.singleton import singleton
 from agentuniverse.base.component.application_component_manager import ApplicationComponentManager
 from agentuniverse.base.component.component_base import ComponentBase
@@ -296,6 +298,8 @@ class AgentUniverse(object):
             elif component_enum.value == ComponentEnum.TOOL.value:
                 # Register TOOL components only if tool names are already in the agent tool set
                 if hasattr(configer_instance, 'name') and configer_instance.name:
+                    if hasattr(configer_instance, 'as_mcp_tool'):
+                        MCPServerManager().register_mcp_tool(configer_instance, component_enum.value)
                     if configer_instance.name not in self.__config_container.app_configer.agent_tool_set:
                         self.__config_container.app_configer.tool_configer_map[
                             configer_instance.name] = configer_instance
@@ -303,6 +307,8 @@ class AgentUniverse(object):
             elif component_enum.value == ComponentEnum.TOOLKIT.value:
                 # Register TOOL components only if tool names are already in the agent tool set
                 if hasattr(configer_instance, 'name') and configer_instance.name:
+                    if hasattr(configer_instance, 'as_mcp_tool'):
+                        MCPServerManager().register_mcp_tool(configer_instance, component_enum.value)
                     if configer_instance.name not in self.__config_container.app_configer.agent_toolkit_set:
                         self.__config_container.app_configer.toolkit_configer_map[
                             configer_instance.name] = configer_instance

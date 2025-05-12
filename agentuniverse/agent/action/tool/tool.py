@@ -61,6 +61,7 @@ class Tool(ComponentBase):
     tool_type: ToolTypeEnum = ToolTypeEnum.FUNC
     input_keys: Optional[List] = None
     tracing: Optional[bool] = None
+    as_mcp_tool: Any = None
 
     # tool's arg model and schema in dict form
     args_model: Any = None

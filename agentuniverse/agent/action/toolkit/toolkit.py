@@ -1,7 +1,7 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
 import copy
-from typing import List, Optional
+from typing import List, Optional, Any
 
 from agentuniverse.agent.action.tool.tool_manager import ToolManager
 from agentuniverse.base.component.component_base import ComponentBase
@@ -25,6 +25,7 @@ class Toolkit(ComponentBase):
     name: str = ""
     description: Optional[str] = None
     include: Optional[List[str]] = []
+    as_mcp_tool: Any = None
 
     def __init__(self, **kwargs):
         super().__init__(component_type=ComponentEnum.TOOLKIT, **kwargs)
