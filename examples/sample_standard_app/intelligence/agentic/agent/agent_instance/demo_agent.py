@@ -31,8 +31,6 @@ class DemoAgent(AgentTemplate):
 
     def parse_input(self, input_object: InputObject, agent_input: dict) -> dict:
         agent_input['input'] = input_object.get_data('input')
-        data = FrameworkContextManager().get_context("scene_code")
-        print(data)
         return agent_input
 
     def parse_result(self, agent_result: dict) -> dict:
