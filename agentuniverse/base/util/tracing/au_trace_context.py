@@ -20,7 +20,6 @@ class AuTraceContext:
         self._trace_id = trace_id or self._generate_id()
         self._span_id = '0'
         self._span_id_counter = 0
-        self._scene_code = 'default'
         self._lock = threading.Lock()
 
     @classmethod
@@ -43,10 +42,6 @@ class AuTraceContext:
     def span_id(self) -> str:
         return self._span_id
 
-    @property
-    def scene_code(self) -> str:
-        return self._scene_code
-
     def set_session_id(self, session_id: str):
         self._session_id = session_id
 
@@ -55,9 +50,6 @@ class AuTraceContext:
 
     def set_span_id(self, span_id: str):
         self._span_id = span_id
-
-    def set_scene_code(self, scene_code):
-        self._scene_code = scene_code
 
     def gen_child_span_id(self) -> str:
         with self._lock:
