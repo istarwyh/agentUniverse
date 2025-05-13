@@ -75,14 +75,15 @@ class AgentUniverse(object):
 
         # load the configuration file
         configer = Configer(path=config_path).load()
-        app_configer = AppConfiger().load_by_configer(configer)
-        self.__config_container.app_configer = app_configer
 
-        # load user custom key
+        # try to load custom key first
         custom_key_configer_path = self.__parse_sub_config_path(
             configer.value.get('SUB_CONFIG_PATH', {}).get('custom_key_path'),
             config_path)
         CustomKeyConfiger(custom_key_configer_path)
+
+        # then reload config
+        configer = Configer(path=config_path).load()
 
         # init loguru loggers
         log_config_path = self.__parse_sub_config_path(
