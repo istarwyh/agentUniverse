@@ -187,15 +187,14 @@ def trace_agent(func):
         start_info = get_caller_info()
         pair_id = f"agent_{uuid.uuid4().hex}"
         kwargs['memory_source_info'] = start_info
+        # add invocation chain to the monitor module.
+        Monitor.init_invocation_chain()
+        Monitor.add_invocation_chain({'source': source, 'type': 'agent'})
         ConversationMemoryModule().add_agent_input_info(start_info, self, agent_input, pair_id)
         if tracing is False:
             result = await func(*args, **kwargs)
             ConversationMemoryModule().add_agent_result_info(self, result, start_info, pair_id)
             return result
-
-        # add invocation chain to the monitor module.
-        Monitor.init_invocation_chain()
-        Monitor.add_invocation_chain({'source': source, 'type': 'agent'})
 
         start_time = time.time()
         Monitor().trace_agent_input(source=source, agent_input=agent_input)
@@ -230,15 +229,14 @@ def trace_agent(func):
         pair_id = f"agent_{uuid.uuid4().hex}"
         start_info = get_caller_info()
         kwargs['memory_source_info'] = start_info
+        # add invocation chain to the monitor module.
+        Monitor.init_invocation_chain()
+        Monitor.add_invocation_chain({'source': source, 'type': 'agent'})
         ConversationMemoryModule().add_agent_input_info(start_info, self, agent_input, pair_id)
         if tracing is False:
             result = func(*args, **kwargs)
             ConversationMemoryModule().add_agent_result_info(self, result, start_info, pair_id)
             return result
-
-        # add invocation chain to the monitor module.
-        Monitor.init_invocation_chain()
-        Monitor.add_invocation_chain({'source': source, 'type': 'agent'})
 
         start_time = time.time()
         Monitor().trace_agent_input(source=source, agent_input=agent_input)
