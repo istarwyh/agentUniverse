@@ -194,6 +194,7 @@ def trace_agent(func):
         if tracing is False:
             result = await func(*args, **kwargs)
             ConversationMemoryModule().add_agent_result_info(self, result, start_info, pair_id)
+            Monitor.pop_invocation_chain()
             return result
 
         start_time = time.time()
@@ -236,6 +237,7 @@ def trace_agent(func):
         if tracing is False:
             result = func(*args, **kwargs)
             ConversationMemoryModule().add_agent_result_info(self, result, start_info, pair_id)
+            Monitor.pop_invocation_chain()
             return result
 
         start_time = time.time()
