@@ -24,11 +24,12 @@ from agentuniverse.base.util.async_util import run_async_from_sync
 class MCPTool(Tool):
 
     server_name: str = ''
-    transport: Literal["stdio", "sse"] = "stdio"
+    transport: Literal["stdio", "sse", "websocket", "streamable_http"] = "stdio"
     url: str = ''
     command: str = ''
     args: List[str] = []
     env: Optional[dict] = None
+    connection_kwargs: Optional[dict] = None
     # You can use origin_tool_name while you want another name for this aU tool
     origin_tool_name: str = ''
 
@@ -55,7 +56,7 @@ class MCPTool(Tool):
 
     def get_mcp_server_connect_args(self) -> dict:
         if self.transport == "sse":
-            return {
+            connect_args = {
                 'transport': self.transport,
                 'url': self.url
             }
@@ -66,9 +67,22 @@ class MCPTool(Tool):
                 "args": self.args,
                 'env': self.env
             }
+        elif self.transport == "streamable_http":
+            connect_args = {
+                'transport': self.transport,
+                'url': self.url
+            }
+        elif self.transport == "websocket":
+            connect_args = {
+                'transport': self.transport,
+                'url': self.url
+            }
         else:
             raise Exception(
                 f'Unsupported mcp server type: {self.transport}')
+        if self.connection_kwargs and isinstance(self.connection_kwargs, dict):
+            connect_args.update(self.connection_kwargs)
+        return connect_args
 
     def initialize_by_component_configer(self, component_configer: ToolConfiger) -> 'MCPTool':
         """Initialize the agent model by component configer."""

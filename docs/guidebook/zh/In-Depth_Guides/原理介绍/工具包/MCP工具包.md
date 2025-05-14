@@ -35,6 +35,18 @@ metadata:
   module: 'agentuniverse.agent.action.toolkit.mcp_toolkit'
   class: 'MCPToolkit'
 ```
+
+通过Streamable HTTP连接的MCPToolkit定义示例如下：
+```yaml
+name: 'weather'
+transport: 'streamable_http'
+url: 'http://localhost:8000/mcp'
+metadata:
+  type: 'TOOLKIT'
+  module: 'agentuniverse.agent.action.toolkit.mcp_toolkit'
+  class: 'MCPToolkit'
+```
+
 - 关于`transport`、`url`、`command`、`args`、`env`参数的填写方式请参考[MCP工具](../工具/MCP工具.md)
 
 完整工具包定义示例可参考：[duckduckgo_search_mcp_tool](../../../../../../examples/sample_apps/toolkit_demo_app/intelligence/agentic/toolkit/docx_toolkit.yaml)

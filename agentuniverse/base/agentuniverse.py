@@ -84,6 +84,8 @@ class AgentUniverse(object):
 
         # then reload config
         configer = Configer(path=config_path).load()
+        app_configer = AppConfiger().load_by_configer(configer)
+        self.__config_container.app_configer = app_configer
 
         # init loguru loggers
         log_config_path = self.__parse_sub_config_path(

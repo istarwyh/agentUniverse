@@ -5,7 +5,7 @@ import asyncio
 # @Author  : wangchongshi
 # @Email   : wangchongshi.wcs@antgroup.com
 # @FileName: tool.py
-from typing import List, Literal
+from typing import List, Literal, Optional
 
 from agentuniverse.agent.action.tool.mcp_tool import MCPTool
 from agentuniverse.agent.action.tool.tool_manager import ToolManager
@@ -17,18 +17,19 @@ from agentuniverse.base.util.async_util import run_async_from_sync
 
 
 class MCPToolkit(Toolkit):
-    transport: Literal['stdio', 'sse'] = 'stdio'
+    transport: Literal["stdio", "sse", "websocket", "streamable_http"] = "stdio"
     url: str = ''
     command: str = ''
     args: List[str] = []
-    env: dict = None
+    env: Optional[dict] = None
     server_name: str = ''
     always_refresh: bool = False
+    connection_kwargs: Optional[dict] = None
 
 
     def get_mcp_server_connect_args(self) -> dict:
         if self.transport == "sse":
-            return {
+            connect_args = {
                 'transport': self.transport,
                 'url': self.url
             }
@@ -39,9 +40,22 @@ class MCPToolkit(Toolkit):
                 "args": self.args,
                 'env': self.env
             }
+        elif self.transport == "streamable_http":
+            connect_args = {
+                'transport': self.transport,
+                'url': self.url
+            }
+        elif self.transport == "websocket":
+            connect_args = {
+                'transport': self.transport,
+                'url': self.url
+            }
         else:
             raise Exception(
                 f'Unsupported mcp server type: {self.transport}')
+        if self.connection_kwargs and isinstance(self.connection_kwargs, dict):
+            connect_args.update(self.connection_kwargs)
+        return connect_args
 
     def _refresh_tool_info(self):
         pass
