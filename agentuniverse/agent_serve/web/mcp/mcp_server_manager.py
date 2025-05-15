@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 import functools
 import inspect
+from typing import Literal
 
 from mcp.server.fastmcp import FastMCP
 
@@ -101,39 +102,36 @@ class MCPServerManager:
             self.server_tool_map[server_name]['toolkit'].append(configer_instance.name)
 
     def start_server(self,
-                     server_name: str = DEFAULT_SERVER_NAME,
                      host: str = '0.0.0.0',
-                     port: int = 8890):
-        if server_name not in self.server_tool_map:
-            raise Exception(f'No mcp server named {server_name}')
+                     port: int = 8890,
+                     transport: Literal["sse", "streamable_http"] = "sse"):
+        # TODO: support streamable http server in next version.
         import uvicorn
+        from mcp.server.fastmcp import FastMCP
+        from starlette.applications import Starlette
+        from starlette.routing import Mount
+        routes_list = []
 
-        server_tool_map = self.server_tool_map[server_name]
-        mcp_server = FastMCP(server_name)
-        for _tool in server_tool_map['tool']:
-            tool_instance = ToolManager().get_instance_obj(_tool)
-            mcp_server.add_tool(
-                fn=create_exposed_tool_method_wrapper(_tool),
-                name=tool_instance.name,
-                description=tool_instance.description
-            )
+        for server_name, tool_dict in self.server_tool_map.items():
+            mcp_server = FastMCP(server_name)
 
-        for _tool in server_tool_map['tool']:
-            tool_instance = ToolManager().get_instance_obj(_tool)
-            mcp_server.add_tool(
-                fn=create_exposed_tool_method_wrapper(_tool),
-                name=tool_instance.name,
-                description=tool_instance.description
-            )
-
-        for _toolkit in server_tool_map['toolkit']:
-            toolkit_instance = ToolkitManager().get_instance_obj(_toolkit)
-            for _tool in toolkit_instance.tool_names:
+            for _tool in tool_dict['tool']:
                 tool_instance = ToolManager().get_instance_obj(_tool)
                 mcp_server.add_tool(
                     fn=create_exposed_tool_method_wrapper(_tool),
                     name=tool_instance.name,
                     description=tool_instance.description
                 )
-        uvicorn.run(mcp_server.sse_app(), host=host, port=port)
 
+            for _toolkit in tool_dict['toolkit']:
+                toolkit_instance = ToolkitManager().get_instance_obj(_toolkit)
+                for _tool in toolkit_instance.tool_names:
+                    tool_instance = ToolManager().get_instance_obj(_tool)
+                    mcp_server.add_tool(
+                        fn=create_exposed_tool_method_wrapper(_tool),
+                        name=tool_instance.name,
+                        description=tool_instance.description
+                    )
+            routes_list.append(Mount(f"/{server_name}", app=mcp_server.sse_app(f"/{server_name}")),)
+        app = Starlette(routes=routes_list)
+        uvicorn.run(app, host=host, port=port)
