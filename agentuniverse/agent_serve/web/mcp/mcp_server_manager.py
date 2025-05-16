@@ -4,8 +4,6 @@ import functools
 import inspect
 from typing import Literal
 
-from mcp.server.fastmcp import FastMCP
-
 from agentuniverse.agent.action.tool.tool import Tool
 from agentuniverse.agent.action.tool.tool_manager import ToolManager
 from agentuniverse.agent.action.toolkit.toolkit_manager import ToolkitManager
@@ -105,12 +103,13 @@ class MCPServerManager:
                      host: str = '0.0.0.0',
                      port: int = 8890,
                      transport: Literal["sse", "streamable_http"] = "sse"):
-        # TODO: support streamable http server in next version.
+        import contextlib
         import uvicorn
+        from fastapi import FastAPI
         from mcp.server.fastmcp import FastMCP
         from starlette.applications import Starlette
         from starlette.routing import Mount
-        routes_list = []
+        mcp_server_list = []
 
         for server_name, tool_dict in self.server_tool_map.items():
             mcp_server = FastMCP(server_name)
@@ -132,6 +131,29 @@ class MCPServerManager:
                         name=tool_instance.name,
                         description=tool_instance.description
                     )
-            routes_list.append(Mount(f"/{server_name}", app=mcp_server.sse_app(f"/{server_name}")),)
-        app = Starlette(routes=routes_list)
+            mcp_server_dict = {
+                'server_name': server_name,
+                'server': mcp_server
+            }
+            if transport == 'sse':
+                mcp_server_dict['mount'] = Mount(f"/{server_name}", app=mcp_server.sse_app(f"/{server_name}"))
+
+            mcp_server_list.append(mcp_server_dict)
+
+        if transport == 'sse':
+            app = Starlette(routes=[_mcp_server['mount'] for _mcp_server in mcp_server_list])
+        elif transport == 'streamable_http':
+            @contextlib.asynccontextmanager
+            async def lifespan(app: FastAPI):
+                async with contextlib.AsyncExitStack() as stack:
+                    for _mcp_server in mcp_server_list:
+                        await stack.enter_async_context(_mcp_server['server'].session_manager.run())
+                    yield
+
+            app = FastAPI(lifespan=lifespan)
+            for _mcp_server in mcp_server_list:
+                app.mount(f"/{_mcp_server['server_name']}", _mcp_server['server'].streamable_http_app())
+        else:
+            raise Exception('Unsupported mcp server type')
+
         uvicorn.run(app, host=host, port=port)

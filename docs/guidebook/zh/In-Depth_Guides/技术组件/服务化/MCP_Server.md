@@ -41,9 +41,12 @@ class ServerApplication:
 if __name__ == "__main__":
     ServerApplication.start()
 ```
-MCPServerManager的start_server接受两个参数：
+MCPServerManager的start_server接受三个参数：
 - host: 表示MCP Server的host，默认值为0.0.0.0
 - port: 接受一个int，表示MCP Server的uvicorn app的启动端口。默认使用8890端口。
+- transport: 表示mcp server的类型，可选值为"sse"和"streamable_http"，默认值为"sse"
 
-调用的时候，访问路径为`http://${host}:${port}/${server_name}/sse`
-以上面默认值为例，则访问mcp_search_server的路径为`http://0.0.0.0:8890/mcp_search_server/sse`
+调用的时候，sse模式访问路径为`http://${host}:${port}/${server_name}/sse`，而streamable_http访问路径为`http://${host}:${port}/${server_name}/mcp`
+以上面默认值为例，则访问mcp_search_server的路径分别为
+- `http://0.0.0.0:8890/mcp_search_server/sse`
+- `http://0.0.0.0:8890/mcp_search_server/mcp`
