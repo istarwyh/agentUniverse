@@ -114,7 +114,7 @@ class MCPServerManager:
         for server_name, tool_dict in self.server_tool_map.items():
             mcp_server = FastMCP(server_name)
 
-            for _tool in tool_dict['tool']:
+            for _tool in set(tool_dict['tool']):
                 tool_instance = ToolManager().get_instance_obj(_tool)
                 mcp_server.add_tool(
                     fn=create_exposed_tool_method_wrapper(_tool),
@@ -122,7 +122,7 @@ class MCPServerManager:
                     description=tool_instance.description
                 )
 
-            for _toolkit in tool_dict['toolkit']:
+            for _toolkit in set(tool_dict['toolkit']):
                 toolkit_instance = ToolkitManager().get_instance_obj(_toolkit)
                 for _tool in toolkit_instance.tool_names:
                     tool_instance = ToolManager().get_instance_obj(_tool)
@@ -136,7 +136,7 @@ class MCPServerManager:
                 'server': mcp_server
             }
             if transport == 'sse':
-                mcp_server_dict['mount'] = Mount(f"/{server_name}", app=mcp_server.sse_app(f"/{server_name}"))
+                mcp_server_dict['mount'] = Mount(f"/{server_name}", app=mcp_server.sse_app())
 
             mcp_server_list.append(mcp_server_dict)
 
