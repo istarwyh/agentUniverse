@@ -55,7 +55,6 @@ class Agent(ComponentBase, ABC):
     """The parent class of all agent models, containing only attributes."""
 
     agent_model: Optional[AgentModel] = None
-    scene_code: Optional[str] = None
 
     def __init__(self):
         """Initialize the AgentModel with the given keyword arguments."""
