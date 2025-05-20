@@ -401,7 +401,7 @@ class Agent(ComponentBase, ABC):
                 tool_input = {key: input_object.get_data(key) for key in tool.input_keys}
                 tool_results.append(str(tool.run(**tool_input)))
             except:
-                pass
+                LOGGER.warn(f'Tool {tool_name} call failed, maybe invalid or lack arguments')
         return "\n\n".join(tool_results)
 
     async def async_invoke_tools(self, input_object: InputObject, **kwargs) -> str:
