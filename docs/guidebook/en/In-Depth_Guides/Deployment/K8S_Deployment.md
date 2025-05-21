@@ -84,7 +84,7 @@ kubectl get all -n agent-namespace
 
 ## 4. Accessing agentUniverse Services from Inside the Cluster
 
-To access AgentUniverse services from within the cluster, use the following command line example:
+To access agentUniverse services from within the cluster, use the following command line example:
 
 ```
 kubectl exec -it [Pod Name] -n agent-namespace -- curl http://agentuniverse-service:9999

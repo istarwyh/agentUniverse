@@ -1,6 +1,6 @@
 # MCP Server
 
-AgentUniverse允许用户将自己的工具通过MCP Server的形式对外提供服务。为此，您需要完成以下几个步骤。
+agentUniverse允许用户将自己的工具通过MCP Server的形式对外提供服务。为此，您需要完成以下几个步骤。
 
 ## 1. 标记需要发布的工具
 您可以在工具(Tool)或者工具包(Toolkit)的yaml定义文件中，将工具或工具包标识为可通过MCP Server调用：
