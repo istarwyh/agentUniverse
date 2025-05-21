@@ -54,7 +54,7 @@ spec:
     targetPort: 8888
 ```
 
-### 1.1 Setting Environment Variables for AgentUniverse Project
+### 1.1 Setting Environment Variables for agentUniverse Project
 
 #### Method 1 (Recommended)
 
@@ -82,7 +82,7 @@ kubectl get all -n agent-namespace
 
 ![Resource Deployment Status](../../../../_picture/k8s_resource.png)
 
-## 4. Accessing AgentUniverse Services from Inside the Cluster
+## 4. Accessing agentUniverse Services from Inside the Cluster
 
 To access AgentUniverse services from within the cluster, use the following command line example:
 

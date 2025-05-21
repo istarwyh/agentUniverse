@@ -258,7 +258,7 @@ If your system has external access, we strongly recommend installing version v0.
 
 ## [0.0.3] - 2024-04-19
 ### Init
-- The official release version of AgentUniverse has been initialized. Enjoy using it!
+- The official release version of agentUniverse has been initialized. Enjoy using it!
 
 ## [0.0.2] - 2024-04-17
 ### Fixed
