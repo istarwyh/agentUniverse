@@ -139,7 +139,7 @@ class LLMChannel(ComponentBase):
         ext_params = {**ext_params, **extra_body}
         if not streaming:
             ext_params.pop("stream_options", "")
-        self.client = self._new_client(kwargs.pop("api_base", None))
+        self.client = self._new_client_with_api_base(kwargs.pop("api_base", None))
         chat_completion = self.client.chat.completions.create(
             messages=messages,
             model=kwargs.pop('model', self.channel_model_name),
@@ -174,7 +174,7 @@ class LLMChannel(ComponentBase):
         ext_params = {**ext_params, **extra_body}
         if not streaming:
             ext_params.pop("stream_options")
-        self.async_client = self._new_async_client(kwargs.pop("api_base", None))
+        self.async_client = self._new_async_client_with_api_base(kwargs.pop("api_base", None))
         chat_completion = await self.async_client.chat.completions.create(
             messages=messages,
             model=kwargs.pop('model', self.channel_model_name),
@@ -214,7 +214,35 @@ class LLMChannel(ComponentBase):
     def max_context_length(self) -> int:
         return self.channel_model_config.get('max_context_length')
 
-    def _new_client(self, api_base: str = None):
+    def _new_client(self):
+        """Initialize the openai client."""
+        if self.client is not None:
+            return self.client
+        return OpenAI(
+            api_key=self.channel_api_key,
+            organization=self.channel_organization,
+            base_url=self.channel_api_base,
+            timeout=self.channel_model_config.get('request_timeout'),
+            max_retries=self.channel_model_config.get('max_retries'),
+            http_client=httpx.Client(proxy=self.channel_proxy) if self.channel_proxy else None,
+            **(self.channel_model_config.get('client_args') or {}),
+        )
+
+    def _new_async_client(self):
+        """Initialize the openai async client."""
+        if self.async_client is not None:
+            return self.async_client
+        return AsyncOpenAI(
+            api_key=self.channel_api_key,
+            organization=self.channel_organization,
+            base_url=self.channel_api_base,
+            timeout=self.channel_model_config.get('request_timeout'),
+            max_retries=self.channel_model_config.get('max_retries'),
+            http_client=httpx.AsyncClient(proxy=self.channel_proxy) if self.channel_proxy else None,
+            **(self.channel_model_config.get('client_args') or {}),
+        )
+
+    def _new_client_with_api_base(self, api_base: str = None):
         """Initialize the openai client."""
         if self.client is not None:
             return self.client
@@ -228,7 +256,7 @@ class LLMChannel(ComponentBase):
             **(self.channel_model_config.get('client_args') or {}),
         )
 
-    def _new_async_client(self, api_base=None):
+    def _new_async_client_with_api_base(self, api_base=None):
         """Initialize the openai async client."""
         if self.async_client is not None:
             return self.async_client

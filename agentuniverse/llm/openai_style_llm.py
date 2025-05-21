@@ -44,7 +44,36 @@ class OpenAIStyleLLM(LLM):
     ext_params: Optional[dict] = {}
     ext_headers: Optional[dict] = {}
 
-    def _new_client(self, api_base=None):
+    def _new_client(self):
+        """Initialize the openai client."""
+        if self.client is not None:
+            return self.client
+        return OpenAI(
+            api_key=self.api_key,
+            organization=self.organization,
+            base_url=self.api_base,
+            timeout=self.request_timeout,
+            max_retries=self.max_retries,
+            http_client=httpx.Client(proxy=self.proxy) if self.proxy else None,
+
+            **(self.client_args or {}),
+        )
+
+    def _new_async_client(self):
+        """Initialize the openai async client."""
+        if self.async_client is not None:
+            return self.async_client
+        return AsyncOpenAI(
+            api_key=self.api_key,
+            organization=self.organization,
+            base_url=self.api_base,
+            timeout=self.request_timeout,
+            max_retries=self.max_retries,
+            http_client=httpx.AsyncClient(proxy=self.proxy) if self.proxy else None,
+            **(self.client_args or {}),
+        )
+
+    def _new_client_with_api_base(self, api_base=None):
         """Initialize the openai client."""
         if self.client is not None:
             return self.client
@@ -59,7 +88,7 @@ class OpenAIStyleLLM(LLM):
             **(self.client_args or {}),
         )
 
-    def _new_async_client(self, api_base: str = None):
+    def _new_async_client_with_api_base(self, api_base=None):
         """Initialize the openai async client."""
         if self.async_client is not None:
             return self.async_client
@@ -83,7 +112,7 @@ class OpenAIStyleLLM(LLM):
         streaming = kwargs.pop("streaming") if "streaming" in kwargs else self.streaming
         if 'stream' in kwargs:
             streaming = kwargs.pop('stream')
-        self.client = self._new_client(kwargs.pop("api_base", None))
+        self.client = self._new_client_with_api_base(kwargs.pop("api_base", None))
         ext_params = self.ext_params.copy()
         extra_body = kwargs.pop("extra_body", {})
         ext_params = {**ext_params, **extra_body}
@@ -117,7 +146,7 @@ class OpenAIStyleLLM(LLM):
         streaming = kwargs.pop("streaming") if "streaming" in kwargs else self.streaming
         if 'stream' in kwargs:
             streaming = kwargs.pop('stream')
-        self.async_client = self._new_async_client(kwargs.pop("api_base", None))
+        self.async_client = self._new_async_client_with_api_base(kwargs.pop("api_base", None))
         async_client = self.async_client
         ext_params = self.ext_params.copy()
         extra_body = kwargs.pop("extra_body", {})
