@@ -85,6 +85,8 @@ class OpenAIStyleLLM(LLM):
             streaming = kwargs.pop('stream')
         self.client = self._new_client(kwargs.pop("api_base", None))
         ext_params = self.ext_params.copy()
+        extra_body = kwargs.pop("extra_body", {})
+        ext_params = {**ext_params, **extra_body}
         if streaming and "stream_options" not in ext_params:
             ext_params["stream_options"] = {
                 "include_usage": True
@@ -118,6 +120,8 @@ class OpenAIStyleLLM(LLM):
         self.async_client = self._new_async_client(kwargs.pop("api_base", None))
         async_client = self.async_client
         ext_params = self.ext_params.copy()
+        extra_body = kwargs.pop("extra_body", {})
+        ext_params = {**ext_params, **extra_body}
         if streaming and "stream_options" not in ext_params:
             ext_params["stream_options"] = {
                 "include_usage": True

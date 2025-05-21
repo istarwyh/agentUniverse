@@ -135,6 +135,8 @@ class LLMChannel(ComponentBase):
             max_tokens = min(support_max_tokens, max_tokens)
 
         ext_params = self.ext_params.copy()
+        extra_body = kwargs.pop("extra_body", {})
+        ext_params = {**ext_params, **extra_body}
         if not streaming:
             ext_params.pop("stream_options", "")
         self.client = self._new_client(kwargs.pop("api_base", None))
@@ -168,6 +170,8 @@ class LLMChannel(ComponentBase):
         if support_max_tokens:
             max_tokens = min(support_max_tokens, max_tokens)
         ext_params = self.ext_params.copy()
+        extra_body = kwargs.pop("extra_body", {})
+        ext_params = {**ext_params, **extra_body}
         if not streaming:
             ext_params.pop("stream_options")
         self.async_client = self._new_async_client(kwargs.pop("api_base", None))
