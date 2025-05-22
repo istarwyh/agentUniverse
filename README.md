@@ -139,7 +139,7 @@ This feature is jointly developed by [difizen](https://github.com/difizen/magent
 The core of agentUniverse provides all the essential components needed to build a single intelligent agent, the collaboration mechanisms between multiple agents, and allows for the injection of expert knowledge. The enables developers to effortlessly create intelligent applications equipped with professional know-how.
 
 ### Multi Agent Collaboration
-AgentUniverse offers several multi-agent collaboration model components that have been validated in real-world industries. Among these, the "PEER" model stands out as one of the most distinctive.
+agentUniverse offers several multi-agent collaboration model components that have been validated in real-world industries. Among these, the "PEER" model stands out as one of the most distinctive.
 
 The PEER model utilizes agents with four distinct responsibilities: Planning, Executing, Expressing, and Reviewing. This structure allows for the decomposition and step-by-step execution of complex problems and enables autonomous iteration based on evaluation feedback, ultimately enhancing performance in reasoning and analytical tasks. This model is particularly effective in scenarios that require multi-step decomposition and in-depth analysis, such as event interpretation, macroeconomic analysis, and the feasibility analysis of business proposals.
 
