@@ -91,8 +91,10 @@ class MCPServerManager:
                     'tool': [],
                     'toolkit': []
                 }
-        else:
+        elif isinstance(configer_instance.as_mcp_tool, bool) and configer_instance.as_mcp_tool:
             server_name = DEFAULT_SERVER_NAME
+        else:
+            return
 
         if configer_type == ComponentEnum.TOOL.value:
             self.server_tool_map[server_name]['tool'].append(configer_instance.name)
