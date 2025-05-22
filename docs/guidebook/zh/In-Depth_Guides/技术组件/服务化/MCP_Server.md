@@ -13,13 +13,13 @@ as_mcp_tool:
 ```
 其中as_mcp_tool表示该工具或工具包可以通过MCP Server调用，而server_name表示所属的MCP服务名称，不同的MCP服务独立运行互不冲突。
 
-如果您不需要单独区分MCP服务，可以不使用server_name字段，如下：
+如果您不需要单独区分MCP服务，可以不使用server_name字段，按照如下配置：
 ```yaml
 name: 'tool_name'
 description: 'tool description'
-as_mcp_tool:
+as_mcp_tool: true
 ```
-该工具会被添加到agentUniverse中的默认MCP Server当中
+该工具会被添加到agentUniverse中的默认MCP Server当中， 默认server名字为`default_mcp_server`。
 
 ## 2.启动MCP Server
 您可以参考示例工程中MCP Server启动的写法：
