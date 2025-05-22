@@ -24,6 +24,31 @@ Note - Additional remarks regarding the version.
 ***************************************************
 
 # Version Update History
+## [0.0.17] - 2025-05-22
+### Added
+- MCP Integration & Publishing Capabilities   
+Enables rapid integration with MCPServer for agent, and allows publishing tools/toolkits from aU as MCPServer services
+- Toolkit Capabilities   
+Supports categorized management of tools and configuration for agent
+- Knowledge Reader Components  
+  - Added Yuque document loading component
+- Added async_execute method to base tool class, enabling asynchronous tool invocation
+- Added custom plugin extensions for trace collection processing
+- Added configurations for the complete Qwen3 series model
+
+### Changed
+- Request Context Optimizations
+
+### Deprecated
+- ToolInput Object  
+The use of ToolInput object for tool parameters is deprecated (will be removed in 3 versions). See agentuniverse.agent.action.tool.common_tool for updated recommendations
+
+### Note
+- New Third-Party Dependencies
+  - mcp ("~=1.9.0")
+  - opentracing (">=2.4.0,<3.0.0")
+- Other code optimizations and documentation updates
+
 ## [0.0.16] - 2025-04-17
 ### Added
 - New Tool Plugins
