@@ -108,6 +108,9 @@ You can further understand how to break down intelligent capabilities into multi
 #### Creating and Using Agent Templates
 You can learn how to create effective agent patterns into templates through the chapter [Creating and Using Agent Templates](docs/guidebook/en/Get_Start/5.Creating_and_Using_Agent_Templates.md). This will greatly enhance the efficiency of constructing subsequent agents and facilitate dissemination.
 
+#### Using and Publishing MCP Services
+You can learn how to quickly use or publish MCP services in agentUniverse framework by referring to [How to Use MCP Servers](docs/guidebook/en/How-to/Use%20and%20Publish%20MCP%20Server/How_to_Use_MCP_Servers.md) and [How to Publish MCP Servers](docs/guidebook/en/How-to/Use%20and%20Publish%20MCP%20Server/How_to_Publish_MCP_Servers.md).
+
 #### Common Tips and Advanced Techniques
 You can learn more advanced techniques in the agent application building process through other documents in the [Get_Start](./docs/guidebook/en/Get_Start), such as how to add a memory module into the intelligent agent process and how to effectively manage prompts within the project.
 ****************************************
@@ -139,7 +142,7 @@ This feature is jointly developed by [difizen](https://github.com/difizen/magent
 The core of agentUniverse provides all the essential components needed to build a single intelligent agent, the collaboration mechanisms between multiple agents, and allows for the injection of expert knowledge. The enables developers to effortlessly create intelligent applications equipped with professional know-how.
 
 ### Multi Agent Collaboration
-AgentUniverse offers several multi-agent collaboration model components that have been validated in real-world industries. Among these, the "PEER" model stands out as one of the most distinctive.
+agentUniverse offers several multi-agent collaboration model components that have been validated in real-world industries. Among these, the "PEER" model stands out as one of the most distinctive.
 
 The PEER model utilizes agents with four distinct responsibilities: Planning, Executing, Expressing, and Reviewing. This structure allows for the decomposition and step-by-step execution of complex problems and enables autonomous iteration based on evaluation feedback, ultimately enhancing performance in reasoning and analytical tasks. This model is particularly effective in scenarios that require multi-step decomposition and in-depth analysis, such as event interpretation, macroeconomic analysis, and the feasibility analysis of business proposals.
 

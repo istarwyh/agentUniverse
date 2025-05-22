@@ -47,7 +47,7 @@ The conversation management system incorporates the last 10 conversation history
 
 ### Debugging the Agent
 On the product homepage, click the edit button on the left of the agent to access the online debugging page.
-You have the ability to debug the agent's Prompt, Tool, Knowledge, and LLM online. Simply click the save button, and the aU-product (AgentUniverse framework) will automatically save the configuration to the corresponding YAML file.
+You have the ability to debug the agent's Prompt, Tool, Knowledge, and LLM online. Simply click the save button, and the aU-product (agentUniverse framework) will automatically save the configuration to the corresponding YAML file.
 ![agentuniverse_product_agent_editor](../../../_picture/agentuniverse_product_agent_editor.png)
 
 To view the Trace information, including token consumption, call chain, and latency of the agent's specific invocation process, click the debug button located in the upper right corner of the image provided above.
@@ -82,6 +82,6 @@ As shown in the yaml file above:
 In the `config.toml`file for global settings, configure the package scan path that corresponds to the product module. With a single click, you can launch the product platform and view the corresponding agent, tool, and knowledge information.
 
 ## More
-The AgentUniverse product platform is undergoing continuous iteration, and in the future, even more convenient and useful features will be available for community users to experience. We warmly welcome your valuable suggestions and feedback.
+The agentUniverse product platform is undergoing continuous iteration, and in the future, even more convenient and useful features will be available for community users to experience. We warmly welcome your valuable suggestions and feedback.
 This feature has been jointly launched by [difizen](https://github.com/difizen/magent) and agentUniverse.
 Let's explore and make progress together!
