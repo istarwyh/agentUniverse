@@ -48,7 +48,7 @@ class AuTraceManager:
         self.trace_context.set_session_id(session_id)
 
     def get_session_id(self):
-        return self.trace_context.trace_id
+        return self.trace_context.session_id
 
     def set_trace_id(self, trace_id):
         self.trace_context.set_trace_id(trace_id)

@@ -112,7 +112,6 @@ class OpenAIStyleLLM(LLM):
         streaming = kwargs.pop("streaming") if "streaming" in kwargs else self.streaming
         if 'stream' in kwargs:
             streaming = kwargs.pop('stream')
-        self.client = self._new_client_with_api_base(kwargs.pop("api_base", None))
         ext_params = self.ext_params.copy()
         extra_body = kwargs.pop("extra_body", {})
         ext_params = {**ext_params, **extra_body}
@@ -120,6 +119,8 @@ class OpenAIStyleLLM(LLM):
             ext_params["stream_options"] = {
                 "include_usage": True
             }
+        self.client = self._new_client()
+        self.client.base_url = kwargs.pop('api_base') if kwargs.get('api_base') else self.api_base
         client = self.client
         chat_completion = client.chat.completions.create(
             messages=messages,
@@ -146,7 +147,8 @@ class OpenAIStyleLLM(LLM):
         streaming = kwargs.pop("streaming") if "streaming" in kwargs else self.streaming
         if 'stream' in kwargs:
             streaming = kwargs.pop('stream')
-        self.async_client = self._new_async_client_with_api_base(kwargs.pop("api_base", None))
+        self.async_client: AsyncOpenAI = self._new_async_client()
+        self.async_client.base_url = kwargs.pop('api_base') if kwargs.get('api_base') else self.api_base
         async_client = self.async_client
         ext_params = self.ext_params.copy()
         extra_body = kwargs.pop("extra_body", {})
@@ -236,10 +238,10 @@ class OpenAIStyleLLM(LLM):
         if 'proxy' in component_configer.configer.value:
             proxy = component_configer.configer.value.get('proxy')
             self.proxy = process_yaml_func(proxy, component_configer.yaml_func_instance)
-        if component_configer.configer.value.get("ext_headers"):
-            self.ext_headers = component_configer.configer.value.get("ext_headers")
-        if component_configer.configer.value.get("ext_params"):
-            self.ext_params = component_configer.configer.value.get("ext_params")
+        if component_configer.configer.value.get("extra_headers"):
+            self.ext_headers = component_configer.configer.value.get("extra_headers")
+        if component_configer.configer.value.get("extra_body"):
+            self.ext_params = component_configer.configer.value.get("extra_body")
 
         return super().initialize_by_component_configer(component_configer)
 
