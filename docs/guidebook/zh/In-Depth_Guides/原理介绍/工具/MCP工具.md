@@ -1,7 +1,7 @@
 # MCP工具
 
 MCP工具是一类特殊的工具Tool，它通过调用MCPServer的Tool完成相应的任务。
-根据MCPServer的种类可分为两类，一是通过标准输入输出流连接的MCPServer，另一种是通过SSE连接的MCPServer。
+MCPServer当前版本可分为三类通信模式,1)通过标准输入输出流(stdio)连接，2)通过SSE方式连接，3）通过Streamable HTTP连接，下列是各类不同MCP模式的配置yaml样例。
 
 通过标准输入输出流连接的MCPTool定义示例如下：
 ```yaml
@@ -55,4 +55,4 @@ metadata:
 
 工具定义示例可参考：[duckduckgo_search_mcp_tool](../../../../../../examples/sample_apps/toolkit_demo_app/intelligence/agentic/tool/duckduckgo_search_mcp_tool.yaml)
 
-工具调用可参考示例：[demo_react_agent_with_single_mcp_tool](../../../../../../examples/sample_apps/toolkit_demo_app/intelligence/agentic/agent/agent_instance/demo_react_agent_with_single_mcp_tool.yaml)
+工具调用可参考示例：[demo_agent_with_mcp_tool](../../../../../../examples/sample_apps/toolkit_demo_app/intelligence/agentic/agent/agent_instance/demo_agent_with_mcp_tool.yaml)

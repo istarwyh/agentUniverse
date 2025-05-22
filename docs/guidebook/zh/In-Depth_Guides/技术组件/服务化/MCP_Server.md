@@ -5,6 +5,15 @@ agentUniverse允许用户将自己的工具通过MCP Server的形式对外提供
 ## 1. 标记需要发布的工具
 您可以在工具(Tool)或者工具包(Toolkit)的yaml定义文件中，将工具或工具包标识为可通过MCP Server调用：
 
+您可以按照如下配置:
+```yaml
+name: 'tool_name'
+description: 'tool description'
+as_mcp_tool: true
+```
+该工具会被添加到agentUniverse中的默认MCP Server当中， 默认server名字为`default_mcp_server`。
+
+如果您需要指定MCP服务命名或发布成多个MCP服务，可以使用server_name字段，按照如下配置：
 ```yaml
 name: 'tool_name'
 description: 'tool description'
@@ -12,14 +21,6 @@ as_mcp_tool:
   server_name: mcp_search_server
 ```
 其中as_mcp_tool表示该工具或工具包可以通过MCP Server调用，而server_name表示所属的MCP服务名称，不同的MCP服务独立运行互不冲突。
-
-如果您不需要单独区分MCP服务，可以不使用server_name字段，按照如下配置：
-```yaml
-name: 'tool_name'
-description: 'tool description'
-as_mcp_tool: true
-```
-该工具会被添加到agentUniverse中的默认MCP Server当中， 默认server名字为`default_mcp_server`。
 
 ## 2.启动MCP Server
 您可以参考示例工程中MCP Server启动的写法：
