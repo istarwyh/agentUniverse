@@ -108,6 +108,9 @@ You can further understand how to break down intelligent capabilities into multi
 #### Creating and Using Agent Templates
 You can learn how to create effective agent patterns into templates through the chapter [Creating and Using Agent Templates](docs/guidebook/en/Get_Start/5.Creating_and_Using_Agent_Templates.md). This will greatly enhance the efficiency of constructing subsequent agents and facilitate dissemination.
 
+#### Using and Publishing MCP Services
+You can learn how to quickly use or publish MCP services in agentUniverse framework by referring to [How to Use MCP Servers](docs/guidebook/en/How-to/Use%20and%20Publish%20MCP%20Server/How_to_Use_MCP_Servers.md) and [How to Publish MCP Servers](docs/guidebook/en/How-to/Use%20and%20Publish%20MCP%20Server/How_to_Publish_MCP_Servers.md).
+
 #### Common Tips and Advanced Techniques
 You can learn more advanced techniques in the agent application building process through other documents in the [Get_Start](./docs/guidebook/en/Get_Start), such as how to add a memory module into the intelligent agent process and how to effectively manage prompts within the project.
 ****************************************
