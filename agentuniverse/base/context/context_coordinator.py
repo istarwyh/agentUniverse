@@ -7,7 +7,7 @@ import opentracing
 from agentuniverse.base.context.framework_context_manager import \
     FrameworkContextManager
 from agentuniverse.base.context.mcp_session_manager import MCPSessionManager
-from agentuniverse.base.util.tracing.au_trace_manager import AuTraceManager
+from agentuniverse.base.tracing.au_trace_manager import AuTraceManager
 
 
 # @Time    : 2025/4/15 15:35

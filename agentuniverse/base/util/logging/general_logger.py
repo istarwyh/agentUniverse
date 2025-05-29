@@ -13,7 +13,7 @@ import loguru
 
 from agentuniverse.base.util.logging.log_type_enum import LogTypeEnum
 from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
-from agentuniverse.base.util.tracing.au_trace_manager import AuTraceManager
+from agentuniverse.base.tracing.au_trace_manager import AuTraceManager
 
 LOG_LEVEL = Literal[
     "TRACE",

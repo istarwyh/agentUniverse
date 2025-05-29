@@ -20,7 +20,7 @@ from agentuniverse.base.config.configer import Configer
 from agentuniverse.base.context.framework_context_manager import FrameworkContextManager
 from agentuniverse.base.util.logging.general_logger import get_context_prefix
 from agentuniverse.base.util.logging.log_type_enum import LogTypeEnum
-from agentuniverse.base.util.tracing.au_trace_manager import AuTraceManager
+from agentuniverse.base.tracing.au_trace_manager import AuTraceManager
 
 LLM_INVOCATION_SUBDIR = "llm_invocation"
 AGENT_INVOCATION_SUBDIR = "agent_invocation"
