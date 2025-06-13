@@ -6,8 +6,12 @@
 # @Email   : fanen.lhy@antgroup.com
 # @FileName: au_trace_context.py
 
+from typing import Optional
+
+from opentelemetry import trace, context
 from opentelemetry.sdk.trace.id_generator import RandomIdGenerator
-from opentelemetry.trace import format_trace_id, format_span_id
+from opentelemetry.trace import format_trace_id, format_span_id, SpanContext, \
+    TraceFlags, NonRecordingSpan
 
 id_generator = RandomIdGenerator()
 
@@ -15,24 +19,60 @@ id_generator = RandomIdGenerator()
 class AuTraceContext:
     def __init__(self):
         self._session_id = None
-        self._trace_id = '' or self._generate_trace_id()
-        self._span_id = '' or self._generate_span_id()
+        current_span = trace.get_current_span()
+
+        if current_span and current_span.get_span_context().is_valid:
+            span_context = current_span.get_span_context()
+            self._trace_id = format_trace_id(span_context.trace_id)
+            self._span_id = format_span_id(span_context.span_id)
+        else:
+            self._trace_id = self._generate_trace_id()
+            self._span_id = self._generate_span_id()
 
     @classmethod
     def new_context(cls):
         return cls()
 
+    @classmethod
+    def from_trace_context(cls, trace_id: str, span_id: str,
+                           session_id: Optional[str] = None):
+        instance = cls.__new__(cls)
+        instance._session_id = session_id
+        instance._trace_id = trace_id
+        instance._span_id = span_id
+        instance._set_otel_context(trace_id, span_id)
+
+        return instance
+
     @staticmethod
     def _generate_trace_id() -> str:
         trace_id_int = id_generator.generate_trace_id()
-        # Format it as a hex string (standard OTel format)
         return format_trace_id(trace_id_int)
 
     @staticmethod
     def _generate_span_id() -> str:
         span_id_int = id_generator.generate_span_id()
-        # Format it as a hex string (standard OTel format)
         return format_span_id(span_id_int)
+
+    def _set_otel_context(self, trace_id: str, span_id: str):
+        try:
+            trace_id_int = int(trace_id, 16)
+            span_id_int = int(span_id, 16)
+
+            span_context = SpanContext(
+                trace_id=trace_id_int,
+                span_id=span_id_int,
+                is_remote=True,
+                trace_flags=TraceFlags(0x01)
+            )
+
+            span = NonRecordingSpan(span_context)
+            ctx = trace.set_span_in_context(span)
+            token = context.attach(ctx)
+            return token
+
+        except Exception as e:
+            return None
 
     @property
     def session_id(self) -> str:
@@ -40,10 +80,20 @@ class AuTraceContext:
 
     @property
     def trace_id(self) -> str:
+        current_span = trace.get_current_span()
+
+        if current_span and current_span.get_span_context().is_valid:
+            span_context = current_span.get_span_context()
+            return format_trace_id(span_context.trace_id)
         return self._trace_id
 
     @property
     def span_id(self) -> str:
+        current_span = trace.get_current_span()
+
+        if current_span and current_span.get_span_context().is_valid:
+            span_context = current_span.get_span_context()
+            return format_span_id(span_context.span_id)
         return self._span_id
 
     def set_session_id(self, session_id: str):
@@ -51,9 +101,16 @@ class AuTraceContext:
 
     def set_trace_id(self, trace_id: str):
         self._trace_id = trace_id
+        self._set_otel_context(trace_id, self._span_id)
 
     def set_span_id(self, span_id: str):
         self._span_id = span_id
+        self._set_otel_context(self._trace_id, span_id)
+
+    def set_trace_context(self, trace_id: str, span_id: str):
+        self._trace_id = trace_id
+        self._span_id = span_id
+        self._set_otel_context(trace_id, span_id)
 
     def to_dict(self) -> dict:
         return {

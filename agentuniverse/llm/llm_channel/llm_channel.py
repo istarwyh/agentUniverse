@@ -21,7 +21,7 @@ from agentuniverse.base.config.application_configer.application_config_manager i
 from agentuniverse.base.config.component_configer.component_configer import ComponentConfiger
 from agentuniverse.llm.llm_channel.langchain_instance.default_channel_langchain_instance import \
     DefaultChannelLangchainInstance
-from agentuniverse.llm.llm_output import LLMOutput
+from agentuniverse.llm.llm_output import LLMOutput, TokenUsage
 
 
 class LLMChannel(ComponentBase):
@@ -264,15 +264,35 @@ class LLMChannel(ComponentBase):
         chat_completion = chunk
         if not isinstance(chunk, dict):
             chunk = chunk.dict()
+        raw_chunk = chat_completion.model_dump()
+
         if len(chunk["choices"]) == 0:
-            return LLMOutput(text="", raw=chat_completion.model_dump())
+            return LLMOutput(text="", raw=raw_chunk,
+                             usage=LLMChannel.parse_usage_dict(
+                                 raw_chunk.get('usage', {})))
         choice = chunk["choices"][0]
         message = choice.get("delta")
         text = message.get("content")
         role = message.get("role")
         if text is None:
             text = ""
-        return LLMOutput(text=text, raw=chat_completion.model_dump(), message=Message(content=text, type=role))
+        return LLMOutput(
+            text=text,
+            raw=chat_completion.model_dump(),
+            message=Message(content=text, type=role),
+            usage=LLMChannel.parse_usage_dict(raw_chunk.get('usage', {}))
+        )
+
+    @staticmethod
+    def parse_usage_dict(usage: dict):
+        if not usage:
+            return None
+        prompt_tokens = usage.get('prompt_tokens', 0)
+        completion_tokens = usage.get('completion_tokens', 0)
+        return TokenUsage(
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens
+        ) if prompt_tokens or completion_tokens else None
 
     def get_instance_code(self) -> str:
         """Return the full name of the component."""
