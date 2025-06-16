@@ -1,0 +1,48 @@
+# !/usr/bin/env python3
+# -*- coding:utf-8 -*-
+
+# @Time    : 2025/6/10 14:40
+# @Author  : fanen.lhy
+# @Email   : fanen.lhy@antgroup.com
+# @FileName: consts.py
+
+
+INSTRUMENTOR_NAME = "opentelemetry-instrumentation-agentuniverse-agent"
+INSTRUMENTOR_VERSION = "0.1.0"
+
+
+# Metric Names
+class MetricNames:
+    AGENT_CALLS_TOTAL = "agent_calls_total"
+    AGENT_ERRORS_TOTAL = "agent_errors_total"
+    AGENT_CALL_DURATION = "agent_call_duration"
+    AGENT_FIRST_TOKEN_DURATION = "agent_first_token_duration"
+
+
+# Span Attribute Names
+class SpanAttributes:
+    # Agent attributes
+    SPAN_KIND = "au.span.kind"
+    AGENT_NAME = "au.agent.name"
+    AGENT_INPUT = "au.agent.input"
+    AGENT_OUTPUT = "au.agent.output"
+    AGENT_DURATION = "au.agent.duration"
+    AGENT_STATUS = "au.agent.status"
+    AGENT_PAIR_ID = "au.agent.pair_id"
+
+    # First token attributes
+    AGENT_FIRST_TOKEN_DURATION = "au.agent.first_token.duration"
+
+    # Error attributes
+    AGENT_ERROR_TYPE = "au.agent.error.type"
+    AGENT_ERROR_MESSAGE = "au.agent.error.message"
+
+    # Trace attributes
+    TRACE_CALLER_INFO = "au.trace.caller_info"
+
+
+class MetricLabels:
+    AGENT_NAME = "agent_name"
+    CALLER = "caller"
+    ERROR_TYPE = "error_type"
+    STREAMING = "streaming"
