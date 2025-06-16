@@ -263,13 +263,11 @@ class LLMChannel(ComponentBase):
         """Generate the result of the stream."""
         chat_completion = chunk
         if not isinstance(chunk, dict):
-            chunk = chunk.dict()
-        raw_chunk = chat_completion.model_dump()
+            chunk = chunk.model_dump()
 
         if len(chunk["choices"]) == 0:
-            return LLMOutput(text="", raw=raw_chunk,
-                             usage=LLMChannel.parse_usage_dict(
-                                 raw_chunk.get('usage', {})))
+            return LLMOutput(text="", raw=chunk,
+                             usage=LLMChannel.parse_usage_dict(chunk.get('usage', {})))
         choice = chunk["choices"][0]
         message = choice.get("delta")
         text = message.get("content")
@@ -280,7 +278,7 @@ class LLMChannel(ComponentBase):
             text=text,
             raw=chat_completion.model_dump(),
             message=Message(content=text, type=role),
-            usage=LLMChannel.parse_usage_dict(raw_chunk.get('usage', {}))
+            usage=LLMChannel.parse_usage_dict(chunk.get('usage', {}))
         )
 
     @staticmethod

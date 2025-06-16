@@ -31,6 +31,7 @@ class SpanAttributes:
     AU_LLM_NAME = "au.llm.name"
     AU_LLM_CHANNEL_NAME = "au.llm.channel_name"
     AU_LLM_INPUT = "au.llm.input"
+    AU_LLM_OUTPUT = "au.llm.output"
     AU_LLM_LLM_PARAMS = "au.llm.llm_params"
     AU_TRACE_CALLER_INFO = "au.trace.caller_info"
 

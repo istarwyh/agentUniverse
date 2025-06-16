@@ -164,6 +164,7 @@ class LLMSpanAttributesSetter:
         """Set success-related span attributes."""
         span.set_attribute(SpanAttributes.AU_LLM_DURATION, duration)
         span.set_attribute(SpanAttributes.AU_LLM_STATUS, "success")
+        span.set_attribute(SpanAttributes.AU_LLM_OUTPUT, result.text)
 
         if result.usage:
             span.set_attribute(SpanAttributes.AU_LLM_USAGE_PROMPT_TOKENS,
