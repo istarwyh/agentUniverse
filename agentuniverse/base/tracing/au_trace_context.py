@@ -1,11 +1,7 @@
 # !/usr/bin/env python3
 # -*- coding:utf-8 -*-
-
-# @Time    : 2025/1/6 17:21
-# @Author  : fanen.lhy
-# @Email   : fanen.lhy@antgroup.com
-# @FileName: au_trace_context.py
-
+import asyncio
+import threading
 from typing import Optional
 
 from opentelemetry import trace, context
@@ -13,10 +9,20 @@ from opentelemetry.sdk.trace.id_generator import RandomIdGenerator
 from opentelemetry.trace import format_trace_id, format_span_id, SpanContext, \
     TraceFlags, NonRecordingSpan
 
+from agentuniverse.llm.llm_output import TokenUsage
+
+# @Time    : 2025/1/6 17:21
+# @Author  : fanen.lhy
+# @Email   : fanen.lhy@antgroup.com
+# @FileName: au_trace_context.py
+
 id_generator = RandomIdGenerator()
 
 
 class AuTraceContext:
+    _token_count_dict = {}
+    _token_count_lock = threading.Lock()
+
     def __init__(self):
         self._session_id = None
         current_span = trace.get_current_span()
@@ -111,6 +117,49 @@ class AuTraceContext:
         self._trace_id = trace_id
         self._span_id = span_id
         self._set_otel_context(trace_id, span_id)
+
+    def _get_current_span_id(self):
+        span = trace.get_current_span()
+        if not span.is_recording():
+            return None
+        return span.context.span_id
+
+    def init_new_token_usage(self, span_id=None):
+        span_id = span_id or trace.get_current_span().get_span_context().span_id
+        if not span_id:
+            return
+        self._token_count_dict[span_id] = TokenUsage()
+
+    def add_current_token_usage(self, token_usage, span_id=None):
+        span_id = span_id or trace.get_current_span().get_span_context().span_id
+        if not span_id:
+            return
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            with self._token_count_lock:
+                self._token_count_dict[span_id] += token_usage
+        else:
+            self._token_count_dict[span_id] += token_usage
+
+    def add_current_token_usage_to_parent(self, token_usage=None, parent_span_id=None):
+        if not token_usage:
+            token_usage = self.get_current_token_usage()
+        if parent_span_id and parent_span_id in self._token_count_dict:
+            self._token_count_dict[parent_span_id] += token_usage
+            return
+
+        span = trace.get_current_span()
+        parent_ctx = span.parent  # 只有 SpanContext，可能为 None
+        if parent_ctx is not None and parent_ctx.span_id and parent_ctx.span_id in self._token_count_dict:
+            self._token_count_dict[parent_ctx.span_id] += token_usage
+
+    def get_current_token_usage(self, span_id=None):
+        span_id = span_id or trace.get_current_span().get_span_context().span_id
+        if not span_id:
+            return 0
+        return self._token_count_dict[span_id]
+
 
     def to_dict(self) -> dict:
         return {

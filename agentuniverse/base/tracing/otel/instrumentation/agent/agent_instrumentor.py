@@ -30,6 +30,8 @@ from agentuniverse.agent.memory.conversation_memory.conversation_memory_module i
 from agentuniverse.agent.output_object import OutputObject
 from agentuniverse.base.annotation.trace import _get_agent_info, \
     InvocationChainContext
+from agentuniverse.base.tracing.au_trace_manager import init_new_token_usage, \
+    get_current_token_usage, add_current_token_usage_to_parent
 from .consts import (
     INSTRUMENTOR_NAME,
     INSTRUMENTOR_VERSION,
@@ -137,10 +139,13 @@ class AgentSpanManager:
             context=context.get_current()
         )
         self.token = context.attach(trace.set_span_in_context(self.span))
+        # init_token_count
+        init_new_token_usage()
         return self.span
 
     def cleanup(self):
         """Cleanup span and context."""
+        add_current_token_usage_to_parent()
         if self.span:
             self.span.end()
             self.span = None
@@ -181,6 +186,15 @@ class AgentMetricsRecorder:
         self.metrics[MetricNames.AGENT_ERRORS_TOTAL].add(1, error_labels)
         self.metrics[MetricNames.AGENT_CALL_DURATION].record(duration, error_labels)
 
+    def record_total_token_usage(self, labels: Dict[str, str]) -> None:
+        """Record start of Agent call."""
+        self.metrics[MetricNames.AGENT_TOTAL_TOKENS].record(
+            get_current_token_usage().total_tokens, labels)
+        self.metrics[MetricNames.AGENT_COMPLETION_TOKENS].record(
+            get_current_token_usage().completion_tokens, labels)
+        self.metrics[MetricNames.AGENT_PROMPT_TOKENS].record(
+            get_current_token_usage().prompt_tokens, labels)
+
 
 class AgentSpanAttributesSetter:
     """Handles setting span attributes."""
@@ -205,7 +219,14 @@ class AgentSpanAttributesSetter:
         """Set success-related span attributes."""
         span.set_attribute(SpanAttributes.AGENT_DURATION, duration)
         span.set_attribute(SpanAttributes.AGENT_STATUS, "success")
-        span.set_attribute(SpanAttributes.AGENT_OUTPUT, result.to_json_str())
+        span.set_attribute(SpanAttributes.AGENT_OUTPUT,
+                           safe_json_dumps(result.to_dict(), ensure_ascii=False))
+        span.set_attribute(SpanAttributes.AGENT_USAGE_TOTAL_TOKENS,
+                           get_current_token_usage().total_tokens)
+        span.set_attribute(SpanAttributes.AGENT_USAGE_COMPLETION_TOKENS,
+                           get_current_token_usage().completion_tokens)
+        span.set_attribute(SpanAttributes.AGENT_USAGE_PROMPT_TOKENS,
+                           get_current_token_usage().prompt_tokens)
 
     @staticmethod
     def set_error_attributes(span: Span, error: Exception,
@@ -215,6 +236,12 @@ class AgentSpanAttributesSetter:
         span.set_attribute(SpanAttributes.AGENT_ERROR_TYPE, type(error).__name__)
         span.set_attribute(SpanAttributes.AGENT_ERROR_MESSAGE, str(error))
         span.set_attribute(SpanAttributes.AGENT_DURATION, duration)
+        span.set_attribute(SpanAttributes.AGENT_USAGE_TOTAL_TOKENS,
+                           get_current_token_usage().total_tokens)
+        span.set_attribute(SpanAttributes.AGENT_USAGE_COMPLETION_TOKENS,
+                           get_current_token_usage().completion_tokens)
+        span.set_attribute(SpanAttributes.AGENT_USAGE_PROMPT_TOKENS,
+                           get_current_token_usage().prompt_tokens)
         span.set_status(Status(StatusCode.ERROR, str(error)))
 
     @staticmethod
@@ -284,6 +311,21 @@ class AgentInstrumentor(BaseInstrumentor):
                 name=MetricNames.AGENT_FIRST_TOKEN_DURATION,
                 description="Duration of Agent first token in seconds",
                 unit="s"
+            ),
+            MetricNames.AGENT_TOTAL_TOKENS: self._meter.create_histogram(
+                name=MetricNames.AGENT_TOTAL_TOKENS,
+                description="Total token nums used in agent",
+                unit="1"
+            ),
+            MetricNames.AGENT_COMPLETION_TOKENS: self._meter.create_histogram(
+                name=MetricNames.AGENT_COMPLETION_TOKENS,
+                description="Total token nums used in agent",
+                unit="1"
+            ),
+            MetricNames.AGENT_PROMPT_TOKENS: self._meter.create_histogram(
+                name=MetricNames.AGENT_PROMPT_TOKENS,
+                description="Total token nums used in agent",
+                unit="1"
             ),
         }
         self._metrics_recorder = AgentMetricsRecorder(self._metrics)
@@ -373,6 +415,7 @@ class AgentInstrumentor(BaseInstrumentor):
 
                 duration = time.time() - start_time
                 self._metrics_recorder.record_duration(duration, labels)
+                self._metrics_recorder.record_total_token_usage(labels)
                 if not labels[MetricLabels.STREAMING]:
                     self._metrics_recorder.record_first_token(duration, labels)
                     AgentSpanAttributesSetter.set_first_token_attributes(span, duration)
@@ -384,6 +427,7 @@ class AgentInstrumentor(BaseInstrumentor):
             except Exception as e:
                 duration = time.time() - start_time
                 self._metrics_recorder.record_error(e, duration, labels)
+                self._metrics_recorder.record_total_token_usage(labels)
                 AgentSpanAttributesSetter.set_error_attributes(
                     span_manager.span, e, duration)
                 raise
@@ -439,6 +483,7 @@ class AgentInstrumentor(BaseInstrumentor):
 
                 duration = time.time() - start_time
                 self._metrics_recorder.record_duration(duration, labels)
+                self._metrics_recorder.record_total_token_usage(labels)
                 if not labels[MetricLabels.STREAMING]:
                     self._metrics_recorder.record_first_token(duration, labels)
                     AgentSpanAttributesSetter.set_first_token_attributes(span, duration)
@@ -450,6 +495,7 @@ class AgentInstrumentor(BaseInstrumentor):
             except Exception as e:
                 duration = time.time() - start_time
                 self._metrics_recorder.record_error(e, duration, labels)
+                self._metrics_recorder.record_total_token_usage(labels)
                 AgentSpanAttributesSetter.set_error_attributes(
                     span_manager.span, e, duration)
                 raise

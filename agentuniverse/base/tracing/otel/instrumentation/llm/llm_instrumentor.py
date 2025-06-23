@@ -22,7 +22,8 @@ from typing import Any, Dict, Optional, AsyncGenerator, Generator
 from opentelemetry import trace, metrics, context
 from opentelemetry.instrumentation.instrumentor import BaseInstrumentor
 from opentelemetry.trace import Status, StatusCode, Span
-
+from agentuniverse.base.tracing.au_trace_manager import init_new_token_usage, \
+    get_current_token_usage, add_current_token_usage_to_parent, add_current_token_usage
 from agentuniverse.base.annotation.trace import _get_llm_info, _llm_plugins
 from agentuniverse.base.util.monitor.monitor import Monitor
 from agentuniverse.llm.llm_output import LLMOutput, TokenUsage
@@ -76,6 +77,7 @@ class LLMSpanManager:
             context=context.get_current()
         )
         self.token = context.attach(trace.set_span_in_context(self.span))
+        init_new_token_usage()
         return self.span
 
     def defer_cleanup(self):
@@ -85,6 +87,13 @@ class LLMSpanManager:
     def cleanup(self):
         """Manually cleanup span and context."""
         if self.span:
+            try:
+                add_current_token_usage_to_parent(
+                    get_current_token_usage(self.span.context.span_id),
+                    self.span.parent.span_id
+                )
+            except:
+                pass
             self.span.end()
             self.span = None
         if self.token and self.auto_cleanup:
@@ -227,7 +236,8 @@ class StreamingResultProcessor:
                 if chunk.usage:
                     usage = chunk.usage
                 yield chunk
-
+            if usage:
+                add_current_token_usage(usage, self.span_manager.span.context.span_id)
             self._finalize_streaming_result(llm_output, usage)
 
         except Exception as e:
@@ -259,7 +269,8 @@ class StreamingResultProcessor:
                 if hasattr(chunk, 'usage') and chunk.usage:
                     usage = chunk.usage
                 yield chunk
-
+            if usage:
+                add_current_token_usage(usage, self.span_manager.span.context.span_id)
             self._finalize_streaming_result(llm_output, usage)
 
         except Exception as e:
@@ -422,6 +433,7 @@ class LLMInstrumentor(BaseInstrumentor):
         self._metrics_recorder.record_first_token(duration, labels, streaming=False)
         if result.usage:
             self._metrics_recorder.record_token_usage(result.usage, labels)
+            add_current_token_usage(result.usage, span.context.span_id)
         LLMSpanAttributesSetter.set_first_token_attributes(span, duration)
         LLMSpanAttributesSetter.set_success_attributes(span, duration, result)
 

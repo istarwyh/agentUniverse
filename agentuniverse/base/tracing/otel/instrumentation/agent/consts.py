@@ -17,6 +17,9 @@ class MetricNames:
     AGENT_ERRORS_TOTAL = "agent_errors_total"
     AGENT_CALL_DURATION = "agent_call_duration"
     AGENT_FIRST_TOKEN_DURATION = "agent_first_token_duration"
+    AGENT_TOTAL_TOKENS = "agent_total_tokens"
+    AGENT_PROMPT_TOKENS = "agent_prompt_tokens"
+    AGENT_COMPLETION_TOKENS = "agent_completion_tokens"
 
 
 # Span Attribute Names
@@ -40,6 +43,10 @@ class SpanAttributes:
     # Trace attributes
     TRACE_CALLER_INFO = "au.trace.caller_info"
 
+    # Total token usage
+    AGENT_USAGE_TOTAL_TOKENS = "au.agent.usage.total_tokens"
+    AGENT_USAGE_PROMPT_TOKENS = "au.agent.usage.prompt_tokens"
+    AGENT_USAGE_COMPLETION_TOKENS = "au.agent.usage.completion_tokens"
 
 class MetricLabels:
     AGENT_NAME = "agent_name"

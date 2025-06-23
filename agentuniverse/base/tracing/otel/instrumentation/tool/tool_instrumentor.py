@@ -23,6 +23,8 @@ from opentelemetry import trace, metrics, context
 from opentelemetry.instrumentation.instrumentor import BaseInstrumentor
 from opentelemetry.trace import Status, StatusCode, Span
 
+from agentuniverse.base.tracing.au_trace_manager import init_new_token_usage, \
+    get_current_token_usage, add_current_token_usage_to_parent
 from agentuniverse.agent.action.tool.tool import ToolInput
 from agentuniverse.agent.memory.conversation_memory.conversation_memory_module import \
     ConversationMemoryModule
@@ -82,10 +84,12 @@ class ToolSpanManager:
             context=context.get_current()
         )
         self.token = context.attach(trace.set_span_in_context(self.span))
+        init_new_token_usage()
         return self.span
 
     def cleanup(self):
         """Cleanup span and context."""
+        add_current_token_usage_to_parent()
         if self.span:
             self.span.end()
             self.span = None
@@ -121,6 +125,13 @@ class ToolMetricsRecorder:
         self.metrics[MetricNames.TOOL_ERRORS_TOTAL].add(1, error_labels)
         self.metrics[MetricNames.TOOL_CALL_DURATION].record(duration, error_labels)
 
+    def record_total_token_usage(self, labels: Dict[str, str]) -> None:
+        """Record start of Agent call."""
+        self.metrics[MetricNames.TOOL_TOTAL_TOKENS].record(get_current_token_usage().total_tokens, labels)
+        self.metrics[MetricNames.TOOL_PROMPT_TOKENS].record(get_current_token_usage().prompt_tokens, labels)
+        self.metrics[MetricNames.TOOL_COMPLETION_TOKENS].record(
+            get_current_token_usage().completion_tokens, labels)
+
 
 class ToolSpanAttributesSetter:
     """Handles setting span attributes."""
@@ -147,6 +158,11 @@ class ToolSpanAttributesSetter:
         span.set_attribute(SpanAttributes.TOOL_STATUS, "success")
         span.set_attribute(SpanAttributes.TOOL_OUTPUT,
                            safe_json_dumps(result, ensure_ascii=False))
+        span.set_attribute(SpanAttributes.TOOL_USAGE_TOTAL_TOKENS, get_current_token_usage().total_tokens)
+        span.set_attribute(SpanAttributes.TOOL_USAGE_COMPLETION_TOKENS,
+                           get_current_token_usage().completion_tokens)
+        span.set_attribute(SpanAttributes.TOOL_USAGE_PROMPT_TOKENS,
+                           get_current_token_usage().prompt_tokens)
 
     @staticmethod
     def set_error_attributes(span: Span, error: Exception,
@@ -157,6 +173,12 @@ class ToolSpanAttributesSetter:
         span.set_attribute(SpanAttributes.TOOL_ERROR_MESSAGE, str(error))
         span.set_attribute(SpanAttributes.TOOL_DURATION, duration)
         span.set_status(Status(StatusCode.ERROR, str(error)))
+        span.set_attribute(SpanAttributes.TOOL_USAGE_TOTAL_TOKENS,
+                           get_current_token_usage().total_tokens)
+        span.set_attribute(SpanAttributes.TOOL_USAGE_COMPLETION_TOKENS,
+                           get_current_token_usage().completion_tokens)
+        span.set_attribute(SpanAttributes.TOOL_USAGE_PROMPT_TOKENS,
+                           get_current_token_usage().prompt_tokens)
 
 
 class ToolInstrumentor(BaseInstrumentor):
@@ -216,6 +238,21 @@ class ToolInstrumentor(BaseInstrumentor):
                 description="Duration of Tool calls in seconds",
                 unit="s"
             ),
+            MetricNames.TOOL_TOTAL_TOKENS: self._meter.create_histogram(
+                name=MetricNames.TOOL_TOTAL_TOKENS,
+                description="Token used in tool call",
+                unit="1"
+            ),
+            MetricNames.TOOL_COMPLETION_TOKENS: self._meter.create_histogram(
+                name=MetricNames.TOOL_COMPLETION_TOKENS,
+                description="Token used in tool call",
+                unit="1"
+            ),
+            MetricNames.TOOL_PROMPT_TOKENS: self._meter.create_histogram(
+                name=MetricNames.TOOL_PROMPT_TOKENS,
+                description="Token used in tool call",
+                unit="1"
+            ),
         }
         self._metrics_recorder = ToolMetricsRecorder(self._metrics)
 
@@ -270,6 +307,7 @@ class ToolInstrumentor(BaseInstrumentor):
 
                 duration = time.time() - start_time
                 self._metrics_recorder.record_duration(duration, labels)
+                self._metrics_recorder.record_total_token_usage(labels)
                 ToolSpanAttributesSetter.set_success_attributes(
                     span, duration, result)
 
@@ -278,6 +316,7 @@ class ToolInstrumentor(BaseInstrumentor):
             except Exception as e:
                 duration = time.time() - start_time
                 self._metrics_recorder.record_error(e, duration, labels)
+                self._metrics_recorder.record_total_token_usage(labels)
                 ToolSpanAttributesSetter.set_error_attributes(
                     span_manager.span, e, duration)
                 raise
@@ -319,6 +358,7 @@ class ToolInstrumentor(BaseInstrumentor):
 
                 duration = time.time() - start_time
                 self._metrics_recorder.record_duration(duration, labels)
+                self._metrics_recorder.record_total_token_usage(labels)
                 ToolSpanAttributesSetter.set_success_attributes(
                     span, duration, result)
 
@@ -327,6 +367,7 @@ class ToolInstrumentor(BaseInstrumentor):
             except Exception as e:
                 duration = time.time() - start_time
                 self._metrics_recorder.record_error(e, duration, labels)
+                self._metrics_recorder.record_total_token_usage(labels)
                 ToolSpanAttributesSetter.set_error_attributes(
                     span_manager.span, e, duration)
                 raise

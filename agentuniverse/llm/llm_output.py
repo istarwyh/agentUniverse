@@ -54,6 +54,15 @@ class TokenUsage(BaseModel):
             'total_tokens': self.total_tokens
         }
 
+    def __add__(self, other):
+        if isinstance(other, TokenUsage):
+            return TokenUsage(
+                prompt_tokens=self.prompt_tokens + other.prompt_tokens,
+                completion_tokens=self.completion_tokens + other.completion_tokens
+            )
+        else:
+            return NotImplemented
+
 
 class LLMOutput(BaseModel):
     """The basic class for llm output."""
