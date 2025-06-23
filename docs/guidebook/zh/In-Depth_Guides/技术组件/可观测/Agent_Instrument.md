@@ -27,6 +27,14 @@
 | `au.trace.caller_info` | string | 调用者信息的 JSON 序列化 |
 | `au.agent.first_token.duration` | float | 首个 token 响应时间（秒） |
 
+### Token 使用属性
+
+| 属性名                                | 类型 | 描述           |
+|------------------------------------|------|--------------|
+| `au.agent.usage.prompt_tokens`     | int | 提示词 token 数量 |
+| `au.agent.usage.completion_tokens` | int | 生成 token 数量  |
+| `au.agent.usage.total_tokens`      | int | 总 token 数量   |
+
 ### 错误属性（仅在出错时设置）
 
 | 属性名 | 类型 | 描述 |
@@ -47,10 +55,13 @@
 
 ### Histogram 直方图
 
-| 指标名 | 类型 | 单位 | 描述 | 标签 |
-|--------|------|------|------|------|
-| `agent_call_duration` | Histogram | `s` | Agent 调用持续时间分布 | `agent_name`, `caller`, `streaming` |
-| `agent_first_token_duration` | Histogram | `s` | 首个 token 响应时间分布 | `agent_name`, `caller`, `streaming` |
+| 指标名                          | 类型 | 单位 | 描述                     | 标签 |
+|------------------------------|------|------|------------------------|------|
+| `agent_call_duration`        | Histogram | `s` | Agent 调用持续时间分布         | `agent_name`, `caller`, `streaming` |
+| `agent_first_token_duration` | Histogram | `s` | 首个 token 响应时间分布        | `agent_name`, `caller`, `streaming` |
+| `agent_total_tokens`         | Histogram | `1` | Agent 调用总 token 数量分布   | `agent_name`, `caller`, `streaming` |
+| `agent_prompt_tokens`        | Histogram | `1` | Agent 调用提示词 token 数量分布 | `agent_name`, `caller`, `streaming` |
+| `agent_completion_tokens`    | Histogram | `1` | Agent 调用完成 token 数量分布  | `agent_name`, `caller`, `streaming` |
 
 ### Metric 标签说明
 

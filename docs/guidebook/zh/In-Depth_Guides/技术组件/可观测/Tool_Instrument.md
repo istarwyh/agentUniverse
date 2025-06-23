@@ -24,6 +24,14 @@
 | `au.tool.output` | string | Tool 输出结果的 JSON 序列化 |
 | `au.trace.caller_info` | string | 调用者信息的 JSON 序列化 |
 
+### Token 使用属性
+
+| 属性名                               | 类型 | 描述           |
+|-----------------------------------|------|--------------|
+| `au.tool.usage.prompt_tokens`     | int | 提示词 token 数量 |
+| `au.tool.usage.completion_tokens` | int | 生成 token 数量  |
+| `au.tool.usage.total_tokens`      | int | 总 token 数量   |
+
 ### 错误属性（仅在出错时设置）
 
 | 属性名 | 类型 | 描述 |
@@ -44,9 +52,12 @@
 
 ### Histogram 直方图
 
-| 指标名 | 类型 | 单位 | 描述 | 标签 |
-|--------|------|------|------|------|
-| `tool_call_duration` | Histogram | `s` | Tool 调用持续时间分布 | `tool_name`, `caller` |
+| 指标名                      | 类型 | 单位 | 描述                     | 标签 |
+|--------------------------|------|------|------------------------|------|
+| `tool_call_duration`     | Histogram | `s` | Tool 调用持续时间分布          | `tool_name`, `caller` |
+| `tool_total_tokens`      | Histogram | `1` | Tool 调用总 token 数量分布    | `tool_name`, `caller` |
+| `tool_prompt_tokens`     | Histogram | `1` | Tool 调用提示词 token 数量分布 | `tool_name`, `caller` |
+| `tool_completion_tokens` | Histogram | `1` | Tool 调用完成 token 数量分布  | `tool_name`, `caller` |
 
 ### Metric 标签说明
 
