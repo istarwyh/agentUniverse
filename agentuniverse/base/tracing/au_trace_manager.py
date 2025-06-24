@@ -9,6 +9,7 @@ from contextvars import ContextVar
 
 from agentuniverse.base.annotation.singleton import singleton
 from agentuniverse.base.tracing.au_trace_context import AuTraceContext
+from agentuniverse.llm.llm_output import TokenUsage
 
 
 @singleton
@@ -63,7 +64,6 @@ class AuTraceManager:
         return self.trace_context.span_id
 
 
-
 def get_trace_dict() -> dict:
     return AuTraceManager().get_trace_dict()
 
@@ -90,3 +90,19 @@ def set_span_id(span_id: str):
 
 def get_span_id() -> str | None:
     return AuTraceManager().get_span_id()
+
+
+def init_new_token_usage(span_id=None):
+    return AuTraceManager().trace_context.init_new_token_usage(span_id)
+
+
+def add_current_token_usage(token_usage, span_id=None):
+    return AuTraceManager().trace_context.add_current_token_usage(token_usage, span_id)
+
+
+def add_current_token_usage_to_parent(token_usage=None, parent_span_id=None):
+    return AuTraceManager().trace_context.add_current_token_usage_to_parent(token_usage, parent_span_id)
+
+
+def get_current_token_usage(span_id=None) -> TokenUsage:
+    return AuTraceManager().trace_context.get_current_token_usage(span_id)
