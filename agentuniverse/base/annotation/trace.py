@@ -28,7 +28,7 @@ def get_caller_info(instance: object = None):
         }
     else:
         return {
-            'source': '',
+            'source': 'unknown',
             'type': 'user'
         }
 

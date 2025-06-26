@@ -32,6 +32,8 @@ class MetricNames:
     TOOL_TOTAL_TOKENS = "tool_total_tokens"
     TOOL_PROMPT_TOKENS = "tool_prompt_tokens"
     TOOL_COMPLETION_TOKENS = "tool_completion_tokens"
+    TOOL_REASONING_TOKENS = "tool_reasoning_tokens"
+    TOOL_CACHED_TOKENS = "tool_cached_tokens"
 
 
 # Span attribute names
@@ -50,16 +52,19 @@ class SpanAttributes:
     TOOL_ERROR_MESSAGE = "au.tool.error.message"
 
     # Trace attributes
-    TRACE_CALLER_INFO = "au.trace.caller_info"
+    TRACE_CALLER_NAME = "au.trace.caller_name"
+    TRACE_CALLER_TYPE = "au.trace.caller_type"
 
     # Total token usage
     TOOL_USAGE_TOTAL_TOKENS = "au.tool.usage.total_tokens"
     TOOL_USAGE_PROMPT_TOKENS = "au.tool.usage.prompt_tokens"
     TOOL_USAGE_COMPLETION_TOKENS = "au.tool.usage.completion_tokens"
+    TOOL_USAGE_DETAIL_TOKENS = "au.tool.usage.detail_tokens"
 
 
 # Label names for metrics
 class MetricLabels:
-    TOOL_NAME = "tool_name"
-    CALLER = "caller"
-    ERROR_TYPE = "error_type"
+    TOOL_NAME = "au_tool_name"
+    STATUS = "au_tool_status"
+    CALLER_NAME = "au_trace_caller_name"
+    CALLER_TYPE = "au_trace_caller_type"

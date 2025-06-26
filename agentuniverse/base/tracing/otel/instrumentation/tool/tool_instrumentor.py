@@ -17,19 +17,20 @@ import datetime
 import decimal
 import json
 import time
+import traceback
 from typing import Any, Dict, Optional
 
 from opentelemetry import trace, metrics, context
 from opentelemetry.instrumentation.instrumentor import BaseInstrumentor
 from opentelemetry.trace import Status, StatusCode, Span
 
-from agentuniverse.base.tracing.au_trace_manager import init_new_token_usage, \
-    get_current_token_usage, add_current_token_usage_to_parent
 from agentuniverse.agent.action.tool.tool import ToolInput
 from agentuniverse.agent.memory.conversation_memory.conversation_memory_module import \
     ConversationMemoryModule
 from agentuniverse.base.annotation.trace import _get_tool_info, \
     InvocationChainContext
+from agentuniverse.base.tracing.au_trace_manager import init_new_token_usage, \
+    get_current_token_usage, add_current_token_usage_to_parent
 from .consts import (
     INSTRUMENTOR_NAME,
     INSTRUMENTOR_VERSION,
@@ -121,7 +122,8 @@ class ToolMetricsRecorder:
     def record_error(self, error: Exception, duration: float,
                      labels: Dict[str, str]) -> None:
         """Record error metrics."""
-        error_labels = {**labels, MetricLabels.ERROR_TYPE: type(error).__name__}
+        error_labels = {**labels}
+        error_labels[MetricLabels.STATUS] = type(error).__name__
         self.metrics[MetricNames.TOOL_ERRORS_TOTAL].add(1, error_labels)
         self.metrics[MetricNames.TOOL_CALL_DURATION].record(duration, error_labels)
 
@@ -131,6 +133,10 @@ class ToolMetricsRecorder:
         self.metrics[MetricNames.TOOL_PROMPT_TOKENS].record(get_current_token_usage().prompt_tokens, labels)
         self.metrics[MetricNames.TOOL_COMPLETION_TOKENS].record(
             get_current_token_usage().completion_tokens, labels)
+        self.metrics[MetricNames.TOOL_REASONING_TOKENS].record(
+            get_current_token_usage().reasoning_tokens, labels)
+        self.metrics[MetricNames.TOOL_CACHED_TOKENS].record(
+            get_current_token_usage().cached_tokens, labels)
 
 
 class ToolSpanAttributesSetter:
@@ -146,8 +152,10 @@ class ToolSpanAttributesSetter:
         span.set_attribute(SpanAttributes.TOOL_NAME, source_name)
         span.set_attribute(SpanAttributes.TOOL_INPUT,
                            safe_json_dumps(input_params, ensure_ascii=False))
-        span.set_attribute(SpanAttributes.TRACE_CALLER_INFO,
-                           safe_json_dumps(caller_info, ensure_ascii=False))
+        span.set_attribute(SpanAttributes.TRACE_CALLER_NAME,
+                           caller_info.get('source', 'unknown'))
+        span.set_attribute(SpanAttributes.TRACE_CALLER_TYPE,
+                           caller_info.get('type', 'user'))
         span.set_attribute(SpanAttributes.TOOL_PAIR_ID, pair_id)
 
     @staticmethod
@@ -163,14 +171,18 @@ class ToolSpanAttributesSetter:
                            get_current_token_usage().completion_tokens)
         span.set_attribute(SpanAttributes.TOOL_USAGE_PROMPT_TOKENS,
                            get_current_token_usage().prompt_tokens)
+        span.set_attribute(SpanAttributes.TOOL_USAGE_DETAIL_TOKENS, safe_json_dumps(
+            get_current_token_usage().to_dict()))
 
     @staticmethod
     def set_error_attributes(span: Span, error: Exception,
                              duration: float) -> None:
         """Set error-related span attributes."""
+        error_str = ''.join(traceback.format_exception(type(error), error,
+                                                       error.__traceback__))
         span.set_attribute(SpanAttributes.TOOL_STATUS, "error")
         span.set_attribute(SpanAttributes.TOOL_ERROR_TYPE, type(error).__name__)
-        span.set_attribute(SpanAttributes.TOOL_ERROR_MESSAGE, str(error))
+        span.set_attribute(SpanAttributes.TOOL_ERROR_MESSAGE, error_str)
         span.set_attribute(SpanAttributes.TOOL_DURATION, duration)
         span.set_status(Status(StatusCode.ERROR, str(error)))
         span.set_attribute(SpanAttributes.TOOL_USAGE_TOTAL_TOKENS,
@@ -179,6 +191,8 @@ class ToolSpanAttributesSetter:
                            get_current_token_usage().completion_tokens)
         span.set_attribute(SpanAttributes.TOOL_USAGE_PROMPT_TOKENS,
                            get_current_token_usage().prompt_tokens)
+        span.set_attribute(SpanAttributes.TOOL_USAGE_DETAIL_TOKENS, safe_json_dumps(
+            get_current_token_usage().to_dict()))
 
 
 class ToolInstrumentor(BaseInstrumentor):
@@ -240,19 +254,29 @@ class ToolInstrumentor(BaseInstrumentor):
             ),
             MetricNames.TOOL_TOTAL_TOKENS: self._meter.create_histogram(
                 name=MetricNames.TOOL_TOTAL_TOKENS,
-                description="Token used in tool call",
+                description="Total token used in tool call",
                 unit="1"
             ),
             MetricNames.TOOL_COMPLETION_TOKENS: self._meter.create_histogram(
                 name=MetricNames.TOOL_COMPLETION_TOKENS,
-                description="Token used in tool call",
+                description="Completion token used in tool call",
                 unit="1"
             ),
             MetricNames.TOOL_PROMPT_TOKENS: self._meter.create_histogram(
                 name=MetricNames.TOOL_PROMPT_TOKENS,
-                description="Token used in tool call",
+                description="Prompt token used in tool call",
                 unit="1"
             ),
+            MetricNames.TOOL_CACHED_TOKENS: self._meter.create_histogram(
+                name=MetricNames.TOOL_CACHED_TOKENS,
+                description="Cached token used in tool call",
+                unit="1"
+            ),
+            MetricNames.TOOL_REASONING_TOKENS: self._meter.create_histogram(
+                name=MetricNames.TOOL_REASONING_TOKENS,
+                description="Reasoning token used in tool call",
+                unit="1"
+            )
         }
         self._metrics_recorder = ToolMetricsRecorder(self._metrics)
 
@@ -280,7 +304,9 @@ class ToolInstrumentor(BaseInstrumentor):
 
         labels = {
             MetricLabels.TOOL_NAME: source,
-            MetricLabels.CALLER: start_info.get('source', 'user')
+            MetricLabels.CALLER_NAME: start_info.get('source', 'unknown'),
+            MetricLabels.CALLER_TYPE: start_info.get('type', 'user'),
+            MetricLabels.STATUS: "success"
         }
 
         span_manager = ToolSpanManager(self._tracer, f"au.tool.{source}")
@@ -331,7 +357,9 @@ class ToolInstrumentor(BaseInstrumentor):
 
         labels = {
             MetricLabels.TOOL_NAME: source,
-            MetricLabels.CALLER: start_info.get('source', 'user')
+            MetricLabels.CALLER_NAME: start_info.get('source', 'unknown'),
+            MetricLabels.CALLER_TYPE: start_info.get('type', 'user'),
+            MetricLabels.STATUS: "success"
         }
 
         span_manager = ToolSpanManager(self._tracer, f"au.tool.{source}")

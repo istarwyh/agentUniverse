@@ -19,6 +19,7 @@ import decimal
 import json
 import queue
 import time
+import traceback
 from typing import Any, Dict, Optional
 
 from opentelemetry import trace, metrics, context
@@ -182,7 +183,8 @@ class AgentMetricsRecorder:
     def record_error(self, error: Exception, duration: float,
                      labels: Dict[str, str]) -> None:
         """Record error metrics."""
-        error_labels = {**labels, MetricLabels.ERROR_TYPE: type(error).__name__}
+        error_labels = {**labels}
+        error_labels[MetricLabels.STATUS] = type(error).__name__
         self.metrics[MetricNames.AGENT_ERRORS_TOTAL].add(1, error_labels)
         self.metrics[MetricNames.AGENT_CALL_DURATION].record(duration, error_labels)
 
@@ -194,6 +196,10 @@ class AgentMetricsRecorder:
             get_current_token_usage().completion_tokens, labels)
         self.metrics[MetricNames.AGENT_PROMPT_TOKENS].record(
             get_current_token_usage().prompt_tokens, labels)
+        self.metrics[MetricNames.AGENT_CACHED_TOKENS].record(
+            get_current_token_usage().cached_tokens, labels)
+        self.metrics[MetricNames.AGENT_REASONING_TOKENS].record(
+            get_current_token_usage().reasoning_tokens, labels)
 
 
 class AgentSpanAttributesSetter:
@@ -209,8 +215,8 @@ class AgentSpanAttributesSetter:
         span.set_attribute(SpanAttributes.AGENT_NAME, source_name)
         span.set_attribute(SpanAttributes.AGENT_INPUT,
                            safe_json_dumps(input_params, ensure_ascii=False))
-        span.set_attribute(SpanAttributes.TRACE_CALLER_INFO,
-                           safe_json_dumps(caller_info, ensure_ascii=False))
+        span.set_attribute(SpanAttributes.TRACE_CALLER_NAME, caller_info.get('source', 'unknown'))
+        span.set_attribute(SpanAttributes.TRACE_CALLER_TYPE, caller_info.get('type', 'user'))
         span.set_attribute(SpanAttributes.AGENT_PAIR_ID, pair_id)
 
     @staticmethod
@@ -227,14 +233,17 @@ class AgentSpanAttributesSetter:
                            get_current_token_usage().completion_tokens)
         span.set_attribute(SpanAttributes.AGENT_USAGE_PROMPT_TOKENS,
                            get_current_token_usage().prompt_tokens)
+        span.set_attribute(SpanAttributes.AGENT_USAGE_DETAIL_TOKENS,
+                           safe_json_dumps(get_current_token_usage().to_dict()))
 
     @staticmethod
     def set_error_attributes(span: Span, error: Exception,
                              duration: float) -> None:
         """Set error-related span attributes."""
+        error_str = ''.join(traceback.format_exception(type(error), error, error.__traceback__))
         span.set_attribute(SpanAttributes.AGENT_STATUS, "error")
         span.set_attribute(SpanAttributes.AGENT_ERROR_TYPE, type(error).__name__)
-        span.set_attribute(SpanAttributes.AGENT_ERROR_MESSAGE, str(error))
+        span.set_attribute(SpanAttributes.AGENT_ERROR_MESSAGE, error_str)
         span.set_attribute(SpanAttributes.AGENT_DURATION, duration)
         span.set_attribute(SpanAttributes.AGENT_USAGE_TOTAL_TOKENS,
                            get_current_token_usage().total_tokens)
@@ -242,7 +251,13 @@ class AgentSpanAttributesSetter:
                            get_current_token_usage().completion_tokens)
         span.set_attribute(SpanAttributes.AGENT_USAGE_PROMPT_TOKENS,
                            get_current_token_usage().prompt_tokens)
+        span.set_attribute(SpanAttributes.AGENT_USAGE_DETAIL_TOKENS,
+                           safe_json_dumps(get_current_token_usage().to_dict()))
         span.set_status(Status(StatusCode.ERROR, str(error)))
+
+    @staticmethod
+    def set_streaming(span: Span, streaming: bool) -> None:
+        span.set_attribute(SpanAttributes.AGENT_STREAMING, streaming)
 
     @staticmethod
     def set_first_token_attributes(span: Span, duration: float) -> None:
@@ -319,14 +334,24 @@ class AgentInstrumentor(BaseInstrumentor):
             ),
             MetricNames.AGENT_COMPLETION_TOKENS: self._meter.create_histogram(
                 name=MetricNames.AGENT_COMPLETION_TOKENS,
-                description="Total token nums used in agent",
+                description="Completion token nums used in agent",
                 unit="1"
             ),
             MetricNames.AGENT_PROMPT_TOKENS: self._meter.create_histogram(
                 name=MetricNames.AGENT_PROMPT_TOKENS,
-                description="Total token nums used in agent",
+                description="Prompt token nums used in agent",
                 unit="1"
             ),
+            MetricNames.AGENT_CACHED_TOKENS: self._meter.create_histogram(
+                name=MetricNames.AGENT_CACHED_TOKENS,
+                description="Cached token nums used in agent",
+                unit="1"
+            ),
+            MetricNames.AGENT_REASONING_TOKENS: self._meter.create_histogram(
+                name=MetricNames.AGENT_REASONING_TOKENS,
+                description="Reasoning token nums used in agent",
+                unit="1"
+            )
         }
         self._metrics_recorder = AgentMetricsRecorder(self._metrics)
 
@@ -375,7 +400,9 @@ class AgentInstrumentor(BaseInstrumentor):
 
         labels = {
             MetricLabels.AGENT_NAME: source,
-            MetricLabels.CALLER: start_info.get('source', 'user')
+            MetricLabels.CALLER_NAME: start_info.get('source', 'unknown'),
+            MetricLabels.CALLER_TYPE: start_info.get('type', 'user'),
+            MetricLabels.STATUS: "success"
         }
 
         span_manager = AgentSpanManager(self._tracer, f"au.agent.{source}")
@@ -401,10 +428,12 @@ class AgentInstrumentor(BaseInstrumentor):
                     'output_stream'] is not None:
                     # Add streaming label
                     labels[MetricLabels.STREAMING] = True
+                    AgentSpanAttributesSetter.set_streaming(span, True)
                     kwargs['output_stream'] = self._wrap_output_stream(
                         kwargs['output_stream'], start_time, span, labels)
                 else:
                     labels[MetricLabels.STREAMING] = False
+                    AgentSpanAttributesSetter.set_streaming(span, False)
 
                 # Execute the agent function
                 result = await func(*args, **kwargs)
@@ -442,7 +471,9 @@ class AgentInstrumentor(BaseInstrumentor):
 
         labels = {
             MetricLabels.AGENT_NAME: source,
-            MetricLabels.CALLER: start_info.get('source', 'user'),
+            MetricLabels.CALLER_NAME: start_info.get('source', 'unknown'),
+            MetricLabels.CALLER_TYPE: start_info.get('type', 'user'),
+            MetricLabels.STATUS: "success"
         }
 
         span_manager = AgentSpanManager(self._tracer, f"au.agent.{source}")
@@ -468,10 +499,12 @@ class AgentInstrumentor(BaseInstrumentor):
                     'output_stream'] is not None:
                     # Add streaming label
                     labels[MetricLabels.STREAMING] = True
+                    AgentSpanAttributesSetter.set_streaming(span, True)
                     kwargs['output_stream'] = self._wrap_output_stream(
                         kwargs['output_stream'], start_time, span, labels)
                 else:
                     labels[MetricLabels.STREAMING] = False
+                    AgentSpanAttributesSetter.set_streaming(span, False)
 
                 # Execute the agent function
                 result: OutputObject = func(*args, **kwargs)

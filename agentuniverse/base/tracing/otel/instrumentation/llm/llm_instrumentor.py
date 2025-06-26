@@ -17,14 +17,17 @@ import datetime
 import decimal
 import json
 import time
+import traceback
 from typing import Any, Dict, Optional, AsyncGenerator, Generator
 
 from opentelemetry import trace, metrics, context
 from opentelemetry.instrumentation.instrumentor import BaseInstrumentor
 from opentelemetry.trace import Status, StatusCode, Span
-from agentuniverse.base.tracing.au_trace_manager import init_new_token_usage, \
-    get_current_token_usage, add_current_token_usage_to_parent, add_current_token_usage
+
 from agentuniverse.base.annotation.trace import _get_llm_info, _llm_plugins
+from agentuniverse.base.tracing.au_trace_manager import init_new_token_usage, \
+    get_current_token_usage, add_current_token_usage_to_parent, \
+    add_current_token_usage
 from agentuniverse.base.util.monitor.monitor import Monitor
 from agentuniverse.llm.llm_output import LLMOutput, TokenUsage
 from .consts import (
@@ -139,11 +142,16 @@ class LLMMetricsRecorder:
             self.metrics[MetricNames.LLM_COMPLETION_TOKENS].record(
                 usage.completion_tokens, labels)
             self.metrics[MetricNames.LLM_TOTAL_TOKENS].record(usage.total_tokens, labels)
+            self.metrics[MetricNames.LLM_CACHED_TOKENS].record(
+                usage.cached_tokens, labels)
+            self.metrics[MetricNames.LLM_REASONING_TOKENS].record(
+                usage.reasoning_tokens, labels)
 
     def record_error(self, error: Exception, duration: float,
                      labels: Dict[str, str]) -> None:
         """Record error metrics."""
-        error_labels = {**labels, MetricLabels.ERROR_TYPE: type(error).__name__}
+        error_labels = {**labels}
+        error_labels[MetricLabels.STATUS] = type(error).__name__
         self.metrics[MetricNames.LLM_ERRORS_TOTAL].add(1, error_labels)
         self.metrics[MetricNames.LLM_CALL_DURATION].record(duration, error_labels)
 
@@ -164,8 +172,10 @@ class LLMSpanAttributesSetter:
                            safe_json_dumps(input_params, ensure_ascii=False))
         span.set_attribute(SpanAttributes.AU_LLM_LLM_PARAMS,
                            safe_json_dumps(llm_params, ensure_ascii=False))
-        span.set_attribute(SpanAttributes.AU_TRACE_CALLER_INFO,
-                           safe_json_dumps(caller_info, ensure_ascii=False))
+        span.set_attribute(SpanAttributes.AU_TRACE_CALLER_NAME,
+                           caller_info.get('source', 'unknown'))
+        span.set_attribute(SpanAttributes.AU_TRACE_CALLER_TYPE,
+                           caller_info.get('type', 'user'))
 
     @staticmethod
     def set_success_attributes(span: Span, duration: float,
@@ -182,14 +192,18 @@ class LLMSpanAttributesSetter:
                                result.usage.completion_tokens)
             span.set_attribute(SpanAttributes.AU_LLM_USAGE_TOTAL_TOKENS,
                                result.usage.total_tokens)
+            span.set_attribute(SpanAttributes.AU_LLM_USAGE_DETAIL_TOKENS,
+                               safe_json_dumps(result.usage.to_dict()))
 
     @staticmethod
     def set_error_attributes(span: Span, error: Exception,
                              duration: float) -> None:
         """Set error-related span attributes."""
+        error_str = ''.join(traceback.format_exception(type(error), error,
+                                                       error.__traceback__))
         span.set_attribute(SpanAttributes.AU_LLM_STATUS, "error")
         span.set_attribute(SpanAttributes.AU_LLM_ERROR_TYPE, type(error).__name__)
-        span.set_attribute(SpanAttributes.AU_LLM_ERROR_MESSAGE, str(error))
+        span.set_attribute(SpanAttributes.AU_LLM_ERROR_MESSAGE, error_str)
         span.set_attribute(SpanAttributes.AU_LLM_DURATION, duration)
         span.set_status(Status(StatusCode.ERROR, str(error)))
 
@@ -197,6 +211,10 @@ class LLMSpanAttributesSetter:
     def set_first_token_attributes(span: Span, duration: float) -> None:
         """Set first token timing attributes."""
         span.set_attribute(SpanAttributes.AU_LLM_FIRST_TOKEN_DURATION, duration)
+
+    @staticmethod
+    def set_streaming(span: Span, streaming: bool) -> None:
+        span.set_attribute(SpanAttributes.AU_LLM_STREAMING, streaming)
 
 
 class StreamingResultProcessor:
@@ -390,6 +408,16 @@ class LLMInstrumentor(BaseInstrumentor):
                 name=MetricNames.LLM_COMPLETION_TOKENS,
                 description="Number of completion tokens in LLM calls",
                 unit="1"
+            ),
+            MetricNames.LLM_REASONING_TOKENS: self._meter.create_histogram(
+                name=MetricNames.LLM_REASONING_TOKENS,
+                description="Number of reasoning tokens in LLM calls",
+                unit="1"
+            ),
+            MetricNames.LLM_CACHED_TOKENS: self._meter.create_histogram(
+                name=MetricNames.LLM_CACHED_TOKENS,
+                description="Number of cached tokens in LLM calls",
+                unit="1"
             )
         }
         self._metrics_recorder = LLMMetricsRecorder(self._metrics)
@@ -415,8 +443,9 @@ class LLMInstrumentor(BaseInstrumentor):
 
         labels = {
             MetricLabels.LLM_NAME: source,
-            MetricLabels.CHANNEL_NAME: channel_name,
-            MetricLabels.CALLER: caller_info['source'] or 'user'
+            MetricLabels.CALLER_NAME: caller_info.get('source', 'unknown'),
+            MetricLabels.CALLER_TYPE: caller_info.get('type', 'user'),
+            MetricLabels.STATUS: "success"
         }
 
         return llm_instance, source, channel_name, llm_input, params, caller_info, labels
@@ -456,6 +485,7 @@ class LLMInstrumentor(BaseInstrumentor):
 
             if isinstance(result, LLMOutput):
                 # Non-streaming result - cleanup immediately
+                LLMSpanAttributesSetter().set_streaming(span, False)
                 duration = time.time() - start_time
                 self._handle_non_streaming_result(
                     result, llm_instance, source, llm_input, duration,
@@ -464,6 +494,7 @@ class LLMInstrumentor(BaseInstrumentor):
                 return result
             else:
                 # Streaming result - defer cleanup to the processor
+                LLMSpanAttributesSetter().set_streaming(span, True)
                 span_manager.defer_cleanup()
                 processor = StreamingResultProcessor(
                     source, llm_input, llm_instance, start_time,
@@ -499,6 +530,7 @@ class LLMInstrumentor(BaseInstrumentor):
 
             if isinstance(result, LLMOutput):
                 # Non-streaming result - cleanup immediately
+                LLMSpanAttributesSetter().set_streaming(span, False)
                 duration = time.time() - start_time
                 self._handle_non_streaming_result(
                     result, llm_instance, source, llm_input, duration,
@@ -507,6 +539,7 @@ class LLMInstrumentor(BaseInstrumentor):
                 return result
             else:
                 # Streaming result - defer cleanup to the processor
+                LLMSpanAttributesSetter().set_streaming(span, True)
                 span_manager.defer_cleanup()
                 processor = StreamingResultProcessor(
                     source, llm_input, llm_instance, start_time,

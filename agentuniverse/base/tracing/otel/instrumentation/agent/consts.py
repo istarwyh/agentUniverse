@@ -20,6 +20,8 @@ class MetricNames:
     AGENT_TOTAL_TOKENS = "agent_total_tokens"
     AGENT_PROMPT_TOKENS = "agent_prompt_tokens"
     AGENT_COMPLETION_TOKENS = "agent_completion_tokens"
+    AGENT_REASONING_TOKENS = "agent_reasoning_tokens"
+    AGENT_CACHED_TOKENS = "agent_cached_tokens"
 
 
 # Span Attribute Names
@@ -32,6 +34,7 @@ class SpanAttributes:
     AGENT_DURATION = "au.agent.duration"
     AGENT_STATUS = "au.agent.status"
     AGENT_PAIR_ID = "au.agent.pair_id"
+    AGENT_STREAMING = "au.agent.streaming"
 
     # First token attributes
     AGENT_FIRST_TOKEN_DURATION = "au.agent.first_token.duration"
@@ -41,15 +44,19 @@ class SpanAttributes:
     AGENT_ERROR_MESSAGE = "au.agent.error.message"
 
     # Trace attributes
-    TRACE_CALLER_INFO = "au.trace.caller_info"
+    TRACE_CALLER_NAME = "au.trace.caller_name"
+    TRACE_CALLER_TYPE = "au.trace.caller_type"
 
     # Total token usage
     AGENT_USAGE_TOTAL_TOKENS = "au.agent.usage.total_tokens"
     AGENT_USAGE_PROMPT_TOKENS = "au.agent.usage.prompt_tokens"
     AGENT_USAGE_COMPLETION_TOKENS = "au.agent.usage.completion_tokens"
+    AGENT_USAGE_DETAIL_TOKENS = "au.agent.usage.detail_tokens"
+
 
 class MetricLabels:
-    AGENT_NAME = "agent_name"
-    CALLER = "caller"
-    ERROR_TYPE = "error_type"
-    STREAMING = "streaming"
+    AGENT_NAME = "au_agent_name"
+    CALLER_NAME = "au_trace_caller_name"
+    CALLER_TYPE = "au_trace_caller_type"
+    STATUS = "au_agent_status"
+    STREAMING = "au_agent_streaming"

@@ -157,7 +157,7 @@ class AuTraceContext:
     def get_current_token_usage(self, span_id=None):
         span_id = span_id or trace.get_current_span().get_span_context().span_id
         if not span_id:
-            return 0
+            return TokenUsage()
         return self._token_count_dict[span_id]
 
 
