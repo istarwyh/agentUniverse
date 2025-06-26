@@ -44,6 +44,14 @@ class TelemetryManager:
         if not otel_conf or self._initialized:
             return
 
+        # ---- activate ------
+        activate = otel_conf.get("activate", True)
+        if isinstance(activate, str) and activate.lower() == "false":
+            return
+
+        if not activate:
+            return
+
         # 0. ----- Resource -------------------
         resource = Resource.create(
             {

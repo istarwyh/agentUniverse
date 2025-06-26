@@ -271,7 +271,7 @@ class LLMChannel(ComponentBase):
 
         if len(chunk["choices"]) == 0:
             return LLMOutput(text="", raw=chunk,
-                             usage=LLMChannel.parse_usage_dict(chunk.get('usage', {})))
+                             usage=TokenUsage.from_openai(chunk.get('usage', {})))
         choice = chunk["choices"][0]
         message = choice.get("delta")
         text = message.get("content")
@@ -282,19 +282,8 @@ class LLMChannel(ComponentBase):
             text=text,
             raw=chat_completion.model_dump(),
             message=Message(content=text, type=role),
-            usage=LLMChannel.parse_usage_dict(chunk.get('usage', {}))
+            usage=TokenUsage.from_openai(chunk.get('usage', {}))
         )
-
-    @staticmethod
-    def parse_usage_dict(usage: dict):
-        if not usage:
-            return None
-        prompt_tokens = usage.get('prompt_tokens', 0)
-        completion_tokens = usage.get('completion_tokens', 0)
-        return TokenUsage(
-            prompt_tokens=prompt_tokens,
-            completion_tokens=completion_tokens
-        ) if prompt_tokens or completion_tokens else None
 
     def get_instance_code(self) -> str:
         """Return the full name of the component."""

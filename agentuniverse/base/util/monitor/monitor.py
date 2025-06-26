@@ -296,8 +296,8 @@ class Monitor(BaseModel):
             # the number of input and output tokens is calculated by the llm `get_num_tokens` method.
             if hasattr(llm_obj, 'get_num_tokens'):
                 output.usage = TokenUsage()
-                output.usage.completion_tokens = llm_obj.get_num_tokens(output.text)
-                output.usage.prompt_tokens = llm_obj.get_num_tokens(input_str)
+                output.usage.text_out = llm_obj.get_num_tokens(output.text)
+                output.usage.text_in = llm_obj.get_num_tokens(input_str)
             return output.usage.to_dict()
         except Exception as e:
             return {}
