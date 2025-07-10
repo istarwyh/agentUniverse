@@ -5,7 +5,7 @@ Language version: [English](./README.md) | [中文](./README_zh.md) | [日本語
 ![](https://img.shields.io/badge/framework-agentUniverse-pink)
 ![](https://img.shields.io/badge/python-3.10%2B-blue?logo=Python)
 [![](https://img.shields.io/badge/%20license-Apache--2.0-yellow)](LICENSE)
-[![Static Badge](https://img.shields.io/badge/pypi-v0.0.17-blue?logo=pypi)](https://pypi.org/project/agentUniverse/)
+[![Static Badge](https://img.shields.io/badge/pypi-v0.0.18-blue?logo=pypi)](https://pypi.org/project/agentUniverse/)
 
 ![](docs/guidebook/_picture/logo_bar.jpg)
 ****************************************
@@ -88,6 +88,9 @@ You can learn how to create effective agent patterns into templates through the 
 
 #### Using and Publishing MCP Servers
 You can learn how to quickly use or publish MCP servers in agentUniverse framework by referring to [How to Use MCP Servers](docs/guidebook/en/How-to/Use%20and%20Publish%20MCP%20Server/How_to_Use_MCP_Servers.md) and [How to Publish MCP Servers](docs/guidebook/en/How-to/Use%20and%20Publish%20MCP%20Server/How_to_Publish_MCP_Servers.md).
+
+#### Agent Application Observability
+agentUniverse provides a standardized observability framework for agent applications. Based on the OpenTelemetry protocol, it enables comprehensive data collection and monitoring of critical components such as agents, LLMs, and tools, facilitating full lifecycle tracking of agents. You can learn how to utilize these observability capabilities in the [Agent Application Observability](docs/guidebook/en/In-Depth_Guides/Tech_Capabilities/Observability/Observability_with_OTEL.md) section.
 
 #### Common Tips and Advanced Techniques
 You can learn more advanced techniques in the agent application building process through other documents in the [Get_Start](./docs/guidebook/en/Get_Start), such as how to add a memory module into the intelligent agent process and how to effectively manage prompts within the project.

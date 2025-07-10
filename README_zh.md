@@ -5,7 +5,7 @@
 ![](https://img.shields.io/badge/framework-agentUniverse-pink)
 ![](https://img.shields.io/badge/python-3.10%2B-blue?logo=Python)
 [![](https://img.shields.io/badge/%20license-Apache--2.0-yellow)](LICENSE)
-[![Static Badge](https://img.shields.io/badge/pypi-v0.0.17-blue?logo=pypi)](https://pypi.org/project/agentUniverse/)
+[![Static Badge](https://img.shields.io/badge/pypi-v0.0.18-blue?logo=pypi)](https://pypi.org/project/agentUniverse/)
 
 ![](docs/guidebook/_picture/logo_bar.jpg)
 ****************************************
@@ -26,8 +26,8 @@
 
 The LLM model integration can be accomplished with simple configuration, currently agentUniverse supported models include:
 
-|-|供应商|                                                        模型                                                         |
-|:-----:|:--------:|:-----------------------------------------------------------------------------------------------------------------:|
+|-|供应商|                                                      模型                                                      |
+|:-----:|:--------:|:------------------------------------------------------------------------------------------------------------:|
 |<img src="https://github.com/user-attachments/assets/b7b0f2ce-3250-4008-b6d7-4712a983deb9" height="25">|Qwen| qwen3 Series（qwen3-235b-a22b、qwen3-32b、qwen3-30b-a3b, etc.） 、qwen2.5-72b-instruct、qwq-32b-preview、qwen-max、… |
 |<img src="https://github.com/user-attachments/assets/5a997feb-bef4-4e53-ac3e-d38221e5399c" height="25">|Deepseek|                            deepseek-r1、deepseek-v3、deepseek-r1-distill-qwen-32b、…                            |
 |<img src="https://github.com/user-attachments/assets/0b50e555-65e8-49b2-b725-f3f71ee7daed" height="25">|OpenAI|                                GPT-4o、GPT-4o mini、OpenAI o1、OpenAI o3-mini、…                                 |
@@ -97,6 +97,9 @@ pip install agentUniverse
 
 #### 使用与发布MCP服务
 您可以通过 [如何使用MCP服务](./docs/guidebook/zh/How-to/使用与发布MCP服务/如何使用MCP服务.md)、[如何发布MCP服务](./docs/guidebook/zh/How-to/使用与发布MCP服务/如何发布MCP服务.md) 章节掌握如何快速在智能体框架中使用或发布MCP服务。
+
+#### 智能体应用观测
+agentUniverse拥有标准的智能体应用观测标准，并基于OpenTelemetry协议对于智能体、模型、工具等重要组件进行全方位采集与观测，方便用户追踪智能体全生命周期，您可以在 [智能体应用可观测](./docs/guidebook/zh/In-Depth_Guides/技术组件/可观测/基于OTEL的可观测能力.md) 章节掌握如何使用观测能力。
 
 #### 常用使用技巧
 您可以通过 [开始章节](./docs/guidebook/zh/开始使用) 下的其他文档了解智能体应用构建过程中的其他进阶技巧，例如如何在智能体过程中加入记忆模块、如何有效的管理项目中的prompt等。
