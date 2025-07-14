@@ -28,7 +28,7 @@ class YouTubeToolTest(unittest.TestCase):
 
     def test_analyze_channel(self) -> None:
         tool_input = ToolInput({
-            'mode': Mode.CHANNEL_ANALYZE.value,
+            'mode': Mode.CHANNEL_INFO.value,
             'input': 'UC_x5XG1OV2P6uZZ5FSM9Ttw'
         })
         result = self.tool.execute(tool_input.mode, tool_input.input)
