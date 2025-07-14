@@ -85,7 +85,7 @@ class YouTubeTool(Tool):
             return [{"error": error_msg}]
 
     @retry(3, 1.0)
-    def _analyze_channel(self, channel_id: str) -> Dict:
+    def _get_channel_info(self, channel_id: str) -> Dict:
         try:
             response = self.service.channels().list(
                 id=channel_id,
@@ -183,7 +183,7 @@ class YouTubeTool(Tool):
         elif mode == Mode.CHANNEL_INFO.value:
             if input is None:
                 raise ValueError("Channel ID is required for channel info mode.")
-            return self._analyze_channel(input)
+            return self._get_channel_info(input)
         elif mode == Mode.TRENDING_VIDEOS.value:
             return self._get_trending_videos(input)
         else:
