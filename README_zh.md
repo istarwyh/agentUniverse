@@ -5,7 +5,7 @@
 ![](https://img.shields.io/badge/framework-agentUniverse-pink)
 ![](https://img.shields.io/badge/python-3.10%2B-blue?logo=Python)
 [![](https://img.shields.io/badge/%20license-Apache--2.0-yellow)](LICENSE)
-[![Static Badge](https://img.shields.io/badge/pypi-v0.0.15-blue?logo=pypi)](https://pypi.org/project/agentUniverse/)
+[![Static Badge](https://img.shields.io/badge/pypi-v0.0.18-blue?logo=pypi)](https://pypi.org/project/agentUniverse/)
 
 ![](docs/guidebook/_picture/logo_bar.jpg)
 ****************************************
@@ -24,6 +24,22 @@
 
 更多模式组件持续推出中...
 
+The LLM model integration can be accomplished with simple configuration, currently agentUniverse supported models include:
+
+|-|供应商|                                                      模型                                                      |
+|:-----:|:--------:|:------------------------------------------------------------------------------------------------------------:|
+|<img src="https://github.com/user-attachments/assets/b7b0f2ce-3250-4008-b6d7-4712a983deb9" height="25">|Qwen| qwen3 Series（qwen3-235b-a22b、qwen3-32b、qwen3-30b-a3b, etc.） 、qwen2.5-72b-instruct、qwq-32b-preview、qwen-max、… |
+|<img src="https://github.com/user-attachments/assets/5a997feb-bef4-4e53-ac3e-d38221e5399c" height="25">|Deepseek|                            deepseek-r1、deepseek-v3、deepseek-r1-distill-qwen-32b、…                            |
+|<img src="https://github.com/user-attachments/assets/0b50e555-65e8-49b2-b725-f3f71ee7daed" height="25">|OpenAI|                                GPT-4o、GPT-4o mini、OpenAI o1、OpenAI o3-mini、…                                 |
+|<img src="https://github.com/user-attachments/assets/60fe0a70-0b47-4ac7-9bc9-8e860732ace9" height="25">|Claude|                             claude 3.7 sonnet 、Claude 3.5 Sonnet、Claude 3 Opus、…                             |
+|<img src="https://github.com/user-attachments/assets/334c7f09-7eae-4a65-a70f-2e6531964224" height="25">|Gemini|                  Gemini 2.5 Pro、Gemini 2.0 Flash、Gemini 2.0 Flash Thinking、Gemini 1.5 Pro、…                  |
+|<img src="https://github.com/user-attachments/assets/8e41c73f-3103-4305-ad1f-56116ea55523" height="25">|Llama|                      llama3.3-70b-instruct、llama3.2-3b-instruct、llama3.2-1b-instruct、…                       |
+|<img src="https://github.com/user-attachments/assets/19d264c6-e499-4913-9d6d-314d392f2246" height="25">|KIMI|                              moonshot-v1-128k、moonshot-v1-32k、moonshot-v1-8k、…                               |
+|<img src="https://github.com/user-attachments/assets/79572d9a-29d5-4c0e-a336-ce3f8018fb05" height="25">|WenXin|                                    ERNIE 4.0、ERNIE 4.0 Turbo、ERNIE 3.5、…                                     |
+|<img src="https://github.com/user-attachments/assets/abb5311e-4d70-4e9c-8fca-e5129ae912fc" height="25">|chatglm|                                         chatglm3-6b、chatglm-6b-v2、…                                          |
+|<img src="https://github.com/user-attachments/assets/fe265f24-4ea6-4ff2-9b50-58ab6706a5f5" height="25">|BaiChuan|                                   baichuan2-turbo、baichuan2-13b-chat-v1、…                                    |
+|<img src="https://github.com/user-attachments/assets/41ffe268-392f-4ab9-b42d-e30dbd70d66b" height="25">|Doubao|                              Doubao-pro-128k、Doubao-pro-32k、Doubao-lite-128k、…                               |
+
 ****************************************
 
 ## 目录
@@ -31,8 +47,8 @@
 |  &nbsp; [快速安装](#快速安装) &nbsp; |
 &nbsp; [运行案例](#运行第一个教程案例) &nbsp; |
 * [如何搭建一个智能体应用](#如何搭建一个智能体应用)  
-| &nbsp; [工程化搭建](#工程化搭建) &nbsp; |
-&nbsp; [产品化搭建](#平台化搭建) &nbsp; |
+| &nbsp; [标准工程脚手架搭建](#标准工程脚手架) &nbsp; |
+&nbsp; [画布式研发平台搭建](#画布式研发平台搭建) &nbsp; |
 * [为什么使用agentUniverse](#为什么使用agentUniverse)  
 | &nbsp; [设计思路](#设计思路) &nbsp; | 
 &nbsp; [协同机制](#多智能体协同机制) &nbsp; | 
@@ -79,6 +95,12 @@ pip install agentUniverse
 #### 沉淀与使用智能体模版
 您可以通过 [沉淀与使用智能体模版](./docs/guidebook/zh/开始使用/5.沉淀与使用智能体模版.md) 章节了解如何将有效的智能体模式沉淀成模版，这将大大提升后续智能体的构建效率并便于传播。
 
+#### 使用与发布MCP服务
+您可以通过 [如何使用MCP服务](./docs/guidebook/zh/How-to/使用与发布MCP服务/如何使用MCP服务.md)、[如何发布MCP服务](./docs/guidebook/zh/How-to/使用与发布MCP服务/如何发布MCP服务.md) 章节掌握如何快速在智能体框架中使用或发布MCP服务。
+
+#### 智能体应用观测
+agentUniverse拥有标准的智能体应用观测标准，并基于OpenTelemetry协议对于智能体、模型、工具等重要组件进行全方位采集与观测，方便用户追踪智能体全生命周期，您可以在 [智能体应用可观测](./docs/guidebook/zh/In-Depth_Guides/技术组件/可观测/基于OTEL的可观测能力.md) 章节掌握如何使用观测能力。
+
 #### 常用使用技巧
 您可以通过 [开始章节](./docs/guidebook/zh/开始使用) 下的其他文档了解智能体应用构建过程中的其他进阶技巧，例如如何在智能体过程中加入记忆模块、如何有效的管理项目中的prompt等。
 
@@ -93,7 +115,7 @@ pip install magent-ui ruamel.yaml
 
 **一键运行**
 
-运行sample_standard_app/bootstrap下的[product_application.py](examples/sample_standard_app/bootstrap/platform/product_application.py)文件，一键启动。
+运行sample_apps/workflow_agent_app/bootstrap/platform下的[product_application.py](examples/sample_apps/workflow_agent_app/bootstrap/platform/product_application.py)文件，一键启动。
 
 更多详情参考 [产品化平台快速开始](./docs/guidebook/zh/How-to/画布式研发平台使用/画布式研发平台快速开始.md)
 与 [产品化平台进阶指南](./docs/guidebook/zh/How-to/画布式研发平台使用/画布式研发平台进阶指南.md) 。本功能由 🔗[difizen](https://github.com/difizen/magent) 项目组 X agentUniverse 项目组联合推出。
@@ -182,7 +204,7 @@ https://private-user-images.githubusercontent.com/39180831/355437700-192f712d-1b
 
 ### 支持
 #### 通过github issue提交疑问
-😊 我们建议您使用[github issue](https://github.com/antgroup/agentUniverse/issues) 提交您的疑问, 我们通常会在2日内回复。
+😊 我们建议您使用[github issue](https://github.com/agentuniverse-ai/agentUniverse/issues) 提交您的疑问, 我们通常会在2日内回复。
 
 #### 通过Discord联系我们
 😊 加入我们的 [Discord频道](https://discord.gg/DHFcdkWAhn) 与我们进行交流。

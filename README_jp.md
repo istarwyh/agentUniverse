@@ -5,7 +5,7 @@
 ![](https://img.shields.io/badge/framework-agentUniverse-pink)
 ![](https://img.shields.io/badge/python-3.10%2B-blue?logo=Python)
 [![](https://img.shields.io/badge/%20license-Apache--2.0-yellow)](LICENSE)
-[![Static Badge](https://img.shields.io/badge/pypi-v0.0.15-blue?logo=pypi)](https://pypi.org/project/agentUniverse/)
+[![Static Badge](https://img.shields.io/badge/pypi-v0.0.17-blue?logo=pypi)](https://pypi.org/project/agentUniverse/)
 
 ![](docs/guidebook/_picture/logo_bar.jpg)
 ****************************************
@@ -68,6 +68,9 @@ pip install agentUniverse
 #### 智能体テンプレートの構築と使用
 効果的なエージェントのパターンをテンプレートとして確立し、使用する方法については、[エージェントテンプレートの構築と使用](docs/guidebook/en/Get_Start/5.Creating_and_Using_Agent_Templates.md)の章をご覧ください。これにより、今後のエージェントの構築効率が大幅に向上し、共有が容易になります。
 
+#### MCP サービスの利用と公開
+agentUniverse フレームワークでMCPサービスを迅速に利用または公開する方法は、以下のドキュメントを参照してください： [MCPサーバーの利用方法](docs/guidebook/en/How-to/Use%20and%20Publish%20MCP%20Server/How_to_Use_MCP_Servers.md) 、 [MCPサーバーの公開方法](docs/guidebook/en/How-to/Use%20and%20Publish%20MCP%20Server/How_to_Publish_MCP_Servers.md).
+
 #### よく使われる利用技術
 [一般的な使用のコツ](docs/guidebook/en/Get_Start)セクションを通じて、スマートエージェントアプリケーションの構築プロセスにおける一般的なテクニックを理解できます。たとえば、スマートエージェントプロセスにメモリモジュールを組み込む方法や、プロジェクト内のプロンプトを効率的に管理する方法などです。
 
@@ -82,7 +85,7 @@ pip install magent-ui ruamel.yaml
 
 **一鍵で実行する**
 
-sample_standard_app/bootstrapの下にある[product_application.py](examples/sample_standard_app/bootstrap/platform/product_application.py)ファイルを実行して、一括起動します。
+sample_apps/workflow_agent_app/bootstrap/platformの下にある[product_application.py](examples/sample_apps/workflow_agent_app/bootstrap/platform/product_application.py)ファイルを実行して、一括起動します。
 
 詳細については、[製品化プラットフォームの迅速な開始](./docs/guidebook/en/How-to/Guide to Visual Agentic Workflow Platform/Product_Platform_Quick_Start.md) と [製品化プラットフォームの進階ガイド](./docs/guidebook/en/How-to/Guide to Visual Agentic Workflow Platform/Product_Platform_Advancement_Guide.md) をご覧ください。本機能は 🔗[difizen](https://github.com/difizen/magent) プロジェクトチームと X agentUniverse プロジェクトチームが共同で提供しています。
 

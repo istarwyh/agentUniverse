@@ -5,7 +5,7 @@ Language version: [English](./README.md) | [中文](./README_zh.md) | [日本語
 ![](https://img.shields.io/badge/framework-agentUniverse-pink)
 ![](https://img.shields.io/badge/python-3.10%2B-blue?logo=Python)
 [![](https://img.shields.io/badge/%20license-Apache--2.0-yellow)](LICENSE)
-[![Static Badge](https://img.shields.io/badge/pypi-v0.0.15-blue?logo=pypi)](https://pypi.org/project/agentUniverse/)
+[![Static Badge](https://img.shields.io/badge/pypi-v0.0.18-blue?logo=pypi)](https://pypi.org/project/agentUniverse/)
 
 ![](docs/guidebook/_picture/logo_bar.jpg)
 ****************************************
@@ -29,43 +29,21 @@ More patterns are coming soon...
 
 The LLM model integration can be accomplished with simple configuration, currently agentUniverse supported models include:
 
-||Vendors|Models|
-|:-----:|:--------:|:------:|
-|<img src="https://github.com/user-attachments/assets/b7b0f2ce-3250-4008-b6d7-4712a983deb9" height="25">|Qwen|qwen2.5-72b-instruct、qwq-32b-preview、qwen-max、…|
-|<img src="https://github.com/user-attachments/assets/5a997feb-bef4-4e53-ac3e-d38221e5399c" height="25">|Deepseek|deepseek-r1、deepseek-v3、deepseek-r1-distill-qwen-32b、…|
-|<img src="https://github.com/user-attachments/assets/0b50e555-65e8-49b2-b725-f3f71ee7daed" height="25">|OpenAI|GPT-4o、GPT-4o mini、OpenAI o1、OpenAI o3-mini、…|
-|<img src="https://github.com/user-attachments/assets/60fe0a70-0b47-4ac7-9bc9-8e860732ace9" height="25">|Claude|Claude 3.5 Sonnet、Claude 3 Opus、…|
-|<img src="https://github.com/user-attachments/assets/334c7f09-7eae-4a65-a70f-2e6531964224" height="25">|Gemini|Gemini 2.0 Flash、Gemini 2.0 Flash Thinking、Gemini 1.5 Pro、…|
-|<img src="https://github.com/user-attachments/assets/8e41c73f-3103-4305-ad1f-56116ea55523" height="25">|Llama|llama3.3-70b-instruct、llama3.2-3b-instruct、llama3.2-1b-instruct、…|
-|<img src="https://github.com/user-attachments/assets/19d264c6-e499-4913-9d6d-314d392f2246" height="25">|KIMI|moonshot-v1-128k、moonshot-v1-32k、moonshot-v1-8k、…|
-|<img src="https://github.com/user-attachments/assets/79572d9a-29d5-4c0e-a336-ce3f8018fb05" height="25">|WenXin|ERNIE 4.0、ERNIE 4.0 Turbo、ERNIE 3.5、…|
-|<img src="https://github.com/user-attachments/assets/abb5311e-4d70-4e9c-8fca-e5129ae912fc" height="25">|chatglm|chatglm3-6b、chatglm-6b-v2、…|
-|<img src="https://github.com/user-attachments/assets/fe265f24-4ea6-4ff2-9b50-58ab6706a5f5" height="25">|BaiChuan|baichuan2-turbo、baichuan2-13b-chat-v1、…|
-|<img src="https://github.com/user-attachments/assets/41ffe268-392f-4ab9-b42d-e30dbd70d66b" height="25">|Doubao|Doubao-pro-128k、Doubao-pro-32k、Doubao-lite-128k、…|
+|-|Vendors|                                                                                                         Models                                                                                                          |
+|:-----:|:--------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|<img src="https://github.com/user-attachments/assets/b7b0f2ce-3250-4008-b6d7-4712a983deb9" height="25">|Qwen| qwen3 Series（qwen3-235b-a22b、qwen3-32b、qwen3-30b-a3b, etc.） 、qwen2.5-72b-instruct、qwq-32b-preview、qwen-max、… |
+|<img src="https://github.com/user-attachments/assets/5a997feb-bef4-4e53-ac3e-d38221e5399c" height="25">|Deepseek|                            deepseek-r1、deepseek-v3、deepseek-r1-distill-qwen-32b、…                            |
+|<img src="https://github.com/user-attachments/assets/0b50e555-65e8-49b2-b725-f3f71ee7daed" height="25">|OpenAI|                                GPT-4o、GPT-4o mini、OpenAI o1、OpenAI o3-mini、…                                 |
+|<img src="https://github.com/user-attachments/assets/60fe0a70-0b47-4ac7-9bc9-8e860732ace9" height="25">|Claude|                             claude 3.7 sonnet 、Claude 3.5 Sonnet、Claude 3 Opus、…                             |
+|<img src="https://github.com/user-attachments/assets/334c7f09-7eae-4a65-a70f-2e6531964224" height="25">|Gemini|                  Gemini 2.5 Pro、Gemini 2.0 Flash、Gemini 2.0 Flash Thinking、Gemini 1.5 Pro、…                  |
+|<img src="https://github.com/user-attachments/assets/8e41c73f-3103-4305-ad1f-56116ea55523" height="25">|Llama|                      llama3.3-70b-instruct、llama3.2-3b-instruct、llama3.2-1b-instruct、…                       |
+|<img src="https://github.com/user-attachments/assets/19d264c6-e499-4913-9d6d-314d392f2246" height="25">|KIMI|                              moonshot-v1-128k、moonshot-v1-32k、moonshot-v1-8k、…                               |
+|<img src="https://github.com/user-attachments/assets/79572d9a-29d5-4c0e-a336-ce3f8018fb05" height="25">|WenXin|                                    ERNIE 4.0、ERNIE 4.0 Turbo、ERNIE 3.5、…                                     |
+|<img src="https://github.com/user-attachments/assets/abb5311e-4d70-4e9c-8fca-e5129ae912fc" height="25">|chatglm|                                         chatglm3-6b、chatglm-6b-v2、…                                          |
+|<img src="https://github.com/user-attachments/assets/fe265f24-4ea6-4ff2-9b50-58ab6706a5f5" height="25">|BaiChuan|                                   baichuan2-turbo、baichuan2-13b-chat-v1、…                                    |
+|<img src="https://github.com/user-attachments/assets/41ffe268-392f-4ab9-b42d-e30dbd70d66b" height="25">|Doubao|                              Doubao-pro-128k、Doubao-pro-32k、Doubao-lite-128k、…                               |
 
-For example, to use deepseek model, you can simply set DEEPSEEK_API_KEY value in the custom_key.toml file, and set the llm_model name in the agent configuration file to 'default_deepseek_llm' and you're all set. For more infomation about llm configuration, please refer to [switch-the-llm](https://github.com/antgroup/agentUniverse/blob/master/docs/guidebook/en/Get_Start/2.Run_Your_First_Tutorial_Example.md#switch-the-llm).
-
-
-****************************************
-
-## Citation
-
-The agentUniverse project is supported by the following research achievements.
-
-BibTeX formatted
-```text
-@misc{wang2024peerexpertizingdomainspecifictasks,
-      title={PEER: Expertizing Domain-Specific Tasks with a Multi-Agent Framework and Tuning Methods}, 
-      author={Yiying Wang and Xiaojing Li and Binzhu Wang and Yueyang Zhou and Han Ji and Hong Chen and Jinshi Zhang and Fei Yu and Zewei Zhao and Song Jin and Renji Gong and Wanqing Xu},
-      year={2024},
-      eprint={2407.06985},
-      archivePrefix={arXiv},
-      primaryClass={cs.AI},
-      url={https://arxiv.org/abs/2407.06985}, 
-}
-```
-Overview: This document introduces in detailed the mechanisms and principles underlying the PEER multi-agent framework. The experimental section assigned scores across seven dimensions: completeness, relevance, conciseness, factualness, logicality, structure, and comprehensiveness, with a maximum score of 5 points for each dimension. On average, the PEER model scored higher in each evaluation dimension compared to BabyAGI, and show notable advantages particularly in completeness, relevance, logicality, structure, and comprehensiveness. Furthermore, when tested with the GPT-3.5 Turbo (16k) model, the PEER model achieved a superior accuracy rate of 83% compared to BabyAGI, and with the GPT-4 model, it achieved an accuracy rate of 81%. For more details, please refer to the document. 
-🔗https://arxiv.org/pdf/2407.06985
+For example, to use deepseek model, you can simply set DEEPSEEK_API_KEY value in the custom_key.toml file, and set the llm_model name in the agent configuration file to 'default_deepseek_llm' and you're all set. For more information about llm configuration, please refer to [switch-the-llm](https://github.com/agentuniverse-ai/agentUniverse/blob/master/docs/guidebook/en/Get_Start/2.Run_Your_First_Tutorial_Example.md#switch-the-llm).
 
 ****************************************
 
@@ -73,7 +51,7 @@ Overview: This document introduces in detailed the mechanisms and principles und
 
 * [Quick Start](#Quick-Start)  
 * [How to build an agent application](#How-to-build-an-agent-application)
-* [Setup the visual agentic workflow platform](#Setup-the-visual-agentic-workflow-platform)
+* [Setup the visual agentic workflow platform](#Set-up-the-visual-agentic-workflow-platform)
 * [Why use agentUniverse](#Why-use-agentUniverse)  
 * [Sample Apps](#Sample-Apps)  
 * [Documents](#Documents)  
@@ -108,6 +86,12 @@ You can further understand how to break down intelligent capabilities into multi
 #### Creating and Using Agent Templates
 You can learn how to create effective agent patterns into templates through the chapter [Creating and Using Agent Templates](docs/guidebook/en/Get_Start/5.Creating_and_Using_Agent_Templates.md). This will greatly enhance the efficiency of constructing subsequent agents and facilitate dissemination.
 
+#### Using and Publishing MCP Servers
+You can learn how to quickly use or publish MCP servers in agentUniverse framework by referring to [How to Use MCP Servers](docs/guidebook/en/How-to/Use%20and%20Publish%20MCP%20Server/How_to_Use_MCP_Servers.md) and [How to Publish MCP Servers](docs/guidebook/en/How-to/Use%20and%20Publish%20MCP%20Server/How_to_Publish_MCP_Servers.md).
+
+#### Agent Application Observability
+agentUniverse provides a standardized observability framework for agent applications. Based on the OpenTelemetry protocol, it enables comprehensive data collection and monitoring of critical components such as agents, LLMs, and tools, facilitating full lifecycle tracking of agents. You can learn how to utilize these observability capabilities in the [Agent Application Observability](docs/guidebook/en/In-Depth_Guides/Tech_Capabilities/Observability/Observability_with_OTEL.md) section.
+
 #### Common Tips and Advanced Techniques
 You can learn more advanced techniques in the agent application building process through other documents in the [Get_Start](./docs/guidebook/en/Get_Start), such as how to add a memory module into the intelligent agent process and how to effectively manage prompts within the project.
 ****************************************
@@ -123,7 +107,7 @@ pip install magent-ui ruamel.yaml
 
 **One-click Run**
 
-Run [product_application.py](examples/sample_standard_app/bootstrap/platform/product_application.py) in sample_standard_app/bootstrap/platform for quick startup.
+Run [product_application.py](examples/sample_apps/workflow_agent_app/bootstrap/platform/product_application.py) in ample_apps/workflow_agent_app/bootstrap/platform for quick startup.
 
 For more details, refer to [Quick Start for Product Platform](docs/guidebook/en/How-to/Guide to Visual Agentic Workflow Platform/Product_Platform_Quick_Start.md) and the [Advanced Guide](docs/guidebook/en/How-to/Guide to Visual Agentic Workflow Platform/Product_Platform_Advancement_Guide.md).
 
@@ -139,7 +123,7 @@ This feature is jointly developed by [difizen](https://github.com/difizen/magent
 The core of agentUniverse provides all the essential components needed to build a single intelligent agent, the collaboration mechanisms between multiple agents, and allows for the injection of expert knowledge. The enables developers to effortlessly create intelligent applications equipped with professional know-how.
 
 ### Multi Agent Collaboration
-AgentUniverse offers several multi-agent collaboration model components that have been validated in real-world industries. Among these, the "PEER" model stands out as one of the most distinctive.
+agentUniverse offers several multi-agent collaboration model components that have been validated in real-world industries. Among these, the "PEER" model stands out as one of the most distinctive.
 
 The PEER model utilizes agents with four distinct responsibilities: Planning, Executing, Expressing, and Reviewing. This structure allows for the decomposition and step-by-step execution of complex problems and enables autonomous iteration based on evaluation feedback, ultimately enhancing performance in reasoning and analytical tasks. This model is particularly effective in scenarios that require multi-step decomposition and in-depth analysis, such as event interpretation, macroeconomic analysis, and the feasibility analysis of business proposals.
 
@@ -198,7 +182,7 @@ https://private-user-images.githubusercontent.com/39180831/355437700-192f712d-1b
 ## Support
 
 ### Submit Questions via GitHub Issues
-😊 We recommend submitting your queries using [GitHub Issues](https://github.com/antgroup/agentUniverse/issues), we typically respond within 2 business days.
+😊 We recommend submitting your queries using [GitHub Issues](https://github.com/agentuniverse-ai/agentUniverse/issues), we typically respond within 2 business days.
 
 ### Contact Us via Discord
 😊 Join our [Discord Channel](https://discord.gg/DHFcdkWAhn) to interact with us.
@@ -211,6 +195,30 @@ https://private-user-images.githubusercontent.com/39180831/355437700-192f712d-1b
 
 ### twitter
 ID: [@agentuniverse_](https://x.com/agentuniverse_)
+
+
+****************************************
+
+## Citation
+
+The PEER multi-agent framework build in agentUniverse project is supported by the following research achievements.
+
+BibTeX formatted
+```text
+@misc{wang2024peerexpertizingdomainspecifictasks,
+      title={PEER: Expertizing Domain-Specific Tasks with a Multi-Agent Framework and Tuning Methods}, 
+      author={Yiying Wang and Xiaojing Li and Binzhu Wang and Yueyang Zhou and Han Ji and Hong Chen and Jinshi Zhang and Fei Yu and Zewei Zhao and Song Jin and Renji Gong and Wanqing Xu},
+      year={2024},
+      eprint={2407.06985},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2407.06985}, 
+}
+```
+Overview: This document introduces in detailed the mechanisms and principles underlying the PEER multi-agent framework. The experimental section assigned scores across seven dimensions: completeness, relevance, conciseness, factualness, logicality, structure, and comprehensiveness, with a maximum score of 5 points for each dimension. On average, the PEER model scored higher in each evaluation dimension compared to BabyAGI, and show notable advantages particularly in completeness, relevance, logicality, structure, and comprehensiveness. Furthermore, when tested with the GPT-3.5 Turbo (16k) model, the PEER model achieved a superior accuracy rate of 83% compared to BabyAGI, and with the GPT-4 model, it achieved an accuracy rate of 81%. For more details, please refer to the document. 
+🔗https://arxiv.org/pdf/2407.06985
+
+****************************************
 
 ### Acknowledgements
 

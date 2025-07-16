@@ -24,6 +24,74 @@ Note - 对于版本的额外说明。
 ***************************************************
 
 # 版本更新记录
+## [0.0.18] - 2025-07-10
+### Added
+- 新增基于OTel协议的智能体应用可观测能力
+制定aU智能体应用的观测标准，基于OTel(OpenTelemetry)协议，对智能体、模型、工具等关键组件的token消耗、耗时、成功率等核心指标以及调用链（trace）进行全面采集与观测，并适配 SigNoz、Jaeger、Prometheus 等主流观测框架，从而实现对智能体全生命周期的可观测性支持。
+
+- 新增异步SLS日志Sink、Sender组件
+
+### Fixed
+- MCP服务调用Stdio模式下env参数支持用户配置透传
+
+### Note
+- 第三方包依赖变更（格式：原版本->新版本，只包含一个版本号为新引入）
+  - openai ("1.13.3" -> "1.55.3")
+  - opentelemetry-api ("^1.25.0")
+  - opentelemetry-sdk ("^1.25.0")
+  - opentelemetry-semantic-conventions (">=0.48b0")
+  - opentelemetry-exporter-otlp-proto-http ("^1.25.0")
+  - httpx ("0.27.2" -> ">=0.27.2")
+  - jsonlines ("^4.0.0")
+- 其他代码优化与文档更新
+
+## [0.0.17] - 2025-05-22
+### Added
+- 新增MCP接入与发布能力
+  - 通过该功能可快速接入MCPServer供智能体使用，亦可将aU中的工具/工具集合发布成为MCPServer对外服务
+- 新增工具包ToolKit能力
+  - 可对于一系列工具进行分类管理并供智能体配置使用
+- 新增知识Reader与加工组件
+  - 新增语雀文档加载组件
+- 工具基类中新增async_execute方法，开放工具异步调用能力
+- trace模块新增自定义插件扩展，支持自定义处理trace采集内容
+- 新增千问3系列模型配置
+
+### Changed
+- Request上下文优化
+
+### Deprecated
+- ToolInput对象废弃  
+工具入参ToolInput对象写法已不推荐(将在3个版本后废弃),可关注agentuniverse.agent.action.tool.common_tool最新推荐写法
+
+### Note
+- 新增第三方包依赖
+  - mcp ("~=1.9.0")
+  - opentracing (">=2.4.0,<3.0.0")
+- 其他代码优化与文档更新
+
+## [0.0.16] - 2025-04-17
+### Added
+- 新增工具插件
+  - 新增基于opencv图像OCR能力的图片文字提取工具
+  - 新增shell命令状态查询与执行工具
+  - 新增通用文件读写工具
+  - 新增Tavily智能搜索工具
+- 新增知识Reader与加工组件
+  - 新增飞书云文档加载组件
+  - 新增通用代码加载组件
+  - 新增基于AST(Abstract Syntax Tree)代码处理组件
+- 新增llm模型通道配置能力，支持模型基于不同通道平台提供方进行切换,详情可见[文档](https://github.com/agentuniverse-ai/agentUniverse/blob/master/docs/guidebook/zh/In-Depth_Guides/%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/%E6%A8%A1%E5%9E%8B/%E6%A8%A1%E5%9E%8B%E9%80%9A%E9%81%93.md)
+- 新增Google gemini 2.5 pro模型配置
+- 支持aU智能体配置接入chatbox、CherryStudio客户端,详情可见[文档](https://github.com/agentuniverse-ai/agentUniverse/blob/master/docs/guidebook/zh/How-to/%E4%BD%BF%E7%94%A8chatbox%E7%AD%89%E5%B7%A5%E5%85%B7%E8%BF%9E%E6%8E%A5aU/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8chatbox%E7%AD%89%E5%B7%A5%E5%85%B7%E8%BF%9E%E6%8E%A5agentUniverse.md)
+
+### Note
+- 部分依赖第三方包版本限制放开
+  - tiktoken ('0.5.2' -> '<1.0.0')
+  - pydantic ('~2.6.4' -> '^2.6.4')
+- 基于Python3.10、3.11与3.12版本的主干回归通过
+- 其他代码优化与文档更新
+
 ## [0.0.15] - 2025-03-03
 ### Added
 - embedding组件新增  
@@ -98,9 +166,9 @@ Note - 对于版本的额外说明。
 
 ### Note 
 - system_db_uri默认路径优化  
-默认路径已兼容windows平台，详情见[issue142](https://github.com/antgroup/agentUniverse/issues/142)
+默认路径已兼容windows平台，详情见[issue142](https://github.com/agentuniverse-ai/agentUniverse/issues/142)
 - ReactAgent支持链停止词配置化  
-ReactAgent yaml配置目前已经支持stop_sequence关键词，用户可以自行配置链停止词,详情见[issue127](https://github.com/antgroup/agentUniverse/issues/127)
+ReactAgent yaml配置目前已经支持stop_sequence关键词，用户可以自行配置链停止词,详情见[issue127](https://github.com/agentuniverse-ai/agentUniverse/issues/127)
 - 新增RAG原理介绍与RAG快速构建指导文档，请关注README与用户指南相应部分。
 - 新增智能体产品化平台高阶指导文档，请关注README与用户指南相应部分。
 - 部分代码优化与文档更新

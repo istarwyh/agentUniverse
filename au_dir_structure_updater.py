@@ -190,18 +190,18 @@ def migrate_files(source_root, target_root):
         },
         {
             'source': 'app/bootstrap/product_application.py',
-            'target': 'boostrap/platform'
+            'target': 'bootstrap/platform'
         },
         {
-            'source': 'app/boostrap/product_application.py',
-            'target': 'boostrap/platform'
+            'source': 'app/bootstrap/product_application.py',
+            'target': 'bootstrap/platform'
         },
         {
             'source': 'app/bootstrap/server_application.py',
             'target': 'boostrap/intelligence'
         },
         {
-            'source': 'app/boostrap/server_application.py',
+            'source': 'app/bootstrap/server_application.py',
             'target': 'boostrap/intelligence'
         },
     ]

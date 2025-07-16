@@ -11,6 +11,7 @@ import sys
 from typing import Optional
 from pathlib import Path
 from typing_extensions import deprecated
+import asyncio
 
 import loguru
 
@@ -110,11 +111,39 @@ def _add_sls_log_handler():
                            LoggingConfig.sls_log_queue_max_size,
                            LoggingConfig.sls_log_send_interval)
     sls_sender.start_batch_send_thread()
+
+    def _sls_filter(record):
+        return record["extra"].get('log_type') == LogTypeEnum.default or record["extra"].get('log_type') == LogTypeEnum.sls
     loguru.logger.add(
         sink=SlsSink(sls_sender),
         format=LoggingConfig.log_format,
+        filter=_sls_filter,
         level=LoggingConfig.log_level,
         enqueue=True
+    )
+
+
+def _add_sls_log_async_handler():
+    """Add a handler to record all """
+    from agentuniverse_extension.logger.sls_sink import AsyncSlsSink, AsyncSlsSender
+    sls_sender = AsyncSlsSender(LoggingConfig.sls_project,
+                           LoggingConfig.sls_log_store,
+                           LoggingConfig.sls_endpoint,
+                           LoggingConfig.access_key_id,
+                           LoggingConfig.access_key_secret,
+                           LoggingConfig.sls_log_queue_max_size,
+                           LoggingConfig.sls_log_send_interval)
+    loop = asyncio.get_event_loop_policy().get_event_loop()
+    loop.create_task(sls_sender.start())
+
+    def _sls_filter(record):
+        return record["extra"].get('log_type') == LogTypeEnum.default or record["extra"].get('log_type') == LogTypeEnum.sls
+    loguru.logger.add(
+        sink=AsyncSlsSink(sls_sender),
+        format=LoggingConfig.log_format,
+        filter=_sls_filter,
+        level=LoggingConfig.log_level,
+        enqueue=False
     )
 
 
@@ -192,6 +221,14 @@ def add_sink(sink, log_level: Optional[LOG_LEVEL] = None) -> bool:
     return False
 
 
+def is_in_coroutine_context():
+    try:
+        asyncio.current_task()
+        return True
+    except RuntimeError:
+        return False
+
+
 def init_loggers(config_path: Optional[str] = None):
     """Parse config and initialize all loggers and handlers.
 
@@ -204,5 +241,8 @@ def init_loggers(config_path: Optional[str] = None):
     _add_std_out_handler()
     _add_error_log_handler()
     if LoggingConfig.log_extend_module_switch["sls_log"]:
-        _add_sls_log_handler()
+        if is_in_coroutine_context():
+            _add_sls_log_async_handler()
+        else:
+            _add_sls_log_handler()
     _add_standard_logger()
