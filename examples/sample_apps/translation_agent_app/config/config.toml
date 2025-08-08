@@ -4,35 +4,35 @@ appname = 'demo_app'
 
 [CORE_PACKAGE]
 # Perform a full component scan and registration for all the paths under this list.
-default = ['traslation_agent_app.intelligence.agentic']
+default = ['translation_agent_app.intelligence.agentic']
 # Scan and register agent components for all paths under this list, with priority over the default.
-agent = ['traslation_agent_app.intelligence.agentic.agent']
+agent = ['translation_agent_app.intelligence.agentic.agent']
 # Scan and register knowledge components for all paths under this list, with priority over the default.
-knowledge = ['traslation_agent_app.intelligence.agentic.knowledge']
+knowledge = ['translation_agent_app.intelligence.agentic.knowledge']
 # Scan and register llm components for all paths under this list, with priority over the default.
-llm = ['traslation_agent_app.intelligence.agentic.llm']
+llm = ['translation_agent_app.intelligence.agentic.llm']
 # Scan and register planner components for all paths under this list, with priority over the default.
 planner = []
 # Scan and register tool components for all paths under this list, with priority over the default.
-tool = ['traslation_agent_app.intelligence.agentic.tool']
+tool = ['translation_agent_app.intelligence.agentic.tool']
 # Scan and register memory components for all paths under this list, with priority over the default.
-memory = ['traslation_agent_app.intelligence.agentic.memory']
+memory = ['translation_agent_app.intelligence.agentic.memory']
 # Scan and register service components for all paths under this list, with priority over the default.
-service = ['traslation_agent_app.intelligence.service.agent_service']
+service = ['translation_agent_app.intelligence.service.agent_service']
 # Scan and register prompt components for all paths under this list, with priority over the default.
-prompt = ['traslation_agent_app.intelligence.agentic.prompt']
+prompt = ['translation_agent_app.intelligence.agentic.prompt']
 # Scan and register store components for all paths under this list, with priority over the default.
-store = ['traslation_agent_app.intelligence.agentic.knowledge.store']
+store = ['translation_agent_app.intelligence.agentic.knowledge.store']
 # Scan and register rag_router components for all paths under this list, with priority over the default.
-rag_router = ['traslation_agent_app.intelligence.agentic.knowledge.rag_router']
+rag_router = ['translation_agent_app.intelligence.agentic.knowledge.rag_router']
 # Scan and register doc_processor components for all paths under this list, with priority over the default.
-doc_processor = ['traslation_agent_app.intelligence.agentic.knowledge.doc_processor']
+doc_processor = ['translation_agent_app.intelligence.agentic.knowledge.doc_processor']
 # Scan and register query_paraphraser components for all paths under this list, with priority over the default.
-query_paraphraser = ['traslation_agent_app.intelligence.agentic.knowledge.query_paraphraser']
+query_paraphraser = ['translation_agent_app.intelligence.agentic.knowledge.query_paraphraser']
 # Scan and register memory_compressor components for all paths under this list, with priority over the default.
-memory_compressor = ['traslation_agent_app.intelligence.agentic.memory.memory_compressor']
+memory_compressor = ['translation_agent_app.intelligence.agentic.memory.memory_compressor']
 # Scan and register memory_storage components for all paths under this list, with priority over the default.
-memory_storage = ['traslation_agent_app.intelligence.agentic.memory.memory_storage']
+memory_storage = ['translation_agent_app.intelligence.agentic.memory.memory_storage']
 
 [SUB_CONFIG_PATH]
 # Log config file path, an absolute path or a relative path based on the dir where the current config file is located.
