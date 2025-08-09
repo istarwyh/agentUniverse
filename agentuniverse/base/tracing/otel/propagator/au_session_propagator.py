@@ -11,7 +11,7 @@
 # @Time    : 2025/5/22 16:10
 # @Author  : fanen.lhy
 # @Email   : fanen.lhy@antgroup.com
-# @FileName: sofa_tracer_propogator.py
+# @FileName: sofa_tracer_propagator.py
 import typing
 
 from opentelemetry import trace

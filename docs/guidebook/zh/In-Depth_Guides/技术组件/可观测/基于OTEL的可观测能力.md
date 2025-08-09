@@ -30,7 +30,7 @@ agentUniverse中提供了三种Instrument，分别基于LLM、Tool以及Agent维
 
 #### 功能特点
 
-- 在 Span 开始时自动添加Sessison ID 属性，属性名为`au.trace.session.id`
+- 在 Span 开始时自动添加 Session ID 属性，属性名为`au.trace.session.id`
 - 如果没有会话 ID，则设置为 `-1`
 
 ### 4. AUSessionPropagator
